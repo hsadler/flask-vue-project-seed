@@ -1,13 +1,16 @@
+***** This is a work in progress *****
+
 # flask-vue-project-seed
+
 > SPA quick start using Python Flask and Vue.js. Containerized with Docker.
 
-## ***** This is a work in progress *****
+## Plan to use:
 
-### Plan to use:
-
-Backend:
+OS/Containerization:
 - Docker
 - Alpine
+
+Backend:
 - Nginx
 - uWSGI
 - Python 3
