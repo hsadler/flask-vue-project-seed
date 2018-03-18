@@ -3,5 +3,6 @@ X get Flask container working
 X figure out where to put frontend files
 X serve Vue SPA index with Flask
 X serve static files with Flask
+- get scss compiling correctly with webpack
 - figure out dev mode and prod mode for backend and frontend
 
