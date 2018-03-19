@@ -8,18 +8,27 @@ COPY requirements.txt /tmp/requirements.txt
 # OS installs, pip installs, etc. (https://pkgs.alpinelinux.org/packages)
 RUN apk add --no-cache \
     python3=3.6.3-r9 \
-    bash=4.4.19-r1 && \
+    nodejs=8.9.3-r0 \
+    nodejs-npm=8.9.3-r0 \
+    bash=4.4.19-r1 \
+    supervisor=3.3.3-r1 && \
     python3 -m ensurepip && \
     rm -r /usr/lib/python*/ensurepip && \
     pip3 install pip setuptools==38.5.1 && \
     pip3 install -r /tmp/requirements.txt
 
+# Custom Supervisord config
+COPY supervisord.dev.conf /etc/supervisord.conf
+
 # copy app dir
 COPY ./app /app
 WORKDIR /app
+
+# npm install modules
+RUN npm install
 
 # set environment vars
 ENV FLASK_APP=main.py
 ENV FLASK_DEBUG=1
 
-CMD ["flask", "run", "--host=0.0.0.0", "--port=80"]
+CMD ["/usr/bin/supervisord"]

@@ -1,14 +1,9 @@
 
+import requests
+
 from flask import (
     Flask,
-    request,
-    render_template,
-    Markup,
-    redirect,
-    abort,
-    url_for,
-    session,
-    escape
+    render_template
 )
 
 
@@ -20,11 +15,14 @@ app = Flask(
 )
 
 
-# routes
+# serve dev or prod index
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
-    return render_template('index.html')
+    if app.debug:
+        return requests.get('http://localhost:8080/{}'.format(path)).text
+    else:
+        return render_template('index.html')
 
 
 # run the app if executed as main file to python interpreter
