@@ -8,6 +8,8 @@ COPY requirements.txt /tmp/requirements.txt
 # OS installs, pip installs, etc. (https://pkgs.alpinelinux.org/packages)
 RUN apk add --no-cache \
     python3=3.6.3-r9 \
+    nodejs=8.9.3-r0 \
+    nodejs-npm=8.9.3-r0 \
     bash=4.4.19-r1 \
     nginx=1.12.2-r3 \
     uwsgi=2.0.16-r0 \
@@ -35,5 +37,8 @@ COPY supervisord.conf /etc/supervisord.conf
 # Add demo app
 COPY ./app /app
 WORKDIR /app
+
+RUN npm install \
+    npm run build
 
 CMD ["/usr/bin/supervisord"]
