@@ -1,8 +1,18 @@
 
+TODO:
+
 X get Flask container working
 X figure out where to put frontend files
 X serve Vue SPA index with Flask
 X serve static files with Flask
+X add node_modules to docker image
+X figure out dev mode and prod mode for backend and frontend
+- get docker dev mode process to update files on save or script run
 - get scss compiling correctly with webpack
-- figure out dev mode and prod mode for backend and frontend
 
+
+NOTES:
+
+- confirmed that Flask development server does reflect file changes without
+	restart
+- confirmed webpack-dev-server does hot reload on file change

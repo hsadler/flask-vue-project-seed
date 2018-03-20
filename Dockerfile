@@ -38,7 +38,7 @@ COPY supervisord.conf /etc/supervisord.conf
 COPY ./app /app
 WORKDIR /app
 
-RUN npm install \
-    npm run build
+RUN npm install
+RUN npm run build
 
 CMD ["/usr/bin/supervisord"]
