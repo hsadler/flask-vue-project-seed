@@ -1,0 +1,20 @@
+2018-03-21 06:04:15,738 CRIT Supervisor running as root (no user in config file)
+2018-03-21 06:04:15,793 INFO supervisord started with pid 1
+2018-03-21 06:04:16,801 INFO spawned: 'npm-dev' with pid 8
+2018-03-21 06:04:16,807 INFO spawned: 'flask-dev' with pid 9
+2018-03-21 06:04:17,813 INFO success: npm-dev entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2018-03-21 06:04:17,814 INFO success: flask-dev entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2018-03-21 06:33:54,295 WARN received SIGINT indicating exit request
+2018-03-21 06:33:54,299 INFO waiting for npm-dev, flask-dev to die
+2018-03-21 06:33:54,516 INFO stopped: flask-dev (exit status 0)
+2018-03-21 06:33:54,574 INFO stopped: npm-dev (terminated by SIGTERM)
+2018-03-21 06:35:30,869 CRIT Supervisor running as root (no user in config file)
+2018-03-21 06:35:30,875 INFO supervisord started with pid 1
+2018-03-21 06:35:31,884 INFO spawned: 'npm-dev' with pid 8
+2018-03-21 06:35:31,890 INFO spawned: 'flask-dev' with pid 9
+2018-03-21 06:35:33,279 INFO success: npm-dev entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2018-03-21 06:35:33,280 INFO success: flask-dev entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2018-03-21 06:36:32,812 WARN received SIGINT indicating exit request
+2018-03-21 06:36:32,816 INFO waiting for npm-dev, flask-dev to die
+2018-03-21 06:36:32,915 INFO stopped: flask-dev (exit status 0)
+2018-03-21 06:36:32,927 INFO stopped: npm-dev (terminated by SIGTERM)

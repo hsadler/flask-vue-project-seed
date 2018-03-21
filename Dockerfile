@@ -2,7 +2,7 @@
 # parent image
 FROM alpine:3.7
 
-# Copy python requirements file
+# copy python requirements file
 COPY requirements.txt /tmp/requirements.txt
 
 # OS installs, pip installs, etc. (https://pkgs.alpinelinux.org/packages)
@@ -22,23 +22,25 @@ RUN apk add --no-cache \
     rm /etc/nginx/conf.d/default.conf && \
     rm -r /root/.cache
 
-# Copy the Nginx global conf
+# copy the Nginx global conf
 COPY nginx.conf /etc/nginx/
 
-# Copy the Flask Nginx site conf
+# copy the Flask Nginx site conf
 COPY flask-app-nginx.conf /etc/nginx/conf.d/
 
-# Copy the base uWSGI ini file to enable default dynamic uwsgi process number
+# copy the base uWSGI ini file to enable default dynamic uwsgi process number
 COPY uwsgi.ini /etc/uwsgi/
 
-# Custom Supervisord config
+# copy custom Supervisord config
 COPY supervisord.conf /etc/supervisord.conf
 
-# Add demo app
+# copy app
 COPY ./app /app
 WORKDIR /app
 
+# run node procs
 RUN npm install
 RUN npm run build
 
+# start server with supervisord
 CMD ["/usr/bin/supervisord"]

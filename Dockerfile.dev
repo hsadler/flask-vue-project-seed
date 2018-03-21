@@ -2,7 +2,7 @@
 # parent image
 FROM alpine:3.7
 
-# Copy python requirements file
+# copy python requirements file
 COPY requirements.txt /tmp/requirements.txt
 
 # OS installs, pip installs, etc. (https://pkgs.alpinelinux.org/packages)
@@ -17,18 +17,11 @@ RUN apk add --no-cache \
     pip3 install pip setuptools==38.5.1 && \
     pip3 install -r /tmp/requirements.txt
 
-# Custom Supervisord config
+# custom Supervisord config
 COPY supervisord.dev.conf /etc/supervisord.conf
-
-# copy app dir
-COPY ./app /app
-WORKDIR /app
-
-# npm install modules
-# RUN npm install
 
 # set environment vars
 ENV FLASK_APP=main.py
 ENV FLASK_DEBUG=1
 
-CMD ["/usr/bin/supervisord"]
+# the rest is handled by the 'docker run' command in dev.sh

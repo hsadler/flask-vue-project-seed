@@ -7,12 +7,8 @@ X serve Vue SPA index with Flask
 X serve static files with Flask
 X add node_modules to docker image
 X figure out dev mode and prod mode for backend and frontend
-- get docker dev mode process to update files on save or script run
+X get docker dev mode process to update files on save
 - get scss compiling correctly with webpack
+- add axios, http service, and backend API call to Vue client
+- add Vuetify
 
-
-NOTES:
-
-- confirmed that Flask development server does reflect file changes without
-	restart
-- confirmed webpack-dev-server does hot reload on file change
