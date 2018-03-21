@@ -8,7 +8,9 @@ X serve static files with Flask
 X add node_modules to docker image
 X figure out dev mode and prod mode for backend and frontend
 X get docker dev mode process to update files on save
+X cleanup root directory configs, put in own directory
 - get scss compiling correctly with webpack
 - add axios, http service, and backend API call to Vue client
 - add Vuetify
+
 

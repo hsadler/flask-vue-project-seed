@@ -23,16 +23,16 @@ RUN apk add --no-cache \
     rm -r /root/.cache
 
 # copy the Nginx global conf
-COPY nginx.conf /etc/nginx/
+COPY config/nginx.conf /etc/nginx/
 
 # copy the Flask Nginx site conf
-COPY flask-app-nginx.conf /etc/nginx/conf.d/
+COPY config/flask-app-nginx.conf /etc/nginx/conf.d/
 
 # copy the base uWSGI ini file to enable default dynamic uwsgi process number
-COPY uwsgi.ini /etc/uwsgi/
+COPY config/uwsgi.ini /etc/uwsgi/
 
 # copy custom Supervisord config
-COPY supervisord.conf /etc/supervisord.conf
+COPY config/supervisord.conf /etc/supervisord.conf
 
 # copy app
 COPY ./app /app

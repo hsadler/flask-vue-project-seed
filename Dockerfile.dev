@@ -18,7 +18,7 @@ RUN apk add --no-cache \
     pip3 install -r /tmp/requirements.txt
 
 # custom Supervisord config
-COPY supervisord.dev.conf /etc/supervisord.conf
+COPY config/supervisord.dev.conf /etc/supervisord.conf
 
 # set environment vars
 ENV FLASK_APP=main.py
