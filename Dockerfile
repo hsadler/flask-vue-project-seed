@@ -39,8 +39,9 @@ COPY ./app /app
 WORKDIR /app
 
 # run node procs
-RUN npm install
-RUN npm run build
+RUN cd client/ && \
+    npm install && \
+    npm run build
 
 # start server with supervisord
 CMD ["/usr/bin/supervisord"]

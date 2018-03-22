@@ -10,8 +10,8 @@ from flask import (
 # init Flask app instance
 app = Flask(
     __name__,
-    static_folder='./dist/static',
-    template_folder='./dist'
+    static_folder='../client/dist/static',
+    template_folder='../client/dist'
 )
 
 
