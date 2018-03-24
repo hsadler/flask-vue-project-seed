@@ -20,8 +20,9 @@ RUN apk add --no-cache \
 # custom Supervisord config
 COPY config/supervisord.dev.conf /etc/supervisord.conf
 
-# set environment vars
-ENV FLASK_APP=main.py
-ENV FLASK_DEBUG=1
+# npm installs
+COPY app/client/package.json /tmp/package.json
+RUN cd /tmp && npm install
+RUN mkdir -p /app/client && cp -a /tmp/node_modules /app/client/
 
-# the rest is handled by the 'docker run' command in dev.sh
+# the rest is handled by the docker-compose.yml file

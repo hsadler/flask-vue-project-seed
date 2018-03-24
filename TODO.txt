@@ -10,6 +10,7 @@ X figure out dev mode and prod mode for backend and frontend
 X get docker dev mode process to update files on save
 X cleanup root directory configs, put in own directory
 X separate server and client files
+- convert container build and run to docker-compose (for dev and prod modes)
 - get scss compiling correctly with webpack
 - add axios, http service, and backend API call to Vue client
 - add Vuetify

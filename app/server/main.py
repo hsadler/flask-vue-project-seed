@@ -1,9 +1,12 @@
 
+import os
 import requests
 
+from random import randint
 from flask import (
     Flask,
-    render_template
+    render_template,
+    jsonify
 )
 
 
@@ -15,12 +18,24 @@ app = Flask(
 )
 
 
+@app.route('/api/random')
+def random_number():
+    response = {
+        'randomNumber': randint(1, 100)
+    }
+    return jsonify(response)
+
+
 # serve dev or prod index
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
     if app.debug:
-        return requests.get('http://localhost:8080/{}'.format(path)).text
+        port = os.environ['PORT']
+        # return 'http://localhost:{}/{}'.format(port, path)
+        return requests.get(
+            'http://localhost:{}/{}'.format(port, path)
+        ).text
     else:
         return render_template('index.html')
 

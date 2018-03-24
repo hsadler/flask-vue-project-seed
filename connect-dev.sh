@@ -1,1 +1,2 @@
-docker exec -it dev-server bash
+
+docker exec -it flask-vue-dev bash

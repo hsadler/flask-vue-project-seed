@@ -1,0 +1,20 @@
+
+version: '3'
+
+services:
+  webapp:
+    build:
+      context: .
+      dockerfile: 'Dockerfile.dev'
+    image: flask-vue:dev
+    container_name: flask-vue-dev
+    ports:
+     - "4000:80"
+    volumes:
+     - ./app:/app
+     - /app/client/node_modules
+    environment:
+     - FLASK_APP=main.py
+     - FLASK_DEBUG=1
+     - PORT=4000
+    command: /usr/bin/supervisord
