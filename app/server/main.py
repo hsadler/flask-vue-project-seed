@@ -1,7 +1,4 @@
 
-import os
-import requests
-
 from random import randint
 from flask import (
     Flask,
@@ -18,6 +15,7 @@ app = Flask(
 )
 
 
+# sample API route
 @app.route('/api/random')
 def random_number():
     response = {
@@ -26,20 +24,19 @@ def random_number():
     return jsonify(response)
 
 
-# serve dev or prod index
+# serve index for non-API calls
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
-    if app.debug:
-        port = os.environ['PORT']
-        # return 'http://localhost:{}/{}'.format(port, path)
-        return requests.get(
-            'http://localhost:{}/{}'.format(port, path)
-        ).text
-    else:
-        return render_template('index.html')
+    return render_template('index.html')
 
 
 # run the app if executed as main file to python interpreter
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
+
+
+
+
+
+

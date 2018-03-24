@@ -9,7 +9,7 @@ services:
     image: flask-vue:dev
     container_name: flask-vue-dev
     ports:
-     - "4000:80"
+     - "4000:4000"
     volumes:
      - ./app:/app
      - /app/client/node_modules
@@ -17,4 +17,5 @@ services:
      - FLASK_APP=main.py
      - FLASK_DEBUG=1
      - PORT=4000
+     - HOST=0.0.0.0
     command: /usr/bin/supervisord
