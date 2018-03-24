@@ -14,8 +14,12 @@ services:
      - ./app:/app
      - /app/client/node_modules
     environment:
+    # flask vars
+     - FLASK_HOST=0.0.0.0
+     - FLASK_PORT=80
      - FLASK_APP=main.py
      - FLASK_DEBUG=1
-     - PORT=4000
+    # webpack server host and port
      - HOST=0.0.0.0
+     - PORT=4000
     command: /usr/bin/supervisord
