@@ -38,10 +38,15 @@ COPY config/supervisord.conf /etc/supervisord.conf
 COPY ./app /app
 WORKDIR /app
 
-# run node procs
-RUN cd client/ && \
+# npm installs
+COPY app/client/package.json /tmp/package.json
+RUN cd /tmp && \
     npm install && \
+    mkdir -p /app/client && \
+    cp -a /tmp/node_modules /app/client/
+
+# npm build
+RUN cd /app/client && \
     npm run build
 
-# start server with supervisord
-CMD ["/usr/bin/supervisord"]
+# the rest is handled by the docker-compose.yml file

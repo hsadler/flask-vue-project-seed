@@ -1,0 +1,16 @@
+
+version: '3'
+
+services:
+  webapp:
+    build:
+      context: .
+      dockerfile: 'Dockerfile'
+    image: flask-vue
+    container_name: flask-vue
+    ports:
+     - "80:80"
+    volumes:
+     - /app/client/node_modules
+    command: /usr/bin/supervisord
+
