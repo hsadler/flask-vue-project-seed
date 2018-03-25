@@ -1,4 +1,3 @@
-***** This is a work in progress *****
 
 
 # flask-vue-project-seed
@@ -13,6 +12,8 @@
 
 
 ## Notes:
+
+***** This is a work in progress, but... *****
 
 Both the dev and prod mode Docker containers are working at a basic level.
 
