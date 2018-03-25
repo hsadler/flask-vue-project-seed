@@ -12,7 +12,9 @@ X cleanup root directory configs, put in own directory
 X separate server and client files
 X convert container build and run to docker-compose (for dev and prod modes)
 X get scss compiling correctly with webpack
-- add axios, http service, and backend API call to Vue client
-- add Vuetify
+X add axios
+- add service architecture
+- add http service
+- add backend API call to Vue client
 
 
