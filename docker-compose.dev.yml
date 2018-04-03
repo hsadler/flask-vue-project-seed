@@ -1,13 +1,19 @@
 
 version: '3'
 
+
 services:
+
   webapp-dev:
     build:
       context: .
       dockerfile: 'Dockerfile.dev'
     image: flask-vue:dev
     container_name: flask-vue-dev
+    restart: always
+    links:
+      - mysql:mysql
+      - redis:redis
     ports:
      - "4000:4000"
     volumes:
@@ -23,3 +29,30 @@ services:
      - HOST=0.0.0.0
      - PORT=4000
     command: /usr/bin/supervisord
+
+  mysql:
+    image: mysql:5.7
+    container_name: flask-vue-mysql
+    restart: always
+    volumes:
+     - ./mysql_store_dev:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=example
+      - MYSQL_DATABASE=test
+
+  adminer:
+    image: adminer:4.6.2
+    container_name: flask-vue-adminer
+    restart: always
+    links:
+      - mysql:mysql
+    ports:
+      - "8080:8080"
+
+  redis:
+    image: redis:4.0.9-alpine
+    container_name: flask-vue-redis
+    restart: always
+    volumes:
+     - ./redis_store_dev:/data
+

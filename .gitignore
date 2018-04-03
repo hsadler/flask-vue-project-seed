@@ -1,7 +1,13 @@
 
+mysql_store
+mysql_store_dev
+redis_store
+redis_store_dev
+
 .DS_Store
 node_modules/
 /dist/
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
