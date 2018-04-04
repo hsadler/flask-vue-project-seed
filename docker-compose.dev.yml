@@ -32,7 +32,7 @@ services:
 
   mysql:
     image: mysql:5.7
-    container_name: flask-vue-mysql
+    container_name: flask-vue-mysql-dev
     restart: always
     volumes:
      - ./mysql_store_dev:/var/lib/mysql
@@ -42,7 +42,7 @@ services:
 
   adminer:
     image: adminer:4.6.2
-    container_name: flask-vue-adminer
+    container_name: flask-vue-adminer-dev
     restart: always
     links:
       - mysql:mysql
@@ -51,7 +51,7 @@ services:
 
   redis:
     image: redis:4.0.9-alpine
-    container_name: flask-vue-redis
+    container_name: flask-vue-redis-dev
     restart: always
     volumes:
      - ./redis_store_dev:/data
