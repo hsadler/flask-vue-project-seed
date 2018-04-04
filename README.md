@@ -57,22 +57,35 @@ http://localhost
 ```
 
 
-## Plans to use/add:
+## Tech Stack:
 
 OS/Containerization:
 - Docker
+- Docker Compose
 - Alpine
+
+Languages:
+- Python3
+- Node.js
+- Javascript ES6
+
+Datastores:
+- MySQL
+- Redis
 
 Backend:
 - Nginx
 - uWSGI
-- Python 3
+- Supervisor
 - Flask
-- MySQL or MongoDB?
-- Reddis?
 
 Frontend:
-- Javascript ES6
 - Vue.js
-- Vuetify
 - Scss
+
+Tools:
+- npm
+- pip3
+- Adminer
+- Webpack
+

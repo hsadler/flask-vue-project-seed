@@ -16,11 +16,15 @@ X add axios
 X add service architecture
 X add http service
 X add backend API call to Vue client
+X add mysql
+X add reddis cache
 
-- add mysql
-- add data object (model) layer
-- add backend api routing
+// Backend architecture layers
+- datastore drivers (intermediary interface between application and datastore)
+- data objects (stateful models, represent deserialized records)
+- controllers (operate on models, business logic)
+- APIs (registries of client endpoints)
+- main route registry
 
-- add reddis cache layer
 
 

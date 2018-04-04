@@ -37,8 +37,8 @@ services:
     volumes:
      - ./mysql_store_dev:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=example
-      - MYSQL_DATABASE=test
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=flask_vue_project_seed
 
   adminer:
     image: adminer:4.6.2
