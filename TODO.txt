@@ -20,11 +20,11 @@ X add mysql
 X add reddis cache
 
 // Backend architecture layers
-- datastore drivers (intermediary interface between application and datastore)
-- data objects (stateful models, represent deserialized records)
-- controllers (operate on models, business logic)
-- APIs (registries of client endpoints)
-- main route registry
+- route registry (central routing registry)
+- api (client endpoints, call into model layer, format response)
+- model (operate on data objects, business logic)
+- data object (stateful models, represent deserialized records, implements CRUD)
+- datastore driver (intermediary interface between application and datastore)
 
 
 

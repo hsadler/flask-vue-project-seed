@@ -15,22 +15,22 @@ class MySQLdbDriver():
 			passwd='password', # replace with config val
 			db=database_name
 		)
-        self.cur = self.connection.cursor(mdb.cursors.DictCursor)
-        self.connection.set_character_set('utf8')
-        self.cur.execute('SET NAMES utf8;')
-        self.cur.execute('SET CHARACTER SET utf8;')
-        self.cur.execute('SET character_set_connection=utf8;')
+		self.cur = self.connection.cursor(mdb.cursors.DictCursor)
+		self.connection.set_character_set('utf8')
+		self.cur.execute('SET NAMES utf8;')
+		self.cur.execute('SET CHARACTER SET utf8;')
+		self.cur.execute('SET character_set_connection=utf8;')
 
 
-    def get_size(self, table_name):
-        with self.connection:
-            self.cur.execute(
-            	"""SELECT table_name AS "Table",
-                ROUND(((data_length + index_length) / 1024 / 1024), 2)
-                AS "Size (MB)"
-                FROM information_schema.TABLES
-                WHERE table_schema = %s
-                ORDER BY (data_length + index_length) DESC;""",
-            	(table_name,)
-            )
-        return self.cur.fetchall()
+	def get_size(self, table_name):
+		with self.connection:
+			self.cur.execute(
+				"""SELECT table_name AS "Table",
+				ROUND(((data_length + index_length) / 1024 / 1024), 2)
+				AS "Size (MB)"
+				FROM information_schema.TABLES
+				WHERE table_schema = %s
+				ORDER BY (data_length + index_length) DESC;""",
+				(table_name,)
+			)
+		return self.cur.fetchall()

@@ -1,5 +1,9 @@
 
-from ..datastore.driver.mysql_driver import MySQLdbDriver
+import sys
+# TODO: find a way to do this via a config which sets a project_dir
+sys.path.append('..')
+
+from datastore.driver.mysql_driver import MySQLdbDriver
 
 
 mysql_driver = MySQLdbDriver(
