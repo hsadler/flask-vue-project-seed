@@ -6,7 +6,8 @@ from utils.print import ppp
 
 
 class MySqlDriver():
-
+	"""TODO: Docstring here...
+	"""
 
 	def __init__(self, database_name):
 		self.database_name = self.__escape(database_name)
@@ -26,8 +27,16 @@ class MySqlDriver():
 	########## CRUD INTERFACE METHODS ##########
 
 	def insert(self, table_name, value_props={}):
+		"""MySQL driver interface method for single record inserts
 
-		res = {}
+		Args:
+			table_name (str): Name of MySQL table to do insert
+			value_props (dict): Dictionary of column insert values where
+				key=column name and value=column value
+		Returns:
+			id of the inserted record
+
+		"""
 
 		fields = []
 		values = []
@@ -51,16 +60,9 @@ class MySqlDriver():
 		)
 
 		with self.conn:
-			try:
-				self.cur.execute(query_stmt, tuple(values))
-				res['success'] = 1
-				res['record_id'] = self.cur.lastrowid
-				return res
-			except Exception as e:
-				res['success'] = 0
-				res['exception'] = e
-				res['query'] = self.cur._last_executed
-				return res
+			self.cur.execute(query_stmt, tuple(values))
+			return self.cur.lastrowid
+
 
 	def find_by_fields(self, table_name, where_props={}):
 		ppp('MySqlDriver.find_by_fields not implemented yet...')
