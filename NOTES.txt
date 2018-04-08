@@ -1,0 +1,20 @@
+
+NOTES:
+
+// Backend architecture layers
+- route registry (central routing registry)
+- api (client endpoints, call into model layer, format response)
+- model (operate on data objects, business logic)
+- data object (stateful models, represent deserialized records, implements CRUD)
+- datastore driver (intermediary interface between application and datastore)
+
+
+INSERT INTO example (example_column)
+VALUES ('hello world');
+
+SELECT table_name AS "Table",
+ROUND(((data_length + index_length) / 1024 / 1024), 2)
+AS "Size (MB)"
+FROM information_schema.TABLES
+WHERE table_schema = "flask_vue_project_seed"
+ORDER BY (data_length + index_length) DESC;

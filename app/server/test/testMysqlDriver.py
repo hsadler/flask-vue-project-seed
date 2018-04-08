@@ -3,19 +3,54 @@ import sys
 # TODO: find a way to do this via a config which sets a project_dir
 sys.path.append('..')
 
-from datastore.driver.mysql_driver import MySQLdbDriver
+from datastore.driver.mysql_driver import MySqlDriver
 
 
-mysql_driver = MySQLdbDriver(
+mysql_driver = MySqlDriver(
 	database_name='flask_vue_project_seed',
 )
 
-size = mysql_driver.get_size('example')
 
+######## TEST TABLE UTILS ########
+
+size = mysql_driver.get_database_size()
 print(size)
 
-# create table example(
-# 	id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-# 	example_column VARCHAR(255)
-# );
+description = mysql_driver.describe_table(table_name="example")
+print(description)
+
+
+######## TEST CRUD INTERFACE ########
+
+TABLE_NAME = 'example'
+
+# test create
+mysql_driver.insert(
+    table_name=TABLE_NAME,
+    value_props=[]
+)
+
+# test read
+mysql_driver.find_by_fields(
+    table_name=TABLE_NAME,
+    where_props=[]
+)
+
+# test update
+mysql_driver.update_by_fields(
+    table_name=TABLE_NAME,
+    value_props=[],
+    where_props=[]
+)
+
+# test delete
+mysql_driver.delete_by_fields(
+    table_name=TABLE_NAME,
+    where_props=[]
+)
+
+
+
+
+
 
