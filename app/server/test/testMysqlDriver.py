@@ -4,6 +4,7 @@ import sys
 sys.path.append('..')
 
 from datastore.driver.mysql_driver import MySqlDriver
+from utils.print import ppp
 
 
 mysql_driver = MySqlDriver(
@@ -11,13 +12,13 @@ mysql_driver = MySqlDriver(
 )
 
 
-######## TEST TABLE UTILS ########
+######## TEST DATABASE UTILS ########
 
 size = mysql_driver.get_database_size()
-print(size)
+ppp(size)
 
 description = mysql_driver.describe_table(table_name="example")
-print(description)
+ppp(description)
 
 
 ######## TEST CRUD INTERFACE ########

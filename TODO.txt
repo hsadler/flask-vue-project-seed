@@ -18,10 +18,25 @@ X add http service
 X add backend API call to Vue client
 X add mysql
 X add reddis cache
+- add mysql database driver
+- add application server config
+- add utils directory with helper modules
 
 TODO for datastore driver layer:
-- stub mysql_driver methods
+X stub mysql_driver methods
 - create test script for mysql_driver
+- implement mysql_driver class
+- test mysql_driver class
+
+TODO for application server config:
+- map-in items:
+	PROJECT_ROOT_DIR
+	DATABASE_HOST
+	DATABASE_USER
+	DATABASE_PASSWORD
+	DATABASE_NAME
+- consider multiple config files for different parts of the application
+
 
 
 
