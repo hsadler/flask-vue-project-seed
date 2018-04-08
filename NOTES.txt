@@ -18,3 +18,8 @@ AS "Size (MB)"
 FROM information_schema.TABLES
 WHERE table_schema = "flask_vue_project_seed"
 ORDER BY (data_length + index_length) DESC;
+
+
+
+INSERT INTO example (`example_column`)
+VALUES ('im a new record');

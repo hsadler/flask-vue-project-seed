@@ -25,29 +25,36 @@ ppp(description)
 
 TABLE_NAME = 'example'
 
-# test create
-mysql_driver.insert(
-    table_name=TABLE_NAME,
-    value_props=[]
+# test insert
+insert_res = mysql_driver.insert(
+	table_name=TABLE_NAME,
+	value_props={
+		'example_column': 'im a new record'
+	}
 )
+ppp(insert_res)
+
+sys.exit()
 
 # test read
 mysql_driver.find_by_fields(
-    table_name=TABLE_NAME,
-    where_props=[]
+	table_name=TABLE_NAME,
+	where_props={
+		'example_column': 'im a new record'
+	}
 )
 
 # test update
 mysql_driver.update_by_fields(
-    table_name=TABLE_NAME,
-    value_props=[],
-    where_props=[]
+	table_name=TABLE_NAME,
+	value_props=[],
+	where_props=[]
 )
 
 # test delete
 mysql_driver.delete_by_fields(
-    table_name=TABLE_NAME,
-    where_props=[]
+	table_name=TABLE_NAME,
+	where_props=[]
 )
 
 

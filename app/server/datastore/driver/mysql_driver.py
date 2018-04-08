@@ -2,6 +2,7 @@
 # MySQL Database Driver
 
 import MySQLdb as mdb
+from utils.print import ppp
 
 
 class MySqlDriver():
@@ -25,14 +26,44 @@ class MySqlDriver():
 	########## CRUD INTERFACE METHODS ##########
 
 	def insert(self, table_name, value_props={}):
-		print('MySqlDriver.insert not implemented yet...')
-		# ex:
-		# INSERT INTO table_name ( field1, field2,...fieldN )
-		# VALUES (value1, value2,...valueN);
-		pass
+
+		res = {}
+
+		fields = []
+		values = []
+		for key, val in value_props.items():
+			fields.append(key)
+			values.append(val)
+
+		fields_str = ', '.join([
+			"`{}`".format(self.__escape(field))
+			for field in fields
+		])
+		values_str_sub = ', '.join(['%s' for item in values])
+
+		query_stmt = """
+			INSERT INTO `{0}` ({1})
+			VALUES ({2});
+		""".format(
+			self.__escape(table_name),
+			fields_str,
+			values_str_sub
+		)
+
+		with self.conn:
+			try:
+				self.cur.execute(query_stmt, tuple(values))
+				res['success'] = 1
+				res['record_id'] = self.cur.lastrowid
+				return res
+			except Exception as e:
+				res['success'] = 0
+				res['exception'] = e
+				res['query'] = self.cur._last_executed
+				return res
 
 	def find_by_fields(self, table_name, where_props={}):
-		print('MySqlDriver.find_by_fields not implemented yet...')
+		ppp('MySqlDriver.find_by_fields not implemented yet...')
 		# ex:
 		# SELECT field1, field2,...fieldN
 		# FROM table_name1, table_name2...
@@ -41,14 +72,14 @@ class MySqlDriver():
 		pass
 
 	def update_by_fields(self, table_name, value_props={}, where_props={}):
-		print('MySqlDriver.update_by_fields not implemented yet...')
+		ppp('MySqlDriver.update_by_fields not implemented yet...')
 		# ex:
 		# UPDATE table_name SET field1 = new-value1, field2 = new-value2
 		# [WHERE Clause]
 		pass
 
 	def delete_by_fields(self, table_name, where_props={}):
-		print('MySqlDriver.delete_by_fields not implemented yet...')
+		ppp('MySqlDriver.delete_by_fields not implemented yet...')
 		# ex:
 		# DELETE FROM table_name [WHERE Clause]
 		pass
@@ -57,7 +88,7 @@ class MySqlDriver():
 	########## DATABASE UTILITIES ##########
 
 	def create_table(self, table_name, column_props={}):
-		print('MySqlDriver.create_table not implemented yet...')
+		ppp('MySqlDriver.create_table not implemented yet...')
 		# CREATE TABLE example(
 		# 	id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 		# 	example_column VARCHAR(255)
@@ -65,12 +96,12 @@ class MySqlDriver():
 		pass
 
 	def delete_table_contents(self, table_name):
-		print('MySqlDriver.delete_table_contents not implemented yet...')
+		ppp('MySqlDriver.delete_table_contents not implemented yet...')
 		# TRUNCATE TABLE table_name;
 		pass
 
 	def delete_table(self, table_name):
-		print('MySqlDriver.delete_table not implemented yet...')
+		ppp('MySqlDriver.delete_table not implemented yet...')
 		# DROP TABLE table_name
 		pass
 

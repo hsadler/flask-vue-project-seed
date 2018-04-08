@@ -3,16 +3,21 @@
 
 import json
 import pprint
-pp = pprint.PrettyPrinter(indent=2)
+
+
+INDENT = 2
+
+pp = pprint.PrettyPrinter(indent=INDENT)
 
 
 def ppp(to_print, as_json=False):
+	print('')
 	if as_json:
 		print(
 			json.dumps(
 				to_print,
 				sort_keys=True,
-				indent=2,
+				indent=INDENT,
 				separators=(',', ': ')
 			)
 		)
