@@ -81,6 +81,11 @@ class MySqlDriver():
 		"""
 		MySQL driver interface method for finding records by conditionals.
 
+		TODO:
+			- add AND/OR specification to WHERE clause
+			- add conditional type specification to WHERE clause:
+				(=, !=, >, <, >=, <=)
+
 		Args:
 			table_name (str): Name of MySQL table.
 			where_props (dict): Dictionary of 'where' clause values where
@@ -101,14 +106,17 @@ class MySqlDriver():
 
 		where_values = None
 		if len(where_props.keys()) > 0:
+			where_fields = []
+			where_values = []
+			for key, val in where_props.items():
+				where_fields.append(key)
+				where_values.append(val)
 			where_component = 'WHERE ' + ' AND '.join([
-				'`{}`=%s'.format(self.__escape(key))
-				for key, val in where_props.items()
+				'`{}`=%s'.format(self.__escape(field))
+				for field in where_fields
 			])
 			query_stmt_components.append(where_component)
-			where_values = tuple([
-				val for key, val in where_props.items()
-			])
+			where_values = tuple(where_values)
 
 		if(limit is not None and int(limit) > 0):
 			limit_component = 'LIMIT {}'.format(self.__escape(str(limit)))
@@ -124,13 +132,64 @@ class MySqlDriver():
 			return self.cur.fetchall()
 
 
-	def update_by_fields(self, table_name, value_props={}, where_props={}):
-		ppp('MySqlDriver.update_by_fields not implemented yet...')
-		print(self.cur._last_executed)
-		# ex:
+	def update_by_fields(self, table_name, where_props={}, value_props={}):
+		"""
+		MySQL driver interface method for updating records by conditionals.
+
+		TODO:
+			- add AND/OR specification to WHERE clause
+			- add conditional specification to WHERE clause
+
+		Args:
+			table_name (str): Name of MySQL table.
+			value_props (dict): Dictionary of column update values where
+				key=column name and value=column value.
+			where_props (dict): Dictionary of 'where' clause values where
+				key=column name and value=column value.
+
+		Returns:
+			List of dictionaries representing MySQL records (deserialized)
+
+		"""
+
+		# ex query:
 		# UPDATE table_name SET field1 = new-value1, field2 = new-value2
 		# [WHERE Clause]
-		pass
+
+		########### TODO: IMPLEMENT THIS NEXT ###########
+		# - should WHERE clause be required?
+
+		query_stmt_components = []
+
+		update_component = 'UPDATE `{}`'.format(
+			self.__escape(table_name)
+		)
+		query_stmt_components.append(select_component)
+
+		# TODO: SET component
+		set_component = ''
+
+		where_values = None
+		if len(where_props.keys()) > 0:
+			where_component = 'WHERE ' + ' AND '.join([
+				'`{}`=%s'.format(self.__escape(key))
+				for key, val in where_props.items()
+			])
+			query_stmt_components.append(where_component)
+			where_values = tuple([
+				val for key, val in where_props.items()
+			])
+
+		query_stmt = ' '.join(query_stmt_components) + ';'
+
+		with self.conn:
+			# TODO: THIS SHOULD NEVER HAPPEN, WITH UPDATE, THERE SHOULD ALWAYS
+			# BE A WHERE CLAUSE
+			if where_values is not None:
+				self.cur.execute(query_stmt, where_values)
+			else:
+				self.cur.execute(query_stmt)
+			return self.cur.fetchall()
 
 	def delete_by_fields(self, table_name, where_props={}):
 		ppp('MySqlDriver.delete_by_fields not implemented yet...')

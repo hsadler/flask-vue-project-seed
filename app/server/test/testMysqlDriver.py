@@ -12,29 +12,20 @@ mysql_driver = MySqlDriver(
 )
 
 
-######## TEST DATABASE UTILS ########
-
-# size = mysql_driver.get_database_size()
-# ppp(size)
-
-# description = mysql_driver.describe_table(table_name="example")
-# ppp(description)
-
-
 ######## TEST CRUD INTERFACE ########
 
 TABLE_NAME = 'person'
 
 # test insert
-# insert_res = mysql_driver.insert(
-# 	table_name=TABLE_NAME,
-# 	value_props={
-# 		'name': 'Tim Tim',
-# 		'age': 30,
-# 		'male': True
-# 	}
-# )
-# ppp(insert_res)
+insert_res = mysql_driver.insert(
+	table_name=TABLE_NAME,
+	value_props={
+		'name': 'Tim Tim',
+		'age': 30,
+		'male': True
+	}
+)
+ppp(insert_res)
 
 # test read
 find_res = mysql_driver.find_by_fields(
@@ -43,17 +34,22 @@ find_res = mysql_driver.find_by_fields(
 		'name': 'Wanda Bob',
 		'male': False
 	},
-	limit=1
+	limit=2
 )
 ppp(find_res)
-sys.exit()
 
 # test update
-mysql_driver.update_by_fields(
+update_res = mysql_driver.update_by_fields(
 	table_name=TABLE_NAME,
-	value_props=[],
-	where_props=[]
+	value_props={
+		'age': 10
+	},
+	where_props={
+		'id': 5
+	}
 )
+ppp(update_res)
+sys.exit()
 
 # test delete
 mysql_driver.delete_by_fields(
@@ -62,6 +58,13 @@ mysql_driver.delete_by_fields(
 )
 
 
+######## TEST DATABASE UTILS ########
+
+size = mysql_driver.get_database_size()
+ppp(size)
+
+description = mysql_driver.describe_table(table_name="example")
+ppp(description)
 
 
 
