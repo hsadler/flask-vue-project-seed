@@ -92,15 +92,41 @@ class MySqlDriver():
 
 		"""
 
-		# ex:
-		# SELECT field1, field2,...fieldN
-		# FROM table_name1, table_name2...
-		# [WHERE Clause]
-		# [OFFSET M ][LIMIT N]
-		pass
+		query_stmt_components = []
+
+		select_component = 'SELECT * FROM `{}`'.format(
+			self.__escape(table_name)
+		)
+		query_stmt_components.append(select_component)
+
+		where_values = None
+		if len(where_props.keys()) > 0:
+			where_component = 'WHERE ' + ' AND '.join([
+				'`{}`=%s'.format(self.__escape(key))
+				for key, val in where_props.items()
+			])
+			query_stmt_components.append(where_component)
+			where_values = tuple([
+				val for key, val in where_props.items()
+			])
+
+		if(limit is not None and int(limit) > 0):
+			limit_component = 'LIMIT {}'.format(self.__escape(str(limit)))
+			query_stmt_components.append(limit_component)
+
+		query_stmt = ' '.join(query_stmt_components) + ';'
+
+		with self.conn:
+			if where_values is not None:
+				self.cur.execute(query_stmt, where_values)
+			else:
+				self.cur.execute(query_stmt)
+			return self.cur.fetchall()
+
 
 	def update_by_fields(self, table_name, value_props={}, where_props={}):
 		ppp('MySqlDriver.update_by_fields not implemented yet...')
+		print(self.cur._last_executed)
 		# ex:
 		# UPDATE table_name SET field1 = new-value1, field2 = new-value2
 		# [WHERE Clause]
