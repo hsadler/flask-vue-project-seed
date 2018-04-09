@@ -23,26 +23,28 @@ ppp(description)
 
 ######## TEST CRUD INTERFACE ########
 
-TABLE_NAME = 'example'
+TABLE_NAME = 'person'
 
 # test insert
 insert_res = mysql_driver.insert(
 	table_name=TABLE_NAME,
 	value_props={
-		'example_column': 'im a new record'
+		'name': 'Wanda Bob',
+		'age': 44,
+		'male': False
 	}
 )
 ppp(insert_res)
 
-sys.exit()
-
 # test read
-mysql_driver.find_by_fields(
+find_res = mysql_driver.find_by_fields(
 	table_name=TABLE_NAME,
 	where_props={
-		'example_column': 'im a new record'
+		'name': 'Wanda Bob'
 	}
 )
+ppp(find_res)
+sys.exit()
 
 # test update
 mysql_driver.update_by_fields(

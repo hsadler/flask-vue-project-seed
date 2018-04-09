@@ -4,10 +4,18 @@
 import MySQLdb as mdb
 from utils.print import ppp
 
+import time
+
 
 class MySqlDriver():
-	"""TODO: Docstring here...
 	"""
+	MySQL database driver which implements CRUD and utility public methods.
+	"""
+
+
+	RECORD_CREATED_TS_COLUMN = 'created_ts'
+	RECORD_UPDATED_TS_COLUMN = 'updated_ts'
+
 
 	def __init__(self, database_name):
 		self.database_name = self.__escape(database_name)
@@ -27,16 +35,21 @@ class MySqlDriver():
 	########## CRUD INTERFACE METHODS ##########
 
 	def insert(self, table_name, value_props={}):
-		"""MySQL driver interface method for single record inserts
+		"""
+		MySQL driver interface method for single record inserts.
 
 		Args:
-			table_name (str): Name of MySQL table to do insert
+			table_name (str): Name of MySQL table.
 			value_props (dict): Dictionary of column insert values where
-				key=column name and value=column value
+				key=column name and value=column value.
+
 		Returns:
 			id of the inserted record
 
 		"""
+
+		value_props[self.RECORD_CREATED_TS_COLUMN] = int(time.time())
+		value_props[self.RECORD_UPDATED_TS_COLUMN] = int(time.time())
 
 		fields = []
 		values = []
@@ -64,8 +77,21 @@ class MySqlDriver():
 			return self.cur.lastrowid
 
 
-	def find_by_fields(self, table_name, where_props={}):
-		ppp('MySqlDriver.find_by_fields not implemented yet...')
+	def find_by_fields(self, table_name, where_props={}, limit=None):
+		"""
+		MySQL driver interface method for finding records by conditionals.
+
+		Args:
+			table_name (str): Name of MySQL table.
+			where_props (dict): Dictionary of 'where' clause values where
+				key=column name and value=column value.
+			limit (int or None): Positive integer limit for query results list.
+
+		Returns:
+			List of dictionaries representing MySQL records (deserialized)
+
+		"""
+
 		# ex:
 		# SELECT field1, field2,...fieldN
 		# FROM table_name1, table_name2...
@@ -129,7 +155,7 @@ class MySqlDriver():
 		return self.cur.fetchall()
 
 
-	########## HELPERS ##########
+	########## PRIVATE HELPERS ##########
 
 	# escape strings for use in query strings
 	def __escape(self, string):

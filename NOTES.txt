@@ -9,17 +9,13 @@ NOTES:
 - datastore driver (intermediary interface between application and datastore)
 
 
-INSERT INTO example (example_column)
-VALUES ('hello world');
-
-SELECT table_name AS "Table",
-ROUND(((data_length + index_length) / 1024 / 1024), 2)
-AS "Size (MB)"
-FROM information_schema.TABLES
-WHERE table_schema = "flask_vue_project_seed"
-ORDER BY (data_length + index_length) DESC;
-
+CREATE TABLE person (
+	id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+	created_ts INT(11) NOT NULL,
+	updated_ts INT(11) NOT NULL,
+	name VARCHAR(255),
+	age INT(6),
+	male BOOL
+);
 
 
-INSERT INTO example (`example_column`)
-VALUES ('im a new record');
