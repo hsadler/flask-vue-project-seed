@@ -42,10 +42,10 @@ ppp(find_res)
 update_res = mysql_driver.update_by_fields(
 	table_name=TABLE_NAME,
 	value_props={
-		'age': 10
+		'age': 66
 	},
 	where_props={
-		'id': 5
+		'id': 1
 	}
 )
 ppp(update_res)

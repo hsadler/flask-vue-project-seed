@@ -132,13 +132,14 @@ class MySqlDriver():
 			return self.cur.fetchall()
 
 
-	def update_by_fields(self, table_name, where_props={}, value_props={}):
+	def update_by_fields(self, table_name, value_props={}, where_props={}):
 		"""
 		MySQL driver interface method for updating records by conditionals.
 
 		TODO:
 			- add AND/OR specification to WHERE clause
-			- add conditional specification to WHERE clause
+			- add conditional type specification to WHERE clause:
+				(=, !=, >, <, >=, <=)
 
 		Args:
 			table_name (str): Name of MySQL table.
@@ -157,39 +158,55 @@ class MySqlDriver():
 		# [WHERE Clause]
 
 		########### TODO: IMPLEMENT THIS NEXT ###########
-		# - should WHERE clause be required?
 
 		query_stmt_components = []
 
 		update_component = 'UPDATE `{}`'.format(
 			self.__escape(table_name)
 		)
-		query_stmt_components.append(select_component)
+		query_stmt_components.append(update_component)
 
-		# TODO: SET component
-		set_component = ''
+		set_values = None
+		if len(value_props.keys()) > 0:
+			set_fields = []
+			set_values = []
+			for key, val in value_props.items():
+				set_fields.append(key)
+				set_values.append(val)
+			set_component = 'SET ' + ', '.join([
+				'`{}`=%s'.format(self.__escape(field))
+				for field in set_fields
+			])
+			query_stmt_components.append(set_component)
+		else:
+			raise RuntimeError("""
+				argument 'value_props' required with at least one SET item
+			""")
 
 		where_values = None
 		if len(where_props.keys()) > 0:
+			where_fields = []
+			where_values = []
+			for key, val in where_props.items():
+				where_fields.append(key)
+				where_values.append(val)
 			where_component = 'WHERE ' + ' AND '.join([
-				'`{}`=%s'.format(self.__escape(key))
-				for key, val in where_props.items()
+				'`{}`=%s'.format(self.__escape(field))
+				for field in where_fields
 			])
 			query_stmt_components.append(where_component)
-			where_values = tuple([
-				val for key, val in where_props.items()
-			])
+		else:
+			raise RuntimeError("""
+				argument 'where_props' required with at least one WHERE
+				condition
+			""")
 
 		query_stmt = ' '.join(query_stmt_components) + ';'
 
 		with self.conn:
-			# TODO: THIS SHOULD NEVER HAPPEN, WITH UPDATE, THERE SHOULD ALWAYS
-			# BE A WHERE CLAUSE
-			if where_values is not None:
-				self.cur.execute(query_stmt, where_values)
-			else:
-				self.cur.execute(query_stmt)
-			return self.cur.fetchall()
+			self.cur.execute(query_stmt, tuple(set_values + where_values))
+			return self.cur.lastrowid
+
 
 	def delete_by_fields(self, table_name, where_props={}):
 		ppp('MySqlDriver.delete_by_fields not implemented yet...')
