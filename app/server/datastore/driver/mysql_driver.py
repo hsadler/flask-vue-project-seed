@@ -44,7 +44,7 @@ class MySqlDriver():
 				key=column name and value=column value.
 
 		Returns:
-			id of the inserted record
+			(integet) 'id' of the inserted record.
 
 		"""
 
@@ -93,7 +93,7 @@ class MySqlDriver():
 			limit (int or None): Positive integer limit for query results list.
 
 		Returns:
-			List of dictionaries representing MySQL records (deserialized)
+			List of dictionaries representing MySQL records (deserialized).
 
 		"""
 
@@ -149,15 +149,9 @@ class MySqlDriver():
 				key=column name and value=column value.
 
 		Returns:
-			List of dictionaries representing MySQL records (deserialized)
+			(integer) Number of rows updated.
 
 		"""
-
-		# ex query:
-		# UPDATE table_name SET field1 = new-value1, field2 = new-value2
-		# [WHERE Clause]
-
-		########### TODO: IMPLEMENT THIS NEXT ###########
 
 		query_stmt_components = []
 
@@ -205,14 +199,61 @@ class MySqlDriver():
 
 		with self.conn:
 			self.cur.execute(query_stmt, tuple(set_values + where_values))
-			return self.cur.lastrowid
+			return self.cur.rowcount
 
 
 	def delete_by_fields(self, table_name, where_props={}):
-		ppp('MySqlDriver.delete_by_fields not implemented yet...')
+		"""
+		MySQL driver interface method for deleting records by conditionals.
+		TODO:
+			- add AND/OR specification to WHERE clause
+			- add conditional type specification to WHERE clause:
+				(=, !=, >, <, >=, <=)
+
+		Args:
+			table_name (str): Name of MySQL table.
+			where_props (dict): Dictionary of 'where' clause values where
+				key=column name and value=column value.
+
+		Returns:
+			(integer) Number of rows updated.
+
+		"""
+
+		query_stmt_components = []
+
+		delete_component = 'DELETE FROM `{}`'.format(
+			self.__escape(table_name)
+		)
+		query_stmt_components.append(delete_component)
+
 		# ex:
 		# DELETE FROM table_name [WHERE Clause]
-		pass
+
+		where_values = None
+		if len(where_props.keys()) > 0:
+			where_fields = []
+			where_values = []
+			for key, val in where_props.items():
+				where_fields.append(key)
+				where_values.append(val)
+			where_component = 'WHERE ' + ' AND '.join([
+				'`{}`=%s'.format(self.__escape(field))
+				for field in where_fields
+			])
+			query_stmt_components.append(where_component)
+		else:
+			raise RuntimeError(
+				"argument 'where_props' required with at least one WHERE " +
+				"condition"
+			)
+
+		query_stmt = ' '.join(query_stmt_components) + ';'
+
+		with self.conn:
+			self.cur.execute(query_stmt, tuple(where_values))
+			return self.cur.rowcount
+
 
 
 	########## DATABASE UTILITIES ##########

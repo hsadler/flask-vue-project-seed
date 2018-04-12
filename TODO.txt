@@ -24,9 +24,9 @@ X add reddis cache
 
 TODO for datastore driver layer:
 X stub mysql_driver methods
-- create test script for mysql_driver
-- implement mysql_driver class
-- test mysql_driver class
+X create test script for mysql_driver
+X implement mysql_driver class
+X test mysql_driver class
 
 TODO for application server config:
 - map-in items:

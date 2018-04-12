@@ -42,20 +42,23 @@ ppp(find_res)
 update_res = mysql_driver.update_by_fields(
 	table_name=TABLE_NAME,
 	value_props={
-		'age': 33
+		'age': 20
 	},
+	where_props={
+		'age': 1000
+	}
+)
+ppp(update_res)
+
+# test delete
+delete_res = mysql_driver.delete_by_fields(
+	table_name=TABLE_NAME,
 	where_props={
 		'id': 2
 	}
 )
-ppp(update_res)
+ppp(delete_res)
 sys.exit()
-
-# test delete
-mysql_driver.delete_by_fields(
-	table_name=TABLE_NAME,
-	where_props=[]
-)
 
 
 ######## TEST DATABASE UTILS ########
