@@ -179,9 +179,9 @@ class MySqlDriver():
 			])
 			query_stmt_components.append(set_component)
 		else:
-			raise RuntimeError("""
-				argument 'value_props' required with at least one SET item
-			""")
+			raise RuntimeError(
+				"argument 'value_props' required with at least one SET item"
+			)
 
 		where_values = None
 		if len(where_props.keys()) > 0:
@@ -196,10 +196,10 @@ class MySqlDriver():
 			])
 			query_stmt_components.append(where_component)
 		else:
-			raise RuntimeError("""
-				argument 'where_props' required with at least one WHERE
-				condition
-			""")
+			raise RuntimeError(
+				"argument 'where_props' required with at least one WHERE " +
+				"condition"
+			)
 
 		query_stmt = ' '.join(query_stmt_components) + ';'
 
