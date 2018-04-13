@@ -2,6 +2,7 @@
 # MySQL Database Driver
 
 import MySQLdb as mdb
+import config.config as config
 from utils.print import ppp
 
 import time
@@ -20,9 +21,9 @@ class MySqlDriver():
 	def __init__(self, database_name):
 		self.database_name = self.__escape(database_name)
 		self.conn = mdb.connect(
-			host='mysql', # replace with config val
-			user='root', # replace with config val
-			passwd='password', # replace with config val
+			host=config.MYSQL_DB_HOST,
+			user=config.MYSQL_DB_USER,
+			passwd=config.MYSQL_DB_PASSWORD,
 			db=database_name
 		)
 		self.cur = self.conn.cursor(mdb.cursors.DictCursor)

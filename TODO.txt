@@ -18,7 +18,7 @@ X add http service
 X add backend API call to Vue client
 X add mysql
 X add reddis cache
-- add mysql database driver
+X add mysql database driver with basic CRUD interface
 - add application server config
 - add utils directory with helper modules
 

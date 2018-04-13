@@ -58,7 +58,6 @@ delete_res = mysql_driver.delete_by_fields(
 	}
 )
 ppp(delete_res)
-sys.exit()
 
 
 ######## TEST DATABASE UTILS ########
