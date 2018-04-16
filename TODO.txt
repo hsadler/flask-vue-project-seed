@@ -21,7 +21,9 @@ X add reddis cache
 X add utils directory with helper modules
 X add application server config
 X add mysql database driver with basic CRUD interface
+X add database driver base class which enforces an interace on all subclasses
 - add dataobject layer
+- add base_dataobject
 - add example_dataobject
 - think about caching layer architecture
 
@@ -40,6 +42,7 @@ X implement mysql_driver class
 X test mysql_driver class
 
 TODO for dataobject layer:
+- architect dataobject layer (base_dataobject->child_dataobjects)
 - stub methods
 - create test script
 - implement class

@@ -28,6 +28,10 @@ dataobject interface:
 		- get(prop_name)
 		- set(prop_name, prop_value)
 		- save()
+	other than CRUD interactions with the database_driver, dataobjects should
+	do things that pertain to itself:
+		- to_dict() (present its state)
+		- ...more here
 
 
 

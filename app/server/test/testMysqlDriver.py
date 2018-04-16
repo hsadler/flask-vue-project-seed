@@ -3,7 +3,7 @@ import sys
 sys.path.append('..')
 
 import config.config as config
-from datastore.driver.mysql_driver import MySqlDriver
+from datastore.database_driver.mysql_driver import MySqlDriver
 from utils.print import ppp
 
 

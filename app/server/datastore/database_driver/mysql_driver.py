@@ -3,12 +3,13 @@
 
 import MySQLdb as mdb
 import config.config as config
+from datastore.database_driver.base_driver import BaseDriver
 from utils.print import ppp
 
 import time
 
 
-class MySqlDriver():
+class MySqlDriver(BaseDriver):
 	"""
 	MySQL database driver which implements CRUD and utility public methods.
 	"""
