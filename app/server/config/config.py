@@ -2,12 +2,9 @@
 # app server config
 
 
-# TODO:
-PROJECT_ROOT_DIR = ''
-
-
 # MySQL Database
-MYSQL_DB_HOST = 'mysql'
-MYSQL_DB_USER = 'root'
-MYSQL_DB_PASSWORD = 'password'
+MYSQL_HOST = 'mysql'
+MYSQL_USER = 'root'
+MYSQL_PASSWORD = 'password'
+MYSQL_DB_NAME = 'flask_vue_project_seed'
 

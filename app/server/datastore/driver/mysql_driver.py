@@ -21,9 +21,9 @@ class MySqlDriver():
 	def __init__(self, database_name):
 		self.database_name = self.__escape(database_name)
 		self.conn = mdb.connect(
-			host=config.MYSQL_DB_HOST,
-			user=config.MYSQL_DB_USER,
-			passwd=config.MYSQL_DB_PASSWORD,
+			host=config.MYSQL_HOST,
+			user=config.MYSQL_USER,
+			passwd=config.MYSQL_PASSWORD,
 			db=database_name
 		)
 		self.cur = self.conn.cursor(mdb.cursors.DictCursor)

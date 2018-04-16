@@ -1,14 +1,14 @@
 
 import sys
-# TODO: find a way to do this via a config which sets a project_dir
 sys.path.append('..')
 
+import config.config as config
 from datastore.driver.mysql_driver import MySqlDriver
 from utils.print import ppp
 
 
 mysql_driver = MySqlDriver(
-	database_name='flask_vue_project_seed',
+	database_name=config.MYSQL_DB_NAME,
 )
 
 

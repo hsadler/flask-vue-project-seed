@@ -18,9 +18,20 @@ X add http service
 X add backend API call to Vue client
 X add mysql
 X add reddis cache
+X add utils directory with helper modules
+X add application server config
 X add mysql database driver with basic CRUD interface
-- add application server config
-- add utils directory with helper modules
+- add dataobject layer
+- add example_dataobject
+- think about caching layer architecture
+
+TODO for application server config:
+X map-in items:
+	DATABASE_HOST
+	DATABASE_USER
+	DATABASE_PASSWORD
+	DATABASE_NAME
+- consider multiple config files for different parts of the application
 
 TODO for datastore driver layer:
 X stub mysql_driver methods
@@ -28,14 +39,12 @@ X create test script for mysql_driver
 X implement mysql_driver class
 X test mysql_driver class
 
-TODO for application server config:
-- map-in items:
-	PROJECT_ROOT_DIR
-	DATABASE_HOST
-	DATABASE_USER
-	DATABASE_PASSWORD
-	DATABASE_NAME
-- consider multiple config files for different parts of the application
+TODO for dataobject layer:
+- stub methods
+- create test script
+- implement class
+- test class
+
 
 
 

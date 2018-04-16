@@ -9,6 +9,28 @@ NOTES:
 - datastore driver (intermediary interface between application and datastore)
 
 
+// How dataobjects use the database drivers
+
+Dataobjects accept as a param a database_driver. If this is not passed, a
+default could be either hardcoded or set in a dataobject.config.py file
+
+dataobject interface:
+	perhaps these could be included in a dataObjectTemplate:
+		- create
+		- find_by_[field]
+		- get_[field]
+		- set_[field]
+		- save
+	or could be one method for each in BaseDataObject class:
+		- create(prop_dict)
+		- find_by(prop_dict)
+		- *** maybe... find_or_create_by(prop_dict) ***
+		- get(prop_name)
+		- set(prop_name, prop_value)
+		- save()
+
+
+
 CREATE TABLE person (
 	id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 	created_ts INT(11) NOT NULL,
