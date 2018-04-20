@@ -17,7 +17,7 @@ mysql_driver = MySqlDriver(
 TABLE_NAME = 'person'
 
 # test insert
-insert_res = mysql_driver.insert(
+insert_id = mysql_driver.insert(
 	table_name=TABLE_NAME,
 	value_props={
 		'name': 'Tim Tim',
@@ -25,10 +25,10 @@ insert_res = mysql_driver.insert(
 		'male': True
 	}
 )
-ppp(insert_res)
+ppp('insert id: ' + str(insert_id))
 
 # test read
-find_res = mysql_driver.find_by_fields(
+found_record = mysql_driver.find_by_fields(
 	table_name=TABLE_NAME,
 	where_props={
 		'name': 'Wanda Bob',
@@ -36,42 +36,44 @@ find_res = mysql_driver.find_by_fields(
 	},
 	limit=2
 )
-ppp(find_res)
+ppp(['found record:', found_record])
 
 # test update
-update_res = mysql_driver.update_by_fields(
+rows_updated = mysql_driver.update_by_fields(
 	table_name=TABLE_NAME,
 	value_props={
-		'age': 20
+		'name': 'Tim Timmy'
 	},
 	where_props={
-		'age': 1000
+		'age': 30
 	}
 )
-ppp(update_res)
+ppp('rows updated: ' + str(rows_updated))
 
 # test delete
-delete_res = mysql_driver.delete_by_fields(
+rows_deleted = mysql_driver.delete_by_fields(
 	table_name=TABLE_NAME,
 	where_props={
 		'id': 2
 	}
 )
-ppp(delete_res)
+ppp('rows deleted: ' + str(rows_deleted))
 
 
 ######## TEST TABLE UTILS ########
 
+description = mysql_driver.describe_table(table_name="example")
+ppp(['table description:', description])
 
+table_field_names = mysql_driver.get_table_field_names(table_name='example')
+ppp(['table field names:', table_field_names])
 
 
 ######## TEST DATABASE UTILS ########
 
-size = mysql_driver.get_database_size()
-ppp(size)
+db_size = mysql_driver.get_database_size()
+ppp(['database size: ', db_size])
 
-description = mysql_driver.describe_table(table_name="example")
-ppp(description)
 
 
 

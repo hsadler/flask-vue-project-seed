@@ -160,8 +160,10 @@ class MySqlDriver(BaseDriver):
 
 		# remove 'id' an 'created_ts' keys from dictionary since they should
 		# never be mutated
-		value_props.pop('id')
-		value_props.pop(self.RECORD_CREATED_TS_COLUMN)
+		if 'id' in value_props:
+			value_props.pop('id')
+		if self.RECORD_CREATED_TS_COLUMN in value_props:
+			value_props.pop(self.RECORD_CREATED_TS_COLUMN)
 		# mutate 'updated_ts' column to current time on update
 		value_props[self.RECORD_UPDATED_TS_COLUMN] = int(time.time())
 
