@@ -8,7 +8,7 @@ from utils.print import ppp
 
 
 mysql_driver = MySqlDriver(
-	database_name=config.MYSQL_DB_NAME,
+	database_name=config.MYSQL_DB_NAME
 )
 
 
@@ -58,6 +58,11 @@ delete_res = mysql_driver.delete_by_fields(
 	}
 )
 ppp(delete_res)
+
+
+######## TEST TABLE UTILS ########
+
+
 
 
 ######## TEST DATABASE UTILS ########

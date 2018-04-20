@@ -12,8 +12,8 @@ class ExampleDataObject(BaseDataObject):
 
 
 	TABLE_NAME = 'example'
-	DEFAULT_DB_DRIVER = MySqlDriver()
-	DEFAULT_CACHE_DRIVER = None
+	DEFAULT_DB_DRIVER_CLASS = MySqlDriver
+	DEFAULT_CACHE_DRIVER_CLASS = None
 
 
 	# Subclass specific methods go here...

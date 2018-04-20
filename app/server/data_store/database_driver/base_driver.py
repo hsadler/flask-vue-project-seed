@@ -34,7 +34,7 @@ class BaseDriver(metaclass=ABCMeta):
 		pass
 
 
-	########## DATABASE UTILITIES ##########
+	########## TABLE UTILITIES ##########
 
 	@abstractmethod
 	def create_table(self, table_name, column_props={}):
@@ -49,10 +49,17 @@ class BaseDriver(metaclass=ABCMeta):
 		pass
 
 	@abstractmethod
-	def get_database_size(self):
+	def describe_table(self, table_name):
 		pass
 
 	@abstractmethod
-	def describe_table(self, table_name):
+	def get_table_field_names(self, table_name):
+		pass
+
+
+	########## DATABASE UTILITIES ##########
+
+	@abstractmethod
+	def get_database_size(self):
 		pass
 

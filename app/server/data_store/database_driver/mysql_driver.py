@@ -12,6 +12,9 @@ import time
 class MySqlDriver(BaseDriver):
 	"""
 	MySQL database driver which implements CRUD and utility public methods.
+
+	TODO:
+		- add 'WHERE' clause string builder
 	"""
 
 
@@ -155,6 +158,13 @@ class MySqlDriver(BaseDriver):
 
 		"""
 
+		# remove 'id' an 'created_ts' keys from dictionary since they should
+		# never be mutated
+		value_props.pop('id')
+		value_props.pop(self.RECORD_CREATED_TS_COLUMN)
+		# mutate 'updated_ts' column to current time on update
+		value_props[self.RECORD_UPDATED_TS_COLUMN] = int(time.time())
+
 		query_stmt_components = []
 
 		update_component = 'UPDATE `{}`'.format(
@@ -257,8 +267,7 @@ class MySqlDriver(BaseDriver):
 			return self.cur.rowcount
 
 
-
-	########## DATABASE UTILITIES ##########
+	########## TABLE UTILITIES ##########
 
 	def create_table(self, table_name, column_props={}):
 		ppp('MySqlDriver.create_table not implemented yet...')
@@ -278,6 +287,22 @@ class MySqlDriver(BaseDriver):
 		# DROP TABLE table_name
 		pass
 
+	def describe_table(self, table_name):
+		query_stmt = "DESC {};".format(
+			self.__escape(table_name)
+		)
+		with self.conn:
+			self.cur.execute(query_stmt)
+		return self.cur.fetchall()
+
+	def get_table_field_names(self, table_name):
+		table_desc = self.describe_table(table_name=table_name)
+		field_names = [col['Field'] for col in table_desc]
+		return field_names
+
+
+	########## DATABASE UTILITIES ##########
+
 	def get_database_size(self):
 		query_stmt = """
 			SELECT table_name AS "Table",
@@ -287,14 +312,6 @@ class MySqlDriver(BaseDriver):
 			WHERE table_schema = "{}"
 			ORDER BY (data_length + index_length) DESC;
 		""".format(self.database_name)
-		with self.conn:
-			self.cur.execute(query_stmt)
-		return self.cur.fetchall()
-
-	def describe_table(self, table_name):
-		query_stmt = "DESC {};".format(
-			self.__escape(table_name)
-		)
 		with self.conn:
 			self.cur.execute(query_stmt)
 		return self.cur.fetchall()
