@@ -1,7 +1,7 @@
 
 # Example Data Object
 
-from dataobject.base_data_object import BaseDataObject
+from data_object.base_data_object import BaseDataObject
 from data_store.database_driver.mysql_driver import MySqlDriver
 
 

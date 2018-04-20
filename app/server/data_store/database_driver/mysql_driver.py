@@ -241,9 +241,6 @@ class MySqlDriver(BaseDriver):
 		)
 		query_stmt_components.append(delete_component)
 
-		# ex:
-		# DELETE FROM table_name [WHERE Clause]
-
 		where_values = None
 		if len(where_props.keys()) > 0:
 			where_fields = []

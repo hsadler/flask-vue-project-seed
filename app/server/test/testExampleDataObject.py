@@ -12,7 +12,9 @@ from utils.print import ppp
 created_example_DO = ExampleDataObject.create(
 	prop_dict={ 'field': 'hello world!' }
 )
-ppp(created_example_DO)
+created_example_DO.save()
+ppp(created_example_DO.state)
+sys.exit()
 
 # test find_many
 found_example_DOs = ExampleDataObject.find_many(

@@ -1,6 +1,7 @@
 
 # Base Data Object
 
+import sys
 import config.config as config
 
 from abc import ABCMeta, abstractmethod
@@ -12,12 +13,17 @@ class BaseDataObject(metaclass=ABCMeta):
 	Provides base methods and interface for all proper data objects.
 
 	TODO:
+		- test
 		- write docstrings for all methods
 		- add caching
 	"""
 
 
-	def __init__(self, prop_dict, db_driver, cache_driver):
+	def __init__(self, prop_dict, db_driver_class, cache_driver_class):
+		db_driver, cache_driver = self.__get_drivers(
+			db_driver_class=db_driver_class,
+			cache_driver_class=cache_driver_class
+		)
 		self.db_driver = db_driver
 		self.cache_driver = cache_driver
 		self.state = prop_dict
@@ -36,8 +42,8 @@ class BaseDataObject(metaclass=ABCMeta):
 
 		return cls(
 			prop_dict=prop_dict,
-			db_driver=db_driver,
-			cache_driver=cache_driver
+			db_driver_class=db_driver_class,
+			cache_driver_class=cache_driver_class
 		)
 
 
@@ -50,6 +56,11 @@ class BaseDataObject(metaclass=ABCMeta):
 		cache_driver_class=None
 	):
 
+		db_driver, cache_driver = cls.__get_drivers(
+			db_driver_class=db_driver_class,
+			cache_driver_class=cache_driver_class
+		)
+
 		records = db_driver.find_by_fields(
 			table_name=cls.TABLE_NAME,
 			where_props=prop_dict,
@@ -59,8 +70,8 @@ class BaseDataObject(metaclass=ABCMeta):
 		instances = [
 			cls(
 				prop_dict=record,
-				db_driver=db_driver,
-				cache_driver=cache_driver
+				db_driver_class=db_driver_class,
+				cache_driver_class=cache_driver_class
 			)
 			for record in records
 		]
@@ -136,13 +147,13 @@ class BaseDataObject(metaclass=ABCMeta):
 				'id': self.state['id']
 			}
 		)
-		return record_delete_count == 1 ? True : False
+		return True if record_delete_count else False
 
 
 	########## UTILITY METHODS ##########
 
 
-	to_json(self, pretty=False):
+	def to_json(self, pretty=False):
 		if pretty:
 			return json.dumps(self.state, sort_keys=True, indent=2)
 		else:
@@ -158,7 +169,8 @@ class BaseDataObject(metaclass=ABCMeta):
 	########## PRIVATE HELPERS ##########
 
 
-	__get_drivers(db_driver_class=None, cache_driver_class=None):
+	@classmethod
+	def __get_drivers(cls, db_driver_class=None, cache_driver_class=None):
 
 		db_driver_class = db_driver_class \
 		if db_driver_class is not None \
@@ -184,6 +196,6 @@ class BaseDataObject(metaclass=ABCMeta):
 		return db_driver, cache_driver
 
 
-	__get_prop_names(self):
+	def __get_prop_names(self):
 		return self.db_driver.get_table_field_names(self.TABLE_NAME)
 
