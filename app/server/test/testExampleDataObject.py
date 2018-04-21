@@ -12,39 +12,51 @@ from utils.print import ppp
 created_example_DO = ExampleDataObject.create(
 	prop_dict={ 'field': 'hello world!' }
 )
-created_example_DO.save()
-ppp(created_example_DO.state)
-sys.exit()
+ppp(['created example data object: ', created_example_DO.state])
 
 # test find_many
 found_example_DOs = ExampleDataObject.find_many(
 	prop_dict={ 'field': 'hello world!' },
 	limit=3
 )
-ppp(found_example_DOs)
+ppp('found example data objects:')
+for ex_DO in found_example_DOs:
+	ppp(ex_DO.state)
 
 # test find_one
 found_example_DO = ExampleDataObject.find_one(
 	prop_dict={'id': 1}
 )
-ppp(found_example_DO)
+ppp(['found one example data object: ', found_example_DO.state])
 
 # test get_prop
-field_value = found_example_DO.get_prop(prop_name='field')
-ppp(field_value)
+property_name = 'field'
+property_value = found_example_DO.get_prop(prop_name=property_name)
+ppp('retrieved property "key"->{0}, "value"->{1}'.format(
+	property_name,
+	property_value
+))
 
 # test set_prop
+property_name = 'field'
+property_value = 'hi there again!'
 found_example_DO.set_prop(
-	prop_name='field',
-	prop_value='hi there again!'
+	prop_name=property_name,
+	prop_value=property_value
 )
-ppp(found_example_DO)
+ppp([
+	'set property "key"->{0}, "value"->{1} for example data object:'.format(
+		property_name,
+		property_value
+	),
+	found_example_DO.state
+])
 
 # test save
-res = found_example_DO.save()
-ppp(res)
+saved_example_DO = found_example_DO.save()
+ppp(['saved example data object:', saved_example_DO.state])
 
 # test delete
-res = found_example_DO.delete()
-ppp(res)
+records_deleted_count = found_example_DO.delete()
+ppp('records deleted count: {0}'.format(records_deleted_count))
 
