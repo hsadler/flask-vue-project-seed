@@ -122,11 +122,10 @@ class BaseDataObject(metaclass=ABCMeta):
 				table_name=self.TABLE_NAME,
 				value_props=self.state,
 				where_props={
-					'id': self.state['id']
+					'id': self.get_prop('id')
 				}
 			)
 			return self if record_update_count == 1 else None
-
 		# new record
 		else:
 			new_record_id = self.db_driver.insert(
@@ -134,23 +133,30 @@ class BaseDataObject(metaclass=ABCMeta):
 				value_props=self.state
 			)
 			if new_record_id > 0:
-				return self.find_one(prop_dict={ 'id': new_record_id })
+				self = self.find_one(prop_dict={ 'id': new_record_id })
+				return self
 			else:
 				return None
 
 
 	def delete(self):
+
 		# TODO: may change this interface
+
 		record_delete_count = self.db_driver.delete_by_fields(
 			table_name=self.TABLE_NAME,
 			where_props={
-				'id': self.state['id']
+				'id': self.get_prop('id')
 			}
 		)
-		return True if record_delete_count else False
+		return True if record_delete_count > 0 else False
 
 
 	########## UTILITY METHODS ##########
+
+
+	def get_state(self):
+		return self.state
 
 
 	def to_json(self, pretty=False):

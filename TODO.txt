@@ -42,11 +42,11 @@ X implement mysql_driver class
 X test mysql_driver class
 
 TODO for dataobject layer:
-- architect dataobject layer (base_dataobject->child_dataobjects)
-- stub methods
-- create test script
-- implement class
-- test class
+X architect dataobject layer (base_dataobject->child_dataobjects)
+X stub methods
+X create test script
+X implement class
+X test class
 
 
 

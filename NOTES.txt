@@ -26,7 +26,7 @@ dataobject interface:
 		- delete()
 	other than CRUD interactions with the database_driver, dataobjects should
 	do things that pertain to itself:
-		- to_dict() (present its state)
+		- to_dict() or get_state() (present its state)
 		- ...more here
 
 

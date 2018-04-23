@@ -12,7 +12,7 @@ from utils.print import ppp
 created_example_DO = ExampleDataObject.create(
 	prop_dict={ 'field': 'hello world!' }
 )
-ppp(['created example data object: ', created_example_DO.state])
+ppp(['created example data object: ', created_example_DO.get_state()])
 
 # test find_many
 found_example_DOs = ExampleDataObject.find_many(
@@ -21,13 +21,13 @@ found_example_DOs = ExampleDataObject.find_many(
 )
 ppp('found example data objects:')
 for ex_DO in found_example_DOs:
-	ppp(ex_DO.state)
+	ppp(ex_DO.get_state())
 
 # test find_one
 found_example_DO = ExampleDataObject.find_one(
 	prop_dict={'id': 1}
 )
-ppp(['found one example data object: ', found_example_DO.state])
+ppp(['found one example data object: ', found_example_DO.get_state()])
 
 # test get_prop
 property_name = 'field'
@@ -49,14 +49,19 @@ ppp([
 		property_name,
 		property_value
 	),
-	found_example_DO.state
+	found_example_DO.get_state()
 ])
 
 # test save
 saved_example_DO = found_example_DO.save()
-ppp(['saved example data object:', saved_example_DO.state])
+ppp(['saved example data object:', saved_example_DO.get_state()])
 
 # test delete
-records_deleted_count = found_example_DO.delete()
-ppp('records deleted count: {0}'.format(records_deleted_count))
+to_delete_example_DO = ExampleDataObject.create(
+	prop_dict={ 'field': 'delete me...' }
+)
+to_delete_example_DO = to_delete_example_DO.save()
+ppp(['data object to delete:', to_delete_example_DO.get_state()])
+record_was_deleted = to_delete_example_DO.delete()
+ppp('record was deleted: {0}'.format(record_was_deleted))
 
