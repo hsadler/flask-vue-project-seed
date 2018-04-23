@@ -16,17 +16,17 @@ default could be either hardcoded or set in a dataobject.config.py file
 
 dataobject interface:
 	BaseDataObject class:
-		- create(prop_dict)
-		- find_many(prop_dict)
-		- find_one(prop_dict)
+		X create(prop_dict)
+		X find_many(prop_dict)
+		X find_one(prop_dict)
 		- *** maybe... find_or_create_by(prop_dict) ***
-		- get(prop_name)
-		- set(prop_name, prop_value)
-		- save()
-		- delete()
+		X get_prop(prop_name)
+		X set_prop(prop_name, prop_value)
+		X save()
+		X delete()
 	other than CRUD interactions with the database_driver, dataobjects should
 	do things that pertain to itself:
-		- to_dict() or get_state() (present its state)
+		X to_dict() (present its state)
 		- ...more here
 
 

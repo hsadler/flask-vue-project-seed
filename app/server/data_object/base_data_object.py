@@ -13,9 +13,9 @@ class BaseDataObject(metaclass=ABCMeta):
 	Provides base methods and interface for all proper data objects.
 
 	TODO:
-		- test
-		- write docstrings for all methods
+		X test
 		- add caching
+		- write docstrings for all methods
 	"""
 
 
@@ -155,7 +155,7 @@ class BaseDataObject(metaclass=ABCMeta):
 	########## UTILITY METHODS ##########
 
 
-	def get_state(self):
+	def to_dict(self):
 		return self.state
 
 

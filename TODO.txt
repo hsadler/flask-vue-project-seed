@@ -22,10 +22,13 @@ X add utils directory with helper modules
 X add application server config
 X add mysql database driver with basic CRUD interface
 X add database driver base class which enforces an interace on all subclasses
-- add dataobject layer
-- add base_dataobject
-- add example_dataobject
-- think about caching layer architecture
+X add dataobject layer
+X add base_data_object
+X add example_data_object
+- add docstrings to dataobject layer
+- build abstract base cache driver class and redis driver class
+- test redis driver
+- incorporate redis caching into base data object class
 
 TODO for application server config:
 X map-in items:
@@ -47,6 +50,9 @@ X stub methods
 X create test script
 X implement class
 X test class
+
+TODO for cache driver layer:
+- create base_cache
 
 
 

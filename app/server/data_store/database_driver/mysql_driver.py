@@ -3,18 +3,15 @@
 
 import MySQLdb as mdb
 import config.config as config
-from data_store.database_driver.base_driver import BaseDriver
+from data_store.database_driver.base_database_driver import BaseDatabaseDriver
 from utils.print import ppp
 
 import time
 
 
-class MySqlDriver(BaseDriver):
+class MySqlDriver(BaseDatabaseDriver):
 	"""
 	MySQL database driver which implements CRUD and utility public methods.
-
-	TODO:
-		- add 'WHERE' clause string builder
 	"""
 
 
@@ -111,15 +108,9 @@ class MySqlDriver(BaseDriver):
 
 		where_values = None
 		if len(where_props.keys()) > 0:
-			where_fields = []
-			where_values = []
-			for key, val in where_props.items():
-				where_fields.append(key)
-				where_values.append(val)
-			where_component = 'WHERE ' + ' AND '.join([
-				'`{}`=%s'.format(self.__escape(field))
-				for field in where_fields
-			])
+			where_component, where_values = self.__construct_where_clause(
+				where_props=where_props
+			)
 			query_stmt_components.append(where_component)
 			where_values = tuple(where_values)
 
@@ -194,15 +185,9 @@ class MySqlDriver(BaseDriver):
 
 		where_values = None
 		if len(where_props.keys()) > 0:
-			where_fields = []
-			where_values = []
-			for key, val in where_props.items():
-				where_fields.append(key)
-				where_values.append(val)
-			where_component = 'WHERE ' + ' AND '.join([
-				'`{}`=%s'.format(self.__escape(field))
-				for field in where_fields
-			])
+			where_component, where_values = self.__construct_where_clause(
+				where_props=where_props
+			)
 			query_stmt_components.append(where_component)
 		else:
 			raise RuntimeError(
@@ -244,15 +229,9 @@ class MySqlDriver(BaseDriver):
 
 		where_values = None
 		if len(where_props.keys()) > 0:
-			where_fields = []
-			where_values = []
-			for key, val in where_props.items():
-				where_fields.append(key)
-				where_values.append(val)
-			where_component = 'WHERE ' + ' AND '.join([
-				'`{}`=%s'.format(self.__escape(field))
-				for field in where_fields
-			])
+			where_component, where_values = self.__construct_where_clause(
+				where_props=where_props
+			)
 			query_stmt_components.append(where_component)
 		else:
 			raise RuntimeError(
@@ -269,6 +248,7 @@ class MySqlDriver(BaseDriver):
 
 	########## TABLE UTILITIES ##########
 
+
 	def create_table(self, table_name, column_props={}):
 		ppp('MySqlDriver.create_table not implemented yet...')
 		# CREATE TABLE example(
@@ -277,15 +257,18 @@ class MySqlDriver(BaseDriver):
 		# );
 		pass
 
+
 	def delete_table_contents(self, table_name):
 		ppp('MySqlDriver.delete_table_contents not implemented yet...')
 		# TRUNCATE TABLE table_name;
 		pass
 
+
 	def delete_table(self, table_name):
 		ppp('MySqlDriver.delete_table not implemented yet...')
 		# DROP TABLE table_name
 		pass
+
 
 	def describe_table(self, table_name):
 		query_stmt = "DESC {};".format(
@@ -295,6 +278,7 @@ class MySqlDriver(BaseDriver):
 			self.cur.execute(query_stmt)
 		return self.cur.fetchall()
 
+
 	def get_table_field_names(self, table_name):
 		table_desc = self.describe_table(table_name=table_name)
 		field_names = [col['Field'] for col in table_desc]
@@ -302,6 +286,7 @@ class MySqlDriver(BaseDriver):
 
 
 	########## DATABASE UTILITIES ##########
+
 
 	def get_database_size(self):
 		query_stmt = """
@@ -319,8 +304,23 @@ class MySqlDriver(BaseDriver):
 
 	########## PRIVATE HELPERS ##########
 
+
 	# escape strings for use in query strings
 	def __escape(self, string):
 		return mdb.escape_string(string).decode('utf-8')
+
+
+	def __construct_where_clause(self, where_props={}):
+		where_fields = []
+		where_values = []
+		for key, val in where_props.items():
+			where_fields.append(key)
+			where_values.append(val)
+		where_component = 'WHERE ' + ' AND '.join([
+			'`{}`=%s'.format(self.__escape(field))
+			for field in where_fields
+		])
+		return where_component, where_values
+
 
 
