@@ -52,7 +52,11 @@ X implement class
 X test class
 
 TODO for cache driver layer:
-- create base_cache
+- create and stub BaseCacheDriver
+- create and stub RedisDriver
+- test RedisDriver with test script
+
+
 
 
 
