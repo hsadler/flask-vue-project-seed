@@ -16,22 +16,25 @@ class RedisDriver(BaseCacheDriver):
 
 
 	def __init__(self):
-		self.r = redis.Redis(
+		self.r = redis.StrictRedis(
 			host=config.REDIS_HOST,
 			port=config.REDIS_PORT,
-			db=0
 		)
 
 
 	########## CRUD INTERFACE METHODS ##########
 
 
-	def set(self):
-		pass
+	def set(self, key, value):
+		return self.r.set(key, value)
 
 
-	def get(self):
-		pass
+	def get(self, key):
+		return self.r.get(key)
+
+
+	def delete(self, key):
+		return self.r.delete(key)
 
 
 

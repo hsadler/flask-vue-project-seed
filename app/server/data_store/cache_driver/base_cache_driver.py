@@ -18,9 +18,13 @@ class BaseCacheDriver(metaclass=ABCMeta):
 	########## CRUD INTERFACE METHODS ##########
 
 	@abstractmethod
-	def set(self):
+	def set(self, key, value):
 		pass
 
 	@abstractmethod
-	def get(self):
+	def get(self, key):
+		pass
+
+	@abstractmethod
+	def delete(self, key):
 		pass
