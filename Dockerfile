@@ -7,20 +7,20 @@ COPY requirements.txt /tmp/requirements.txt
 
 # OS installs, pip installs, etc. (https://pkgs.alpinelinux.org/packages)
 RUN apk add --no-cache \
-    python3=3.6.1-r3 \
-    python3-dev=3.6.1-r3 \
-    nodejs=6.10.3-r2 \
-    nodejs-npm=6.10.3-r2 \
-    bash=4.3.48-r1 \
-    mariadb-dev=10.1.26-r0 \
-    build-base=0.5-r0 \
-    supervisor=3.2.4-r0 \
-    nginx=1.12.2-r1 \
-    uwsgi=2.0.17-r0 \
-    uwsgi-python3=2.0.17-r0 && \
+    python3 \
+    python3-dev \
+    nodejs \
+    nodejs-npm \
+    bash \
+    mariadb-dev \
+    build-base \
+    supervisor \
+    nginx \
+    uwsgi \
+    uwsgi-python3 && \
     python3 -m ensurepip && \
     rm -r /usr/lib/python*/ensurepip && \
-    pip3 install pip setuptools==38.5.1 && \
+    pip3 install pip setuptools && \
     pip3 install -r /tmp/requirements.txt && \
     rm /etc/nginx/conf.d/default.conf && \
     rm -r /root/.cache
