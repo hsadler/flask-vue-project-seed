@@ -2,11 +2,11 @@
 # Redis Cache Driver
 
 import redis
+import json
+
 import config.config as config
 from data_store.cache_driver.base_cache_driver import BaseCacheDriver
 from utils.print import ppp
-
-import time
 
 
 class RedisDriver(BaseCacheDriver):
@@ -25,12 +25,21 @@ class RedisDriver(BaseCacheDriver):
 	########## CRUD INTERFACE METHODS ##########
 
 
-	def set(self, key, value):
-		return self.r.set(key, value)
+	def set(self, key, value, ttl=None):
+		json_value = json.dumps(value)
+		if ttl is not None:
+			return self.r.set(key, json_value, ex=ttl)
+		else:
+			return self.r.set(key, json_value)
 
 
 	def get(self, key):
-		return self.r.get(key)
+		json_value = self.r.get(key)
+		if json_value is not None:
+			value = json.loads(json_value)
+			return value
+		else:
+			return None
 
 
 	def delete(self, key):
