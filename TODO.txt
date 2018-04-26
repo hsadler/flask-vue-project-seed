@@ -25,10 +25,11 @@ X add database driver base class which enforces an interace on all subclasses
 X add dataobject layer
 X add base_data_object
 X add example_data_object
+X build abstract base cache driver class and redis driver class
+X test redis driver
+- incorporate caching into base data object class
+- add docstrings to caching layer
 - add docstrings to dataobject layer
-- build abstract base cache driver class and redis driver class
-- test redis driver
-- incorporate redis caching into base data object class
 
 TODO for application server config:
 X map-in items:
@@ -52,9 +53,15 @@ X implement class
 X test class
 
 TODO for cache driver layer:
-- create and stub BaseCacheDriver
-- create and stub RedisDriver
-- test RedisDriver with test script
+X create and stub BaseCacheDriver
+X create and stub RedisDriver
+X test RedisDriver with test script
+
+TODO for incorporating caching into base data object class:
+- think about where to apply caching:
+	- load
+	- save
+- stub private caching methods in BaseDataObject
 
 
 

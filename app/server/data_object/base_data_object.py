@@ -61,6 +61,8 @@ class BaseDataObject(metaclass=ABCMeta):
 			cache_driver_class=cache_driver_class
 		)
 
+		# TODO: before making trip to DB, try cache for data object here
+
 		records = db_driver.find_by_fields(
 			table_name=cls.TABLE_NAME,
 			where_props=prop_dict,
@@ -114,7 +116,7 @@ class BaseDataObject(metaclass=ABCMeta):
 
 	def save(self):
 
-		# TODO: may change this interface
+		# TODO: add caching of data object upon save here..
 
 		# existing record
 		if 'id' in self.state:
@@ -140,9 +142,6 @@ class BaseDataObject(metaclass=ABCMeta):
 
 
 	def delete(self):
-
-		# TODO: may change this interface
-
 		record_delete_count = self.db_driver.delete_by_fields(
 			table_name=self.TABLE_NAME,
 			where_props={
