@@ -20,6 +20,8 @@ class BaseDataObject(metaclass=ABCMeta):
 
 
 	def __init__(self, prop_dict, db_driver_class, cache_driver_class):
+		self.db_driver_class = db_driver_class
+		self.cache_driver_class = cache_driver_class
 		db_driver, cache_driver = self.__get_drivers(
 			db_driver_class=db_driver_class,
 			cache_driver_class=cache_driver_class
@@ -55,13 +57,14 @@ class BaseDataObject(metaclass=ABCMeta):
 		db_driver_class=None,
 		cache_driver_class=None
 	):
+		"""
+		Note: There is NO CACHING for this 'batch find' method
+		"""
 
 		db_driver, cache_driver = cls.__get_drivers(
 			db_driver_class=db_driver_class,
 			cache_driver_class=cache_driver_class
 		)
-
-		# TODO: before making trip to DB, try cache for data object here
 
 		records = db_driver.find_by_fields(
 			table_name=cls.TABLE_NAME,
@@ -89,6 +92,18 @@ class BaseDataObject(metaclass=ABCMeta):
 		cache_driver_class=None
 	):
 
+		# only check cache if finding solely by id
+		find_props = list(prop_dict.keys())
+		if len(find_props) == 1 and find_props[0] == 'id':
+			instance = cls.__load_from_cache(
+				id=prop_dict['id'],
+				db_driver_class=db_driver_class,
+				cache_driver_class=cache_driver_class
+			)
+			if instance is not None:
+				instance.__set_to_cache()
+				return instance
+
 		instance_list = cls.find_many(
 			prop_dict=prop_dict,
 			limit=1,
@@ -114,9 +129,9 @@ class BaseDataObject(metaclass=ABCMeta):
 			return False
 
 
-	def save(self):
+	def save(self, cache_ttl=None):
 
-		# TODO: add caching of data object upon save here..
+		result = None
 
 		# existing record
 		if 'id' in self.state:
@@ -127,7 +142,7 @@ class BaseDataObject(metaclass=ABCMeta):
 					'id': self.get_prop('id')
 				}
 			)
-			return self if record_update_count == 1 else None
+			result = self if record_update_count == 1 else None
 		# new record
 		else:
 			new_record_id = self.db_driver.insert(
@@ -135,10 +150,12 @@ class BaseDataObject(metaclass=ABCMeta):
 				value_props=self.state
 			)
 			if new_record_id > 0:
-				self = self.find_one(prop_dict={ 'id': new_record_id })
-				return self
-			else:
-				return None
+				result = self.find_one(prop_dict={ 'id': new_record_id })
+
+		if result is not None:
+			result.__set_to_cache()
+
+		return result
 
 
 	def delete(self):
@@ -148,7 +165,11 @@ class BaseDataObject(metaclass=ABCMeta):
 				'id': self.get_prop('id')
 			}
 		)
-		return True if record_delete_count > 0 else False
+		if record_delete_count > 0:
+			self.__delete_from_cache()
+			return True
+		else:
+			return False
 
 
 	########## UTILITY METHODS ##########
@@ -194,13 +215,58 @@ class BaseDataObject(metaclass=ABCMeta):
 			)
 
 		if cache_driver_class is not None:
-			cache_driver = cache_driver_class(
-				database_name=config.MYSQL_DB_NAME
-			)
+			cache_driver = cache_driver_class()
 
 		return db_driver, cache_driver
 
 
 	def __get_prop_names(self):
 		return self.db_driver.get_table_field_names(self.TABLE_NAME)
+
+
+	@classmethod
+	def __construct_cache_key(cls, id):
+		cache_key = '{0}_id={1}'.format(
+			cls.TABLE_NAME,
+			id
+		)
+		return cache_key
+
+
+	def __set_to_cache(self, ttl=None):
+		cache_key = self.__construct_cache_key(id=self.get_prop('id'))
+		cache_value = self.to_dict()
+		ttl = ttl if ttl is not None else self.DEFAULT_CACHE_TTL
+		self.cache_driver.set(
+			key=cache_key,
+			value=cache_value,
+			ttl=ttl
+		)
+
+
+	@classmethod
+	def __load_from_cache(cls, id, db_driver_class, cache_driver_class):
+		db_driver, cache_driver = cls.__get_drivers(
+			db_driver_class=db_driver_class,
+			cache_driver_class=cache_driver_class
+		)
+		cache_key = cls.__construct_cache_key(id=id)
+		cached_value = cache_driver.get(cache_key)
+		if cached_value is not None:
+			instance = cls(
+				prop_dict=cached_value,
+				db_driver_class=db_driver_class,
+				cache_driver_class=cache_driver_class
+			)
+			return instance
+		else:
+			return None
+
+
+	def __delete_from_cache(self):
+		cache_key = self.__construct_cache_key(id=self.get_prop('id'))
+		self.cache_driver.delete(cache_key)
+
+
+
 

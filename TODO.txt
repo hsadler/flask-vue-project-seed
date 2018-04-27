@@ -27,7 +27,8 @@ X add base_data_object
 X add example_data_object
 X build abstract base cache driver class and redis driver class
 X test redis driver
-- incorporate caching into base data object class
+X incorporate caching into base data object class
+- test data object caching with ExampleDataObject
 - add docstrings to caching layer
 - add docstrings to dataobject layer
 
@@ -58,10 +59,16 @@ X create and stub RedisDriver
 X test RedisDriver with test script
 
 TODO for incorporating caching into base data object class:
-- think about where to apply caching:
-	- load
-	- save
-- stub private caching methods in BaseDataObject
+X think about where to apply caching:
+	X load
+	X save
+	X delete
+X stub private caching methods in BaseDataObject
+X incorporate caching in CRUD methods
+X test new caching with testExampleDataObject test script
+- update testExampleDataObject script to test caching specifically
+- test with testExampleDataObject script again
+
 
 
 
