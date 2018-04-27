@@ -14,7 +14,7 @@ class BaseDataObject(metaclass=ABCMeta):
 
 	TODO:
 		X test
-		- add caching
+		X add caching
 		- write docstrings for all methods
 	"""
 
