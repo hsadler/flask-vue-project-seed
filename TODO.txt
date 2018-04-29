@@ -29,7 +29,7 @@ X build abstract base cache driver class and redis driver class
 X test redis driver
 X incorporate caching into base data object class
 X test data object caching with ExampleDataObject
-- add docstrings to caching layer
+X add docstrings to caching layer
 - add docstrings to dataobject layer
 - finish implementing MySqlDriver table methods
 

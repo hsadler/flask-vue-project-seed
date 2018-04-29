@@ -75,7 +75,7 @@ class RedisDriver(BaseCacheDriver):
 
 	def delete(self, key):
 		"""
-		Redis driver interface method for cached items by key.
+		Redis driver interface method for deleting cached items by key.
 
 		Args:
 			key (str): Cache key.
@@ -90,14 +90,17 @@ class RedisDriver(BaseCacheDriver):
 
 	########## REDIS SPECIFIC METHODS ##########
 
+
 	def get_all_keys(self):
 		"""
-		TODO
+		Get a list of all currently set Redis cache keys.
+
+		Returns:
+			(list) List of strings.
 
 		"""
 
-		ppp('RedisDriver.get_all_keys() not implemented yet...')
-		pass
+		return [ str(x, 'utf-8') for x in self.r.keys() ]
 
 
 

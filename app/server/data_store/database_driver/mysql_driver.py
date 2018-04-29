@@ -105,7 +105,8 @@ class MySqlDriver(BaseDatabaseDriver):
 			limit (int or None): Positive integer limit for query results list.
 
 		Returns:
-			List of dictionaries representing MySQL records (deserialized).
+			(tuple) Tuple of dictionaries representing MySQL records
+			(deserialized).
 
 		"""
 
@@ -268,7 +269,7 @@ class MySqlDriver(BaseDatabaseDriver):
 			query_string (str): raw MySQL query string.
 
 		Returns:
-			(list) List of dictionary representation of records.
+			(tuple) Tuple of dictionary representation of records.
 
 		"""
 

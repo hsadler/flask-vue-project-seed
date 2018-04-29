@@ -77,4 +77,14 @@ ppp('tests passed: {}'.format(tests_passed))
 ppp('tests failed: {}'.format(tests_failed))
 
 
+######## TEST REDIS SPECIFIC METHODS ########
+
+redis_driver.set(
+	key='my_key',
+	value='my_value',
+	ttl=30
+)
+redis_keys = redis_driver.get_all_keys()
+ppp(['all currently set Redis keys:', redis_keys])
+
 
