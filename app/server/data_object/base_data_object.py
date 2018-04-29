@@ -89,7 +89,8 @@ class BaseDataObject(metaclass=ABCMeta):
 		cls,
 		prop_dict={},
 		db_driver_class=None,
-		cache_driver_class=None
+		cache_driver_class=None,
+		cache_ttl=None
 	):
 
 		# only check cache if finding solely by id
@@ -101,7 +102,7 @@ class BaseDataObject(metaclass=ABCMeta):
 				cache_driver_class=cache_driver_class
 			)
 			if instance is not None:
-				instance.__set_to_cache()
+				instance.__set_to_cache(ttl=cache_ttl)
 				return instance
 
 		instance_list = cls.find_many(
@@ -153,7 +154,7 @@ class BaseDataObject(metaclass=ABCMeta):
 				result = self.find_one(prop_dict={ 'id': new_record_id })
 
 		if result is not None:
-			result.__set_to_cache()
+			result.__set_to_cache(ttl=cache_ttl)
 
 		return result
 
@@ -241,6 +242,19 @@ class BaseDataObject(metaclass=ABCMeta):
 			key=cache_key,
 			value=cache_value,
 			ttl=ttl
+		)
+
+
+	@classmethod
+	def load_from_cache(cls, id, db_driver_class, cache_driver_class):
+		"""
+		This public method is a wrapper of the private method
+		'__load_from_cache()', and only exists for testing purposes.
+		"""
+		return cls.__load_from_cache(
+			id=id,
+			db_driver_class=db_driver_class,
+			cache_driver_class=cache_driver_class
 		)
 
 

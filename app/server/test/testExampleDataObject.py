@@ -81,19 +81,21 @@ example_DO = ExampleDataObject.create(
 	prop_dict={ 'field': 'i am going to be cached' }
 )
 saved_and_cached_example_DO = example_DO.save(cache_ttl=1)
-from_cache_example_DO = ExampleDataObject.__load_from_cache(
+
+from_cache_example_DO = ExampleDataObject.load_from_cache(
 	id=saved_and_cached_example_DO.get_prop('id'),
 	db_driver_class=MySqlDriver,
 	cache_driver_class=RedisDriver
 )
-ppp(['this should exist from the Redis cache:', from_cache_example_DO])
+ppp(['this should exist in the Redis cache:', from_cache_example_DO])
+
 time.sleep(2)
-from_cache_example_DO = ExampleDataObject.__load_from_cache(
+from_cache_example_DO = ExampleDataObject.load_from_cache(
 	id=saved_and_cached_example_DO.get_prop('id'),
 	db_driver_class=MySqlDriver,
 	cache_driver_class=RedisDriver
 )
-ppp(['this should NOT exist from the Redis cache:', from_cache_example_DO])
+ppp(['this should NOT exist in the Redis cache:', from_cache_example_DO])
 
 
 
