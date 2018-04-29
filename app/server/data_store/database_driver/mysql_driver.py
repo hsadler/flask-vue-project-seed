@@ -20,6 +20,16 @@ class MySqlDriver(BaseDatabaseDriver):
 
 
 	def __init__(self, database_name):
+		"""
+		MySQL driver instance constructor.
+
+		Sets database name and configures the MySQL server connection and
+		cursor.
+
+		Args:
+			database_name (str): Name of MySQL database.
+
+		"""
 		self.database_name = self.__escape(database_name)
 		self.conn = mdb.connect(
 			host=config.MYSQL_HOST,
@@ -46,7 +56,7 @@ class MySqlDriver(BaseDatabaseDriver):
 				key=column name and value=column value.
 
 		Returns:
-			(integet) 'id' of the inserted record.
+			(int) 'id' of the inserted record.
 
 		"""
 
@@ -205,6 +215,7 @@ class MySqlDriver(BaseDatabaseDriver):
 	def delete_by_fields(self, table_name, where_props={}):
 		"""
 		MySQL driver interface method for deleting records by conditionals.
+
 		TODO:
 			- add AND/OR specification to WHERE clause
 			- add conditional type specification to WHERE clause:
@@ -246,11 +257,30 @@ class MySqlDriver(BaseDatabaseDriver):
 			return self.cur.rowcount
 
 
+	########## MYSQL SPECIFIC METHODS ##########
+
+
+	def query(self, query_string):
+		"""
+		Performs a MySQL query from a raw query string and returns the result.
+
+		Args:
+			query_string (str): raw MySQL query string.
+
+		Returns:
+			(list) List of dictionary representation of records.
+
+		"""
+
+		self.cur.execute(query_string)
+		return self.cur.fetchall()
+
+
 	########## TABLE UTILITIES ##########
 
 
 	def create_table(self, table_name, column_props={}):
-		ppp('MySqlDriver.create_table not implemented yet...')
+		ppp('MySqlDriver.create_table() not implemented yet...')
 		# CREATE TABLE example(
 		# 	id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 		# 	example_column VARCHAR(255)
@@ -259,13 +289,13 @@ class MySqlDriver(BaseDatabaseDriver):
 
 
 	def delete_table_contents(self, table_name):
-		ppp('MySqlDriver.delete_table_contents not implemented yet...')
+		ppp('MySqlDriver.delete_table_contents() not implemented yet...')
 		# TRUNCATE TABLE table_name;
 		pass
 
 
 	def delete_table(self, table_name):
-		ppp('MySqlDriver.delete_table not implemented yet...')
+		ppp('MySqlDriver.delete_table() not implemented yet...')
 		# DROP TABLE table_name
 		pass
 

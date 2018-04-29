@@ -28,9 +28,10 @@ X add example_data_object
 X build abstract base cache driver class and redis driver class
 X test redis driver
 X incorporate caching into base data object class
-- test data object caching with ExampleDataObject
+X test data object caching with ExampleDataObject
 - add docstrings to caching layer
 - add docstrings to dataobject layer
+- finish implementing MySqlDriver table methods
 
 TODO for application server config:
 X map-in items:
@@ -66,8 +67,8 @@ X think about where to apply caching:
 X stub private caching methods in BaseDataObject
 X incorporate caching in CRUD methods
 X test new caching with testExampleDataObject test script
-- update testExampleDataObject script to test caching specifically
-- test with testExampleDataObject script again
+X update testExampleDataObject script to specifically test caching
+X test with testExampleDataObject script again
 
 
 

@@ -16,6 +16,12 @@ class RedisDriver(BaseCacheDriver):
 
 
 	def __init__(self):
+		"""
+		Redis driver instance constructor. Configures the Redis connection with
+		host and port.
+
+		"""
+
 		self.r = redis.StrictRedis(
 			host=config.REDIS_HOST,
 			port=config.REDIS_PORT,
@@ -26,6 +32,20 @@ class RedisDriver(BaseCacheDriver):
 
 
 	def set(self, key, value, ttl=None):
+		"""
+		Redis driver interface method for setting values with key and
+		time-to-live.
+
+		Args:
+			key (str): Cache key.
+			value (mixed): Python data structure to save to cache.
+			ttl (int): Cached item time-to-live in seconds.
+
+		Returns:
+			(bool) Successful cache set.
+
+		"""
+
 		json_value = json.dumps(value)
 		if ttl is not None:
 			return self.r.set(key, json_value, ex=ttl)
@@ -34,6 +54,17 @@ class RedisDriver(BaseCacheDriver):
 
 
 	def get(self, key):
+		"""
+		Redis driver interface method for getting cached values by key.
+
+		Args:
+			key (str): Cache key.
+
+		Returns:
+			(mixed) Cached python data structre value.
+
+		"""
+
 		json_value = self.r.get(key)
 		if json_value is not None:
 			value = json.loads(json_value)
@@ -43,7 +74,30 @@ class RedisDriver(BaseCacheDriver):
 
 
 	def delete(self, key):
+		"""
+		Redis driver interface method for cached items by key.
+
+		Args:
+			key (str): Cache key.
+
+		Returns:
+			(int) Successful cache delete.
+
+		"""
+
 		return self.r.delete(key)
+
+
+	########## REDIS SPECIFIC METHODS ##########
+
+	def get_all_keys(self):
+		"""
+		TODO
+
+		"""
+
+		ppp('RedisDriver.get_all_keys() not implemented yet...')
+		pass
 
 
 

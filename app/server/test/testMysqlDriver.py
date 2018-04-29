@@ -60,6 +60,13 @@ rows_deleted = mysql_driver.delete_by_fields(
 ppp('rows deleted: ' + str(rows_deleted))
 
 
+######## TEST MYSQL SPECIFIC METHODS ########
+
+select_query = 'SELECT * FROM person WHERE male=1 LIMIT 5'
+select_query_result = mysql_driver.query(query_string=select_query)
+ppp(['result of select query:', select_query_result])
+
+
 ######## TEST TABLE UTILS ########
 
 description = mysql_driver.describe_table(table_name="example")
