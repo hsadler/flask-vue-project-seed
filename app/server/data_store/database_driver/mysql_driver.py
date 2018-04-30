@@ -269,7 +269,7 @@ class MySqlDriver(BaseDatabaseDriver):
 			query_string (str): raw MySQL query string.
 
 		Returns:
-			(tuple) Tuple of dictionary representation of records.
+			(tuple) Tuple of dictionary representations of records.
 
 		"""
 
@@ -278,27 +278,6 @@ class MySqlDriver(BaseDatabaseDriver):
 
 
 	########## TABLE UTILITIES ##########
-
-
-	def create_table(self, table_name, column_props={}):
-		ppp('MySqlDriver.create_table() not implemented yet...')
-		# CREATE TABLE example(
-		# 	id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-		# 	example_column VARCHAR(255)
-		# );
-		pass
-
-
-	def delete_table_contents(self, table_name):
-		ppp('MySqlDriver.delete_table_contents() not implemented yet...')
-		# TRUNCATE TABLE table_name;
-		pass
-
-
-	def delete_table(self, table_name):
-		ppp('MySqlDriver.delete_table() not implemented yet...')
-		# DROP TABLE table_name
-		pass
 
 
 	def describe_table(self, table_name):
@@ -336,12 +315,20 @@ class MySqlDriver(BaseDatabaseDriver):
 	########## PRIVATE HELPERS ##########
 
 
-	# escape strings for use in query strings
 	def __escape(self, string):
+		"""
+		Escape strings for use in query strings.
+
+		"""
+
 		return mdb.escape_string(string).decode('utf-8')
 
 
 	def __construct_where_clause(self, where_props={}):
+		"""
+		'WHERE' clause string constructor.
+
+		"""
 		where_fields = []
 		where_values = []
 		for key, val in where_props.items():

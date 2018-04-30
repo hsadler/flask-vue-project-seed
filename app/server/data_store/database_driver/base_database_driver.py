@@ -37,18 +37,6 @@ class BaseDatabaseDriver(metaclass=ABCMeta):
 	########## TABLE UTILITIES ##########
 
 	@abstractmethod
-	def create_table(self, table_name, column_props={}):
-		pass
-
-	@abstractmethod
-	def delete_table_contents(self, table_name):
-		pass
-
-	@abstractmethod
-	def delete_table(self, table_name):
-		pass
-
-	@abstractmethod
 	def describe_table(self, table_name):
 		pass
 
