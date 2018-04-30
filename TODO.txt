@@ -30,7 +30,7 @@ X test redis driver
 X incorporate caching into base data object class
 X test data object caching with ExampleDataObject
 X add docstrings to caching layer
-- add docstrings to dataobject layer
+X add docstrings to dataobject layer
 - finish implementing MySqlDriver table methods
 
 TODO for application server config:

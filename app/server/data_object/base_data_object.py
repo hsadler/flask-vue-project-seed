@@ -12,14 +12,21 @@ class BaseDataObject(metaclass=ABCMeta):
 	"""
 	Provides base methods and interface for all proper data objects.
 
-	TODO:
-		X test
-		X add caching
-		- write docstrings for all methods
 	"""
 
 
 	def __init__(self, prop_dict, db_driver_class, cache_driver_class):
+		"""
+		Data object instance constructor. Configures the database driver, cache
+		driver, and state dictionary.
+
+		Args:
+			prop_dict (dict): Dictionary representing data object state.
+			db_driver_class (class): Database driver class.
+			cache_driver_class (class): Cache driver class.
+
+		"""
+
 		self.db_driver_class = db_driver_class
 		self.cache_driver_class = cache_driver_class
 		db_driver, cache_driver = self.__get_drivers(
@@ -41,6 +48,19 @@ class BaseDataObject(metaclass=ABCMeta):
 		db_driver_class=None,
 		cache_driver_class=None
 	):
+		"""
+		Data object creation method. Basically a class method wrapper of the
+		constructor method.
+
+		Args:
+			prop_dict (dict): Dictionary representing data object state.
+			db_driver_class (class): Database driver class.
+			cache_driver_class (class): Cache driver class.
+
+		Returns:
+			(object) Data object instance.
+
+		"""
 
 		return cls(
 			prop_dict=prop_dict,
@@ -58,7 +78,20 @@ class BaseDataObject(metaclass=ABCMeta):
 		cache_driver_class=None
 	):
 		"""
-		Note: There is NO CACHING for this 'batch find' method
+		Data object database search method. Search for multiple records matching
+		all properties in the prop_dict dictionary.
+
+		Note: There is NO CACHING for this 'batch find' method.
+
+		Args:
+			prop_dict (dict): Dictionary representing data object state.
+			limit (int): Limit lenth of returned data object list.
+			db_driver_class (class): Database driver class.
+			cache_driver_class (class): Cache driver class.
+
+		Returns:
+			(list) List of data object instances.
+
 		"""
 
 		db_driver, cache_driver = cls.__get_drivers(
@@ -92,6 +125,20 @@ class BaseDataObject(metaclass=ABCMeta):
 		cache_driver_class=None,
 		cache_ttl=None
 	):
+		"""
+		Data object database search method. Search for single records matching
+		all properties in the prop_dict dictionary.
+
+		Args:
+			prop_dict (dict): Dictionary representing data object state.
+			db_driver_class (class): Database driver class.
+			cache_driver_class (class): Cache driver class.
+			cache_ttl (int): Cache time-to-live in seconds.
+
+		Returns:
+			(object) Data object instance.
+
+		"""
 
 		# only check cache if finding solely by id
 		find_props = list(prop_dict.keys())
@@ -119,10 +166,33 @@ class BaseDataObject(metaclass=ABCMeta):
 
 
 	def get_prop(self, prop_name):
+		"""
+		Data object property getter method.
+
+		Args:
+			prop_name (str): Name of property.
+
+		Returns:
+			(mixed) Data object property.
+
+		"""
+
 		return self.state[prop_name]
 
 
 	def set_prop(self, prop_name, prop_value):
+		"""
+		Data object property setter method.
+
+		Args:
+			prop_name (str): Name of property.
+			prop_value (mixed): Property value.
+
+		Returns:
+			(bool) Property set success.
+
+		"""
+
 		if prop_name in self.state:
 			self.state[prop_name] = prop_value
 			return True
@@ -131,6 +201,16 @@ class BaseDataObject(metaclass=ABCMeta):
 
 
 	def save(self, cache_ttl=None):
+		"""
+		Data object database save method.
+
+		Args:
+			cache_ttl (int): Cache time-to-live in seconds.
+
+		Returns:
+			(object) Data object instance.
+
+		"""
 
 		result = None
 
@@ -160,6 +240,14 @@ class BaseDataObject(metaclass=ABCMeta):
 
 
 	def delete(self):
+		"""
+		Data object database delete method.
+
+		Returns:
+			(bool) Database delete success.
+
+		"""
+
 		record_delete_count = self.db_driver.delete_by_fields(
 			table_name=self.TABLE_NAME,
 			where_props={
@@ -177,14 +265,33 @@ class BaseDataObject(metaclass=ABCMeta):
 
 
 	def to_dict(self):
+		"""
+		Get data object's state in dictionary format.
+
+		Returns:
+			(dict) Dictionary representation of data object.
+
+		"""
+
 		return self.state
 
 
 	def to_json(self, pretty=False):
+		"""
+		Get data object's state formatted as JSON string.
+
+		Args:
+			pretty (bool): Option for getting JSON string in pretty format.
+
+		Returns:
+			(str) JSON string.
+
+		"""
+
 		if pretty:
-			return json.dumps(self.state, sort_keys=True, indent=2)
+			return json.dumps(self.to_dict(), sort_keys=True, indent=2)
 		else:
-			return json.dumps(self.state)
+			return json.dumps(self.to_dict())
 
 
 	########## INTERFACE METHODS ##########
@@ -250,6 +357,7 @@ class BaseDataObject(metaclass=ABCMeta):
 		"""
 		This public method is a wrapper of the private method
 		'__load_from_cache()', and only exists for testing purposes.
+
 		"""
 		return cls.__load_from_cache(
 			id=id,
