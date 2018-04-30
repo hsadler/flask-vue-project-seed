@@ -15,7 +15,7 @@
 
 ***** This is a work in progress, but... *****
 
-Both the dev and prod mode Docker containers are working at a basic level.
+Both the dev and prod mode Docker containers are working.
 
 Prod mode serves exclusively from the Flask backend (app index.html, static
 assets, and JSON API).
@@ -28,6 +28,15 @@ be automatically reflected in the container's server responses.
 I imagine this could be used to develope both locally or on a remote dev host.
 Just fire-up '. dev.sh' and rsync files upon update. Even webpack's hot-reload
 works from the container!
+
+Included in this project is a homebrewed database driver, cache driver and data
+object architecture to provide a starting point for new projects.
+
+Here's an outline of the multitier architecture so far:
+- api (client endpoints, call into model layer, format response)
+- model (operate on data objects, business logic)
+- data object (stateful models, represent deserialized records, implements CRUD)
+- data store driver (intermediary interface between application and datastore)
 
 
 ## Usage
