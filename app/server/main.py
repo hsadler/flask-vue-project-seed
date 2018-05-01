@@ -6,6 +6,8 @@ from flask import (
     jsonify
 )
 
+from api.web.wall_messages_api import web_wall_messages_api
+
 
 # init Flask app instance
 app = Flask(
@@ -13,6 +15,10 @@ app = Flask(
     static_folder='../client/dist/static',
     template_folder='../client/dist'
 )
+
+
+# register api routes
+app.register_blueprint(web_wall_messages_api, url_prefix='/api/wall-messages')
 
 
 # sample API route
