@@ -4,7 +4,7 @@ NOTES:
 // Backend architecture layers
 - route registry (central routing registry)
 - api (client endpoints, call into model layer, format response)
-- model (operate on data objects, business logic)
+- service (operate on data objects, business logic)
 - data object (stateful models, represent deserialized records, implements CRUD)
 - data store driver (intermediary interface between application and datastore)
 
@@ -46,4 +46,11 @@ CREATE TABLE example (
 	field VARCHAR(255)
 );
 
+CREATE TABLE wall_message (
+	id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+	created_ts INT(11) NOT NULL,
+	updated_ts INT(11) NOT NULL,
+	message VARCHAR(1000),
+	attribution VARCHAR(255)
+);
 

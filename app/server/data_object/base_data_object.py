@@ -294,12 +294,6 @@ class BaseDataObject(metaclass=ABCMeta):
 			return json.dumps(self.to_dict())
 
 
-	########## INTERFACE METHODS ##########
-
-
-	# ...
-
-
 	########## PRIVATE HELPERS ##########
 
 

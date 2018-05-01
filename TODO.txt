@@ -33,6 +33,7 @@ X add docstrings to caching layer
 X add docstrings to dataobject layer
 X finish implementing MySqlDriver table methods
 - architect backend endpoint routing
+- change 'model' layer to be named 'service'
 - implement a message board for fullstack example of framework
 
 TODO for application server config:

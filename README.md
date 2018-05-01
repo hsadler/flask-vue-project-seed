@@ -34,7 +34,7 @@ object architecture to provide a starting point for new projects.
 
 Here's an outline of the multitier architecture so far:
 - api (client endpoints, call into model layer, format response)
-- model (operate on data objects, business logic)
+- service (operate on data objects, business logic)
 - data object (stateful models, represent deserialized records, implements CRUD)
 - data store driver (intermediary interface between application and datastore)
 
