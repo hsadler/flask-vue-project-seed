@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/views/Home'
-import About from '@/views/About'
+import WallMessages from '@/views/WallMessages'
 import NotFound from '@/views/NotFound'
 
 Vue.use(Router)
@@ -15,9 +15,9 @@ export default new Router({
       component: Home
     },
     {
-      path: '/about',
-      name: 'About',
-      component: About
+      path: '/wall-messages',
+      name: 'WallMessages',
+      component: WallMessages
     },
     {
       path: '*',

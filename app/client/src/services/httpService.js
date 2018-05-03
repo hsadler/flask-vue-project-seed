@@ -7,6 +7,11 @@ class HttpService {
       return res.data
     })
   }
+  post (url, options) {
+    return axios.post(url, options).then(res => {
+      return res.data
+    })
+  }
 }
 
 export default new HttpService()

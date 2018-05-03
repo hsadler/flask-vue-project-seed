@@ -1,7 +1,7 @@
 <template>
   <div class="navigation-container">
     <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+    <router-link to="/wall-messages">Wall Messages</router-link>
   </div>
 </template>
 

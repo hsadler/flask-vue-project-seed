@@ -32,9 +32,9 @@ X test data object caching with ExampleDataObject
 X add docstrings to caching layer
 X add docstrings to dataobject layer
 X finish implementing MySqlDriver table methods
-- architect backend endpoint routing
+X architect backend endpoint routing
 X change 'model' layer to be named 'service'
-- implement a message board for fullstack example of framework
+X implement a message board for fullstack example of framework
 
 TODO for application server config:
 X map-in items:
@@ -74,11 +74,11 @@ X update testExampleDataObject script to specifically test caching
 X test with testExampleDataObject script again
 
 TODO for message board example:
-- create MySQL table 'wall_message'
-- create and implement WallMessageDataObject class
-- create and implement WallMessageModel class
-- create and implement WallMessageWebAPI class
-- create and implement web client view, components, state, backend calls
+X create MySQL table 'wall_message'
+X create and implement WallMessageDataObject class
+X create and implement WallMessageModel class
+X create and implement WallMessageWebAPI class
+X create and implement web client view, components, state, backend calls
 
 
 

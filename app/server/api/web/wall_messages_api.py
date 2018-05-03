@@ -1,5 +1,8 @@
 
-from flask import Blueprint, jsonify
+
+# Wall Messages API
+
+from flask import Blueprint, jsonify, request
 
 from service.wall_messages import WallMessages
 web_wall_messages_api = Blueprint('web_wall_messages_api', __name__)
@@ -24,10 +27,14 @@ def add_message():
 
 	"""
 
-	message_body = str(request.form['body'])
-	message_attribution = str(request.form['attribution'])
+	r = request.get_json()
+	message_body = r['message']
+	message_attribution = r['attribution']
 	wm = WallMessages.add_message(
 		message_body=message_body,
 		message_attribution=message_attribution
 	)
-	return jsonify(wm)
+	return jsonify(wm.to_dict())
+
+
+
