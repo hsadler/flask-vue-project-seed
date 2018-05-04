@@ -6,7 +6,6 @@ import json
 
 import config.config as config
 from data_store.cache_driver.base_cache_driver import BaseCacheDriver
-from utils.print import ppp
 
 
 class RedisDriver(BaseCacheDriver):

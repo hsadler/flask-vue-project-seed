@@ -4,6 +4,7 @@
 
 from flask import Blueprint, jsonify, request
 
+from data_store.cache_driver.redis_driver import RedisDriver
 from service.wall_messages import WallMessages
 web_wall_messages_api = Blueprint('web_wall_messages_api', __name__)
 
@@ -11,12 +12,19 @@ web_wall_messages_api = Blueprint('web_wall_messages_api', __name__)
 @web_wall_messages_api.route('/get-all', methods=['GET'])
 def get_all():
 	"""
-	Get all wall messages.
+	Get all wall messages. Recached every 10 seconds
 
 	"""
 
+	cache_key = 'web_wall_messages_api_get_all_wall_messages'
+	cache = RedisDriver()
+	cache_res = cache.get(key=cache_key)
+	if cache_res is not None:
+		return jsonify(cache_res)
+
 	wms = WallMessages.get_all()
 	response = [ wm.to_dict() for wm in wms ]
+	cache.set(key=cache_key, value=response, ttl=10)
 	return jsonify(response)
 
 
