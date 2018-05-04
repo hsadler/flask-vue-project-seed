@@ -1,6 +1,6 @@
 <template>
   <div class="home-container">
-    <p>Home page</p>
+    <h1>Home page</h1>
     <button @click="getApiRandomNumber()">
       get a random number from the Flask backend
     </button>

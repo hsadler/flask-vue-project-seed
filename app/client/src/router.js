@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/views/Home'
 import WallMessages from '@/views/WallMessages'
+import EditWallMessage from '@/views/EditWallMessage'
 import NotFound from '@/views/NotFound'
 
 Vue.use(Router)
@@ -18,6 +19,11 @@ export default new Router({
       path: '/wall-messages',
       name: 'WallMessages',
       component: WallMessages
+    },
+    {
+      path: '/edit-message/:id',
+      name: 'EditWallMessage',
+      component: EditWallMessage
     },
     {
       path: '*',

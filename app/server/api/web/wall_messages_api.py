@@ -20,6 +20,18 @@ def get_all():
 	return jsonify(response)
 
 
+@web_wall_messages_api.route('/find-one', methods=['GET'])
+def find_one():
+	"""
+	Find a wall message by id.
+
+	"""
+
+	message_id = request.args.get('message_id')
+	wm = WallMessages.find_one(message_id=message_id)
+	return jsonify(wm.to_dict())
+
+
 @web_wall_messages_api.route('/add-message', methods=['POST'])
 def add_message():
 	"""
@@ -31,6 +43,25 @@ def add_message():
 	message_body = r['message']
 	message_attribution = r['attribution']
 	wm = WallMessages.add_message(
+		message_body=message_body,
+		message_attribution=message_attribution
+	)
+	return jsonify(wm.to_dict())
+
+
+@web_wall_messages_api.route('/update-message', methods=['POST'])
+def update_message():
+	"""
+	Update a wall message.
+
+	"""
+
+	r = request.get_json()
+	message_id = r['message_id']
+	message_body = r['message_body']
+	message_attribution = r['message_attribution']
+	wm = WallMessages.update_message(
+		message_id=message_id,
 		message_body=message_body,
 		message_attribution=message_attribution
 	)

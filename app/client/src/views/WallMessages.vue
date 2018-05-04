@@ -1,12 +1,14 @@
 <template>
   <div class="wall-messages-container">
 
+    <h1>Wall Messages</h1>
+
     <section class="messages-section">
-      <h1>Wall Messages</h1>
       <div
         class="wall-message"
         v-for="(message, index) in wallMessages"
         :key="index"
+        @click="goToEditMessage(message)"
       >
         <p>{{ message.message }}</p>
         <p>~ {{ message.attribution }}</p>
@@ -48,6 +50,12 @@ export default {
       this.httpService.post(url, options).then((res) => {
         this.wallMessages.push(res)
       })
+    },
+    goToEditMessage (message) {
+      this.$router.push({
+        name: 'EditWallMessage',
+        params: { id: message.id }
+      })
     }
   },
   created () {
@@ -69,6 +77,7 @@ export default {
         padding: 0 20px;
         text-align: left;
         border: 1px solid gray;
+        cursor: pointer;
       }
     }
 

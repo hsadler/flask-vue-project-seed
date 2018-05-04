@@ -79,6 +79,8 @@ X create and implement WallMessageDataObject class
 X create and implement WallMessageModel class
 X create and implement WallMessageWebAPI class
 X create and implement web client view, components, state, backend calls
+- add wall message edit feature
+- add caching
 
 
 
