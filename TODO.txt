@@ -85,8 +85,10 @@ X add caching
 
 TODO for final cleanup
 X create script for wall_message table creation
-- delete test files
-- delete test class ExampleDataObject
+X delete test class ExampleDataObject
+X delect test script for testing ExampleDataObject
+- alter test scripts to be able to be run without outside table creations in
+	mysql
 - delete NOTES file
 - delete test backend API endpoints
 - cleanup everything else that doesn't focus on the WallMessage feature
