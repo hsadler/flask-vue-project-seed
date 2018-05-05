@@ -35,6 +35,7 @@ X finish implementing MySqlDriver table methods
 X architect backend endpoint routing
 X change 'model' layer to be named 'service'
 X implement a message board for fullstack example of framework
+- do cleanup for final version of project-seed
 
 TODO for application server config:
 X map-in items:
@@ -82,7 +83,13 @@ X create and implement web client view, components, state, backend calls
 X add wall message edit feature
 X add caching
 
-
+TODO for final cleanup
+X create script for wall_message table creation
+- delete test files
+- delete test class ExampleDataObject
+- delete NOTES file
+- delete test backend API endpoints
+- cleanup everything else that doesn't focus on the WallMessage feature
 
 
 
