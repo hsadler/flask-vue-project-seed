@@ -1,43 +1,20 @@
 <template>
   <div class="home-container">
     <h1>Home page</h1>
-    <button @click="getApiRandomNumber()">
-      get a random number from the Flask backend
-    </button>
-    <p>{{ httpResponse ? httpResponse : 'nothing yet' }}</p>
   </div>
 </template>
 
 <script>
-import services from '@/services'
-
 export default {
   name: 'HomePage',
   props: {},
   data () {
-    return {
-      httpService: services.use('httpService'),
-      httpResponse: null
-    }
+    return {}
   },
-  methods: {
-    getApiRandomNumber () {
-      this.httpService.get('/api/random').then((res) => {
-        if (res.randomNumber) {
-          this.httpResponse = res.randomNumber
-        } else {
-          this.httpResponse = 'failed response...'
-        }
-      })
-    }
-  }
+  methods: {}
 }
 </script>
 
 <style scoped lang="scss">
-  div.home-container {
-    button {
-      font-size: 14px;
-    }
-  }
+  div.home-container {}
 </style>
