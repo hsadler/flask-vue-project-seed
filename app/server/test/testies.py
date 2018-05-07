@@ -20,16 +20,32 @@ class Testies():
 
 
 	def should_be_equal(self, expected, actual):
-		# TODO
-		pass
+		are_equal = expected == actual
+		if are_equal:
+			self.tests_passed = self.tests_passed + 1
+		else:
+			ppp('actual value: {0} should equal expected value: {1}'.format(
+				expected,
+				actual
+			))
+		self.tests_total = self.tests_total + 1
 
 
 	def should_not_be_equal(self, expected, actual):
-		# TODO
-		pass
+		are_equal = expected == actual
+		if not are_equal:
+			self.tests_passed = self.tests_passed + 1
+		else:
+			ppp('actual value: {0} shouldn\'t equal expected value: {1}'.format(
+				expected,
+				actual
+			))
+		self.tests_total = self.tests_total + 1
 
 
 	def print_report(self):
-		# TODO
-		pass
+		ppp('test results: {0}/{1}'.format(
+			self.tests_passed,
+			self.tests_total
+		))
 
