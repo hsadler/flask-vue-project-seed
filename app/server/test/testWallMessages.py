@@ -6,7 +6,13 @@ from service.wall_messages import WallMessages
 from utils.print import ppp
 
 
-# TEST SERVICE
+"""
+Test WallMessages service.
+
+Requires creation of 'wall_message' MySQL table via
+create-wall-messages-table.py script.
+"""
+
 
 wm = WallMessages.add_message(
 	message_body='hello, world!',
