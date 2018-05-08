@@ -67,7 +67,13 @@ t.should_be_equal(
 )
 
 
-# TODO: delete_message()
+delete_status = WallMessages.delete_message(
+	message_id=added_wm.get_prop('id')
+)
+
+ppp('deleted wall message successfully: {0}'.format(delete_status))
+
+t.should_be_equal(expected=True, actual=delete_status)
 
 
 wms = WallMessages.get_all()
@@ -75,3 +81,4 @@ ppp(['all wall messages:', [ wm.to_dict() for wm in wms ]])
 
 
 t.print_report()
+
