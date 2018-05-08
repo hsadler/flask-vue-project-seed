@@ -1,13 +1,10 @@
 
-# Testies test framework
-
-import sys
-sys.path.append('..')
+# Testie test framework
 
 from utils.print import ppp
 
 
-class Testies():
+class Testie():
 	"""
 	Tiny little test framework for keeping track of test cases.
 

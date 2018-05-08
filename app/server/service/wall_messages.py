@@ -41,3 +41,13 @@ class WallMessages():
 		wm.set_prop('message', message_body)
 		wm.set_prop('attribution', message_attribution)
 		return wm.save();
+
+
+	@staticmethod
+	def delete_message(message_id):
+		wm = WallMessageDataObject.find_one(prop_dict={
+			'id': message_id
+		})
+		delete_status = wm.delete()
+		return delete_status
+
