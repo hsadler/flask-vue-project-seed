@@ -76,7 +76,8 @@ rows_updated = mysql_driver.update_by_fields(
 ppp('rows updated: {0}'.format(rows_updated))
 
 t.should_be_equal(
-	expected=1, actual=rows_updated
+	expected=1,
+	actual=rows_updated
 )
 
 
@@ -89,6 +90,11 @@ rows_deleted = mysql_driver.delete_by_fields(
 )
 
 ppp('rows deleted: {0}'.format(rows_deleted))
+
+t.should_be_equal(
+	expected=1,
+	actual=rows_deleted
+)
 
 
 ######## TEST MYSQL SPECIFIC METHODS ########
