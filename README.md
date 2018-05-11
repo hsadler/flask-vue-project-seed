@@ -11,41 +11,73 @@
 - docker-compose
 
 
-## Notes:
+## What is this repo and how do I use it?
 
-***** This is a work in progress, but... *****
+This repository is meant to be a full-stack web application starting point. It
+contains these basic features:
 
-Both the dev and prod mode Docker containers are working.
+### General:
+- Containerized with Docker and Docker Compose
+- Backend and Frontend code built with Webpack
+- Example full-stack 'wall message' web application
+
+### Backend:
+- Python3 and Flask
+- MySQL database container and driver
+- Redis cache container and driver
+- Architecture:
+  * API (interface endpoints, call into service layer, format response)
+  * Services (operate on data objects, business logic)
+  * Data Objects (stateful models, represent deserialized records, implements CRUD)
+  * Data Store Drivers (intermediary interface between application and datastore)
+
+### Frontend:
+- Vue.js
+- vue-router
+- Architecture:
+  * Services (handle state and business logic, injectable into views and components)
+  * Views (top level web page wrappers)
+  * Components (UI building blocks, reusable, nestable)
+
+
+## More Information:
+
+Features dev and prod mode Docker containers.
 
 Prod mode serves exclusively from the Flask backend (app index.html, static
 assets, and JSON API).
 
 Dev mode runs both a Flask backend server and a webpack frontend server
 simultaneously. The webpack frontend server proxies the Flask backend. The app
-directory is a Docker mounted volume, and saves to backend and client files will
-be automatically reflected in the container's server responses.
-
-I imagine this could be used to develope both locally or on a remote dev host.
-Just fire-up '. dev.sh' and rsync files upon update. Even webpack's hot-reload
-works from the container!
-
-Included in this project is a homebrewed database driver, cache driver and data
-object architecture to provide a starting point for new projects.
-
-Here's an outline of the multitier architecture so far:
-- api (client endpoints, call into model layer, format response)
-- service (operate on data objects, business logic)
-- data object (stateful models, represent deserialized records, implements CRUD)
-- data store driver (intermediary interface between application and datastore)
+directory is a Docker mounted volume, and changes to backend and client files
+will be automatically reflected.
 
 
-## Usage
+## Getting started with full-stack app example:
+
+First, spin-up the dev environment:
+```sh
+source shell-scripts/up-dev.sh
+```
+
+Then, connect to the app server container
+```sh
+source shell-scripts/app-dev.sh
+```
+
+Once connected, run the table creation python script
+```sh
+cd /app/server/scripts/ && python3 create-wall-message-table.py
+```
+
+
+## Full Usage
 
 ### Dev Mode
 
 Start dev mode server in Docker container:
 ```sh
-source dev.sh
+source shell-scripts/up-dev.sh
 ```
 
 Navigate to dev localhost URL:
@@ -57,12 +89,29 @@ http://localhost:4000
 
 Start prod mode server in Docker container:
 ```sh
-source prod.sh
+source shell-scripts/up-prod.sh
 ```
 
 Navigate to prod localhost URL:
 ```sh
 http://localhost
+```
+
+### Other Convenience Shell Scripts
+
+Connect to prod or dev mode app server container:
+```sh
+source shell-scripts/app-[mode].sh
+```
+
+Connect to prod or dev mode MySQL container:
+```sh
+source shell-scripts/mysql-[mode].sh
+```
+
+Connect to prod or dev mode Redis container:
+```sh
+source shell-scripts/redis-[mode].sh
 ```
 
 

@@ -92,7 +92,7 @@ X alter test scripts to be able to be run with minimal setup
 X delete NOTES file
 X delete test backend API endpoints
 X cleanup everything else that doesn't focus on the WallMessage feature
-- update README with information about backend framework
+X update README with information about backend framework
 - delete TODO file
 
 
