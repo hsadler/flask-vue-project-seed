@@ -14,7 +14,7 @@
 ## What is this repo and how do I use it?
 
 This repository is meant to be a full-stack web application starting point. It
-contains these basic features:
+contains these basic parts and features:
 
 ### General:
 - Containerized with Docker and Docker Compose
