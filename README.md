@@ -60,17 +60,17 @@ First, spin-up the dev environment:
 source shell-scripts/up-dev.sh
 ```
 
-Then, connect to the app server container
+Then, connect to the app server container:
 ```sh
 source shell-scripts/app-dev.sh
 ```
 
-Once connected, run the table creation python script
+Once connected, run the table creation python script:
 ```sh
 cd /app/server/scripts/ && python3 create-wall-message-table.py
 ```
 
-Lastly, navigate to the 'wall messages' dev web page
+Lastly, navigate to the 'wall messages' dev web page and create some messages:
 ```sh
 http://localhost:4000/wall-messages
 ```
