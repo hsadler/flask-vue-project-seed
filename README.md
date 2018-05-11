@@ -70,6 +70,11 @@ Once connected, run the table creation python script
 cd /app/server/scripts/ && python3 create-wall-message-table.py
 ```
 
+Lastly, navigate to the 'wall messages' dev web page
+```sh
+http://localhost:4000/wall-messages
+```
+
 
 ## Full Usage
 
