@@ -87,12 +87,13 @@ TODO for final cleanup
 X create script for wall_message table creation
 X delete test class ExampleDataObject
 X delete test script for testing ExampleDataObject
-- create small test framework for running test scripts
-- alter test scripts to be able to be run with minimal setup
-- delete NOTES file
+X create small test framework for running test scripts
+X alter test scripts to be able to be run with minimal setup
+X delete NOTES file
 X delete test backend API endpoints
 X cleanup everything else that doesn't focus on the WallMessage feature
 - update README with information about backend framework
+- delete TODO file
 
 
 
