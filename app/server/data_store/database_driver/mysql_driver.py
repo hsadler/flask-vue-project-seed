@@ -277,6 +277,25 @@ class MySqlDriver(BaseDatabaseDriver):
 		return self.cur.fetchall()
 
 
+	def query_bind(self, query_string, bind_vars):
+		"""
+		Performs a MySQL query from a raw query string and returns the result.
+		Uses bound variables to protect against SQL injection.
+
+		Args:
+			query_string (str): formatted MySQL query string.
+			bind_vars (dict): named variables to be escaped and injected into
+				the query string.
+
+		Returns:
+			(tuple) Tuple of dictionary representations of records.
+
+		"""
+
+		self.cur.execute(query_string, bind_vars)
+		return self.cur.fetchall()
+
+
 	########## TABLE UTILITIES ##########
 
 
