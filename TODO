@@ -1,0 +1,8 @@
+
+// CACH DRIVER (redis driver)
+	- batch sets
+	- batch gets
+
+// DB DRIVER (mysql driver)
+	- more options for query conditionals (where clauses)
+	- batch selects and batch caching of query result items
