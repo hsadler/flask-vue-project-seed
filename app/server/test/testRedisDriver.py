@@ -27,11 +27,11 @@ cache_items = {
 }
 cache_ttl = 1
 
-
+# test single items
 for cache_key, cache_value in cache_items.items():
 
 	# test set
-	set_response = redis_driver.set(
+	set_response = redis_driver.set_single(
 		key=cache_key,
 		value=cache_value,
 		ttl=cache_ttl
@@ -40,27 +40,31 @@ for cache_key, cache_value in cache_items.items():
 	t.should_be_equal(expected=True, actual=set_response)
 
 	# test get before expiration
-	get_response = redis_driver.get(key=cache_key)
+	get_response = redis_driver.get_single(key=cache_key)
 	ppp(['get_response:', get_response])
 	t.should_be_equal(expected=cache_value, actual=get_response)
 
 	# test get after expiration
 	time.sleep(2)
-	get_response = redis_driver.get(key=cache_key)
+	get_response = redis_driver.get_single(key=cache_key)
 	ppp(['get_response:', get_response])
 	t.should_be_equal(expected=None, actual=get_response)
 
 	# test delete
-	redis_driver.set(cache_key, cache_value)
-	delete_response = redis_driver.delete(cache_key)
+	redis_driver.set_single(cache_key, cache_value)
+	delete_response = redis_driver.delete_single(cache_key)
 	ppp(['delete_response:', delete_response])
 	t.should_be_equal(expected=1, actual=delete_response)
 
+# test batching
+batch_set_response = redis_driver.set_batch(items=cache_items, ttl=cache_ttl)
+t.should_be_equal(expected=True, actual=batch_set_response)
+# ....stopped here......
 
 ######## TEST REDIS SPECIFIC METHODS ########
 
 
-redis_driver.set(
+redis_driver.set_single(
 	key='my_key',
 	value='my_value',
 	ttl=30

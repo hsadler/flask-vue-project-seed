@@ -31,7 +31,7 @@ class RedisDriver(BaseCacheDriver):
 	########## CRUD INTERFACE METHODS ##########
 
 
-	def set(self, key, value, ttl=None):
+	def set_single(self, key, value, ttl=None):
 		"""
 		Redis driver interface method for setting values with key and
 		time-to-live.
@@ -53,7 +53,7 @@ class RedisDriver(BaseCacheDriver):
 			return self.r.set(key, json_value)
 
 
-	def get(self, key):
+	def get_single(self, key):
 		"""
 		Redis driver interface method for getting cached values by key.
 
@@ -73,7 +73,7 @@ class RedisDriver(BaseCacheDriver):
 			return None
 
 
-	def delete(self, key):
+	def delete_single(self, key):
 		"""
 		Redis driver interface method for deleting cached items by key.
 
