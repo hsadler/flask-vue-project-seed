@@ -65,12 +65,19 @@ for key, val in cache_items.items():
 	batch_set_expected[key] = True
 t.should_be_equal(expected=batch_set_expected, actual=batch_set_response)
 
-sys.exit()
+# test get of single after batch set
+cache_key = 'string'
+cache_value = cache_items[cache_key]
+get_response = redis_driver.get(key=cache_key)
+ppp(['get_response:', get_response])
+t.should_be_equal(expected=cache_value, actual=get_response)
 
 cache_key_list = list(cache_items.keys())
 batch_get_response = redis_driver.batch_get(keys=cache_key_list)
 ppp(['batch_get_response:', batch_get_response])
 t.should_be_equal(expected=cache_items, actual=batch_get_response)
+
+sys.exit()
 
 batch_delete_response = redis_driver.batch_delete(keys=cache_key_list)
 ppp(['batch_delete_response:', batch_delete_response])

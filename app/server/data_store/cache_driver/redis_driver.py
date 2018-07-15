@@ -90,15 +90,43 @@ class RedisDriver(BaseCacheDriver):
 			return self.r.set(key, json_value)
 
 
+	def batch_get(self, keys=[]):
+		"""
+		Redis driver interface method for getting cached values by keys in
+		batch.
+
+		Args:
+			keys (list): List of cache key strings.
+
+		Returns:
+			(dict) Cache key -> cache value (or None if not found)
+
+		"""
+
+		pipe = self.r.pipeline()
+
+		for key in keys:
+			pipe.get(key)
+
+		redis_response = pipe.execute()
+		cached_values = [ json.loads(x) for x in redis_response ]
+
+		result = {}
+		for i, value in enumerate(cached_values):
+			result[keys[i]] = value
+
+		return result
+
+
 	def get(self, key):
 		"""
-		Redis driver interface method for getting cached values by key.
+		Redis driver interface method for getting a cached value by key.
 
 		Args:
 			key (str): Cache key.
 
 		Returns:
-			(mixed) Cached python data structure value.
+			(mixed) Cached python data structure value or None if not found.
 
 		"""
 
@@ -133,7 +161,7 @@ class RedisDriver(BaseCacheDriver):
 		Get a list of all currently set Redis cache keys.
 
 		Returns:
-			(list) List of strings.
+			(list) List of cache key strings.
 
 		"""
 

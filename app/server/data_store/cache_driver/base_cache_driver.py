@@ -25,9 +25,9 @@ class BaseCacheDriver(metaclass=ABCMeta):
 	def set(self, key, value, ttl=None):
 		pass
 
-	# @abstractmethod
-	# def batch_get(self, keys):
-	# 	pass
+	@abstractmethod
+	def batch_get(self, keys=[]):
+		pass
 
 	@abstractmethod
 	def get(self, key):
