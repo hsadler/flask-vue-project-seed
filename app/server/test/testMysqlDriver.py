@@ -8,6 +8,15 @@ from testie import Testie
 from utils.print import ppp
 
 
+################################################################################
+### REWRITE TO DO THIS:
+###		- create a DB table
+###		- create a populate with records
+###		- run tests
+###		- delete table
+################################################################################
+
+
 t = Testie()
 
 mysql_driver = MySqlDriver(

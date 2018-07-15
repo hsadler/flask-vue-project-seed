@@ -89,6 +89,11 @@ class MySqlDriver(BaseDatabaseDriver):
 			return self.cur.lastrowid
 
 
+	def find_by_id(self, table_name, id):
+		# TODO
+		pass
+
+
 	def find_by_fields(self, table_name, where_props={}, limit=None):
 		"""
 		MySQL driver interface method for finding records by conditionals.
@@ -137,6 +142,11 @@ class MySqlDriver(BaseDatabaseDriver):
 			else:
 				self.cur.execute(query_stmt)
 			return self.cur.fetchall()
+
+
+	def update_by_id(self, table_name, id, value_props={}):
+		# TODO
+		pass
 
 
 	def update_by_fields(self, table_name, value_props={}, where_props={}):
@@ -211,6 +221,11 @@ class MySqlDriver(BaseDatabaseDriver):
 		with self.conn:
 			self.cur.execute(query_stmt, tuple(set_values + where_values))
 			return self.cur.rowcount
+
+
+	def delete_by_id(self, table_name, id):
+		# TODO
+		pass
 
 
 	def delete_by_fields(self, table_name, where_props={}):

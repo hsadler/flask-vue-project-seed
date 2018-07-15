@@ -22,11 +22,23 @@ class BaseDatabaseDriver(metaclass=ABCMeta):
 		pass
 
 	@abstractmethod
+	def find_by_id(self, table_name, id):
+		pass
+
+	@abstractmethod
 	def find_by_fields(self, table_name, where_props={}, limit=None):
 		pass
 
 	@abstractmethod
+	def update_by_id(self, table_name, id, value_props={}):
+		pass
+
+	@abstractmethod
 	def update_by_fields(self, table_name, value_props={}, where_props={}):
+		pass
+
+	@abstractmethod
+	def delete_by_id(self, table_name, id):
 		pass
 
 	@abstractmethod
@@ -38,6 +50,10 @@ class BaseDatabaseDriver(metaclass=ABCMeta):
 
 	@abstractmethod
 	def describe_table(self, table_name):
+		pass
+
+	@abstractmethod
+	def get_table_size(self, table_name):
 		pass
 
 	@abstractmethod
