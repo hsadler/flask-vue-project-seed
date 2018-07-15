@@ -77,17 +77,18 @@ batch_get_response = redis_driver.batch_get(keys=cache_key_list)
 ppp(['batch_get_response:', batch_get_response])
 t.should_be_equal(expected=cache_items, actual=batch_get_response)
 
-sys.exit()
-
 batch_delete_response = redis_driver.batch_delete(keys=cache_key_list)
 ppp(['batch_delete_response:', batch_delete_response])
-t.should_be_equal(expected=cache_key_list, actual=batch_delete_response)
+batch_delete_expected = {}
+for key, val in cache_items.items():
+	batch_delete_expected[key] = 1
+t.should_be_equal(expected=batch_delete_expected, actual=batch_delete_response)
 
 
 ######## TEST REDIS SPECIFIC METHODS ########
 
 
-redis_driver.set_single(
+redis_driver.set(
 	key='my_key',
 	value='my_value',
 	ttl=30

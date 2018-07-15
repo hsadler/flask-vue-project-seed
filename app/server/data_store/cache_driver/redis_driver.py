@@ -58,14 +58,13 @@ class RedisDriver(BaseCacheDriver):
 			json_value = json.dumps(value)
 			pipe.set(key, json_value)
 
-		redis_response = pipe.execute()
+		set_statuses = pipe.execute()
 
 		result = {}
-		for i, set_status in enumerate(redis_response):
+		for i, set_status in enumerate(set_statuses):
 			result[keys[i]] = set_status
 
 		return result
-
 
 
 	def set(self, key, value, ttl=None):
@@ -136,6 +135,33 @@ class RedisDriver(BaseCacheDriver):
 			return value
 		else:
 			return None
+
+
+	def batch_delete(self, keys=[]):
+		"""
+		Redis driver interface method for deleting cached items by keys for a
+		batch.
+
+		Args:
+			keys (list): List of cache key strings.
+
+		Returns:
+			(dict) Cache key -> int delete status for each item in batch.
+
+		"""
+
+		pipe = self.r.pipeline()
+
+		for key in keys:
+			pipe.delete(key)
+
+		delete_statuses = pipe.execute()
+
+		result = {}
+		for i, delete_status in enumerate(delete_statuses):
+			result[keys[i]] = delete_status
+
+		return result
 
 
 	def delete(self, key):

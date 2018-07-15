@@ -33,9 +33,9 @@ class BaseCacheDriver(metaclass=ABCMeta):
 	def get(self, key):
 		pass
 
-	# @abstractmethod
-	# def batch_delete(self, keys):
-	# 	pass
+	@abstractmethod
+	def batch_delete(self, keys):
+		pass
 
 	@abstractmethod
 	def delete(self, key):
