@@ -31,9 +31,46 @@ class RedisDriver(BaseCacheDriver):
 	########## CRUD INTERFACE METHODS ##########
 
 
-	def set_single(self, key, value, ttl=None):
+	def batch_set(self, items={}, ttl=None):
 		"""
-		Redis driver interface method for setting values with key and
+		Redis driver interface method for batch setting values with keys and a
+		time-to-live.
+
+		Args:
+			items (dict): Cache keys and values to set.
+			ttl (int): Cached item time-to-live in seconds.
+
+		Returns:
+			(dict) Cache key -> bool set status for each item in batch.
+
+		"""
+
+		pipe = self.r.pipeline()
+		keys = []
+		values = []
+
+		for key, val in items.items():
+			keys.append(key)
+			values.append(val)
+
+		for i, key in enumerate(keys):
+			value = values[i]
+			json_value = json.dumps(value)
+			pipe.set(key, json_value)
+
+		redis_response = pipe.execute()
+
+		result = {}
+		for i, set_status in enumerate(redis_response):
+			result[keys[i]] = set_status
+
+		return result
+
+
+
+	def set(self, key, value, ttl=None):
+		"""
+		Redis driver interface method for setting a value with a key and a
 		time-to-live.
 
 		Args:
@@ -53,7 +90,7 @@ class RedisDriver(BaseCacheDriver):
 			return self.r.set(key, json_value)
 
 
-	def get_single(self, key):
+	def get(self, key):
 		"""
 		Redis driver interface method for getting cached values by key.
 
@@ -61,7 +98,7 @@ class RedisDriver(BaseCacheDriver):
 			key (str): Cache key.
 
 		Returns:
-			(mixed) Cached python data structre value.
+			(mixed) Cached python data structure value.
 
 		"""
 
@@ -73,7 +110,7 @@ class RedisDriver(BaseCacheDriver):
 			return None
 
 
-	def delete_single(self, key):
+	def delete(self, key):
 		"""
 		Redis driver interface method for deleting cached items by key.
 

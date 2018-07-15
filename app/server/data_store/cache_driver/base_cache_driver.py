@@ -18,26 +18,26 @@ class BaseCacheDriver(metaclass=ABCMeta):
 	########## CRUD INTERFACE METHODS ##########
 
 	@abstractmethod
-	def set_batch(self, items={}, ttl=None):
+	def batch_set(self, items={}, ttl=None):
 		pass
 
 	@abstractmethod
-	def set_single(self, key, value, ttl=None):
-		pass
-
-	# @abstractmethod
-	# def get_batch(self, keys):
-	# 	pass
-
-	@abstractmethod
-	def get_single(self, key):
+	def set(self, key, value, ttl=None):
 		pass
 
 	# @abstractmethod
-	# def delete_batch(self, keys):
+	# def batch_get(self, keys):
 	# 	pass
 
 	@abstractmethod
-	def delete_single(self, key):
+	def get(self, key):
+		pass
+
+	# @abstractmethod
+	# def batch_delete(self, keys):
+	# 	pass
+
+	@abstractmethod
+	def delete(self, key):
 		pass
 

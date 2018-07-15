@@ -22,8 +22,8 @@ class Testie():
 			self.tests_passed = self.tests_passed + 1
 		else:
 			ppp('actual value: {0} should equal expected value: {1}'.format(
-				expected,
-				actual
+				actual,
+				expected
 			))
 		self.tests_total = self.tests_total + 1
 
@@ -34,8 +34,8 @@ class Testie():
 			self.tests_passed = self.tests_passed + 1
 		else:
 			ppp('actual value: {0} shouldn\'t equal expected value: {1}'.format(
-				expected,
-				actual
+				actual,
+				expected
 			))
 		self.tests_total = self.tests_total + 1
 

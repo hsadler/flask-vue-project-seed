@@ -31,7 +31,7 @@ cache_ttl = 1
 for cache_key, cache_value in cache_items.items():
 
 	# test set
-	set_response = redis_driver.set_single(
+	set_response = redis_driver.set(
 		key=cache_key,
 		value=cache_value,
 		ttl=cache_ttl
@@ -40,26 +40,42 @@ for cache_key, cache_value in cache_items.items():
 	t.should_be_equal(expected=True, actual=set_response)
 
 	# test get before expiration
-	get_response = redis_driver.get_single(key=cache_key)
+	get_response = redis_driver.get(key=cache_key)
 	ppp(['get_response:', get_response])
 	t.should_be_equal(expected=cache_value, actual=get_response)
 
 	# test get after expiration
 	time.sleep(2)
-	get_response = redis_driver.get_single(key=cache_key)
+	get_response = redis_driver.get(key=cache_key)
 	ppp(['get_response:', get_response])
 	t.should_be_equal(expected=None, actual=get_response)
 
 	# test delete
-	redis_driver.set_single(cache_key, cache_value)
-	delete_response = redis_driver.delete_single(cache_key)
+	redis_driver.set(cache_key, cache_value)
+	delete_response = redis_driver.delete(cache_key)
 	ppp(['delete_response:', delete_response])
 	t.should_be_equal(expected=1, actual=delete_response)
 
+
 # test batching
-batch_set_response = redis_driver.set_batch(items=cache_items, ttl=cache_ttl)
-t.should_be_equal(expected=True, actual=batch_set_response)
-# ....stopped here......
+batch_set_response = redis_driver.batch_set(items=cache_items, ttl=cache_ttl)
+ppp(['batch_set_response:', batch_set_response])
+batch_set_expected = {}
+for key, val in cache_items.items():
+	batch_set_expected[key] = True
+t.should_be_equal(expected=batch_set_expected, actual=batch_set_response)
+
+sys.exit()
+
+cache_key_list = list(cache_items.keys())
+batch_get_response = redis_driver.batch_get(keys=cache_key_list)
+ppp(['batch_get_response:', batch_get_response])
+t.should_be_equal(expected=cache_items, actual=batch_get_response)
+
+batch_delete_response = redis_driver.batch_delete(keys=cache_key_list)
+ppp(['batch_delete_response:', batch_delete_response])
+t.should_be_equal(expected=cache_key_list, actual=batch_delete_response)
+
 
 ######## TEST REDIS SPECIFIC METHODS ########
 
