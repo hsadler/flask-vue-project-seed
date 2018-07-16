@@ -1,21 +1,21 @@
 
+
 // CACH DRIVER (redis driver)
 	X batch sets
 	X batch gets
 	X batch deletes
 
+
 // DB DRIVER (mysql driver)
 	- more options for query conditionals (where clauses)
-	- batch selects and batch caching of query result items
-	- asses types of batching currently implemented and research alternatives
+	- methods for select, update, and delete by primary key id
 	- rewrite testMysqlDriver.py
 
 	methods that need work:
 		- (new) find_by_id()
 		- (new) update_by_id()
 		- (new) delete_by_id()
-		- (new) get_table_size()
-		- (update) __construct_where_clause()
+		- (update) construct_where_clause()
 
 	new interface for where_props:
 		where_props = {
@@ -23,7 +23,7 @@
 			'prop_1a': {					// prop_1a = 1
 				'=': 1
 			},
-			'prop_1b': {					// prop_1b != 1
+			'prop_1b': {					// prop_1b <> 1
 				'!=': 1
 			},
 			'prop_2': {  					// prop_2 < 5
@@ -62,3 +62,8 @@
 			where_props=where_props,
 			limit=None
 		)
+
+
+// BASE DATA OBJECT
+	- batch query and batch caching of query result items
+	- asses types of batching currently implemented and research alternatives

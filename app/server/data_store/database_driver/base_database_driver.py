@@ -53,10 +53,6 @@ class BaseDatabaseDriver(metaclass=ABCMeta):
 		pass
 
 	@abstractmethod
-	def get_table_size(self, table_name):
-		pass
-
-	@abstractmethod
 	def get_table_field_names(self, table_name):
 		pass
 

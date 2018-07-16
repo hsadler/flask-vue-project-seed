@@ -24,6 +24,32 @@ mysql_driver = MySqlDriver(
 )
 
 
+######## NEW ########
+
+where_clause, where_vals = mysql_driver.construct_where_clause(where_props={
+	'id': 1,
+	'name': {
+		'like': '%Sh%'
+	},
+	'age': {
+		'gt': 20,
+		'lte': 40,
+		'!=': 30
+	},
+	'height': {
+		'in': [1,2,3,4]
+	},
+	'race': {
+		'is not': None
+	},
+	'maiden_name': None
+})
+
+ppp(where_clause)
+ppp(where_vals)
+sys.exit()
+
+
 ######## TEST CRUD INTERFACE ########
 
 
