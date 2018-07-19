@@ -24,29 +24,36 @@ mysql_driver = MySqlDriver(
 )
 
 
-######## NEW ########
-
+# test WHERE clause builder method
 where_clause, where_vals = mysql_driver.construct_where_clause(where_props={
 	'id': 1,
 	'name': {
 		'like': '%Sh%'
-	},
-	'age': {
-		'gt': 20,
-		'lte': 40,
-		'!=': 30
-	},
-	'height': {
-		'in': [1,2,3,4]
-	},
-	'race': {
-		'is not': None
-	},
-	'maiden_name': None
+	}
+	# 'age': {
+	# 	'gt': 20,
+	# 	'lte': 40,
+	# 	'!=': 30
+	# },
+	# 'height': {
+	# 	'in': [1,2,3,4]
+	# },
+	# 'race': {
+	# 	'is not': None
+	# },
+	# 'maiden_name': None
 })
 
-ppp(where_clause)
-ppp(where_vals)
+ppp('where_clause:', where_clause)
+ppp('where_vals:', where_vals)
+
+expected_where_clause = "WHERE `id` = %s AND `name` LIKE %s"
+
+t.should_be_equal(
+	expected=expected_where_clause,
+	actual=where_clause
+)
+
 sys.exit()
 
 
