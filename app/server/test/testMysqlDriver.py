@@ -8,15 +8,6 @@ from testie import Testie
 from utils.print import ppp
 
 
-################################################################################
-### REWRITE TO DO THIS:
-###		- create a DB table
-###		- create a populate with records
-###		- run tests
-###		- delete table
-################################################################################
-
-
 t = Testie()
 
 mysql_driver = MySqlDriver(
@@ -24,43 +15,64 @@ mysql_driver = MySqlDriver(
 )
 
 
-# test WHERE clause builder method
+######## TEST WHERE CLAUSE BUILDER ########
+
+
 where_clause, where_vals = mysql_driver.construct_where_clause(where_props={
 	'id': 1,
 	'name': {
 		'like': '%Sh%'
-	}
-	# 'age': {
-	# 	'gt': 20,
-	# 	'lte': 40,
-	# 	'!=': 30
-	# },
-	# 'height': {
-	# 	'in': [1,2,3,4]
-	# },
-	# 'race': {
-	# 	'is not': None
-	# },
-	# 'maiden_name': None
+	},
+	'age': {
+		'gt': 20,
+		'lte': 40,
+		'!=': 30
+	},
+	'height': {
+		'in': [1,2,3,4]
+	},
+	'race': {
+		'is not': None
+	},
+	'maiden_name': None
 })
 
 ppp('where_clause:', where_clause)
 ppp('where_vals:', where_vals)
 
-expected_where_clause = "WHERE `id` = %s AND `name` LIKE %s"
+expected_where_clause = "WHERE `id` = %s AND `name` LIKE %s AND `age` > %s AND \
+`age` <= %s AND `age` <> %s AND `height` IN (%s,%s,%s,%s) AND `race` IS NOT %s \
+AND `maiden_name` IS %s"
 
 t.should_be_equal(
 	expected=expected_where_clause,
 	actual=where_clause
 )
 
-sys.exit()
+
+######## CREATE TEST TABLE ########
+
+
+TABLE_NAME = 'test_table'
+create_table_query = """
+	CREATE TABLE IF NOT EXISTS {0} (
+		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		created_ts INT(11) NOT NULL,
+		updated_ts INT(11) NOT NULL,
+		message VARCHAR(1000),
+		attribution VARCHAR(255)
+	)
+""".format(TABLE_NAME)
+query_result = mysql_driver.query_bind(query_string=create_table_query)
+ppp('result of create table query:', query_result)
+
+
+# TODO: needed?
+######## POPULATE TEST TABLE WITH RECORDS ########
 
 
 ######## TEST CRUD INTERFACE ########
 
-
-TABLE_NAME = 'wall_message'
 
 # test insert
 insert_message = 'hello!'
@@ -149,7 +161,7 @@ select_query = 'SELECT * FROM {0} WHERE id > {1} LIMIT {2}'.format(
 	query_id,
 	query_limit
 )
-select_query_result = mysql_driver.query(query_string=select_query)
+select_query_result = mysql_driver.query_bind(query_string=select_query)
 
 ppp(['result of select query:', select_query_result])
 
@@ -170,6 +182,16 @@ ppp(['table field names:', table_field_names])
 
 db_size = mysql_driver.get_database_size()
 ppp(['database size: ', db_size])
+
+
+######## DELETE TEST TABLE ########
+
+
+create_table_query = """
+	DROP TABLE {0}
+""".format(TABLE_NAME)
+query_result = mysql_driver.query(query_string=create_table_query)
+ppp('result of drop table query:', query_result)
 
 
 t.print_report()

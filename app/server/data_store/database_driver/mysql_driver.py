@@ -299,8 +299,10 @@ class MySqlDriver(BaseDatabaseDriver):
 
 		Args:
 			query_string (str): formatted MySQL query string.
+				Ex. 'SELECT * FROM table where id=:id'
 			bind_vars (dict): named variables to be escaped and injected into
 				the query string.
+				Ex. { 'id': 1234 }
 
 		Returns:
 			(tuple) Tuple of dictionary representations of records.
