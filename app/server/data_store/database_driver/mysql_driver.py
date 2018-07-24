@@ -18,6 +18,28 @@ class MySqlDriver(BaseDatabaseDriver):
 	RECORD_CREATED_TS_COLUMN = 'created_ts'
 	RECORD_UPDATED_TS_COLUMN = 'updated_ts'
 
+	WHERE_MAP = {
+		'=': '=',
+		'!=': '<>',
+		'lt': '<',
+		'<': '<',
+		'gt': '>',
+		'>': '>',
+		'lte': '<=',
+		'<=': '<=',
+		'gte': '>=',
+		'>=': '>=',
+		'is': 'IS',
+		'is not': 'IS NOT',
+		'like': 'LIKE',
+		'not like': 'NOT LIKE'
+	}
+
+	WHERE_IN_MAP = {
+		'in': 'IN',
+		'not in': 'NOT IN'
+	}
+
 
 	def __init__(self, database_name):
 		"""
@@ -30,7 +52,7 @@ class MySqlDriver(BaseDatabaseDriver):
 			database_name (str): Name of MySQL database.
 
 		"""
-		self.database_name = self.__escape(database_name)
+		self.database_name = self.escape(database_name)
 		self.conn = mdb.connect(
 			host=config.MYSQL_HOST,
 			user=config.MYSQL_USER,
@@ -70,7 +92,7 @@ class MySqlDriver(BaseDatabaseDriver):
 			values.append(val)
 
 		fields_str = ', '.join([
-			"`{}`".format(self.__escape(field))
+			"`{}`".format(self.escape(field))
 			for field in fields
 		])
 		values_str_sub = ', '.join(['%s' for item in values])
@@ -79,7 +101,7 @@ class MySqlDriver(BaseDatabaseDriver):
 			INSERT INTO `{0}` ({1})
 			VALUES ({2});
 		""".format(
-			self.__escape(table_name),
+			self.escape(table_name),
 			fields_str,
 			values_str_sub
 		)
@@ -89,14 +111,16 @@ class MySqlDriver(BaseDatabaseDriver):
 			return self.cur.lastrowid
 
 
+	def find_by_id(self, table_name, id):
+		return self.find_by_fields(
+			table_name=table_name,
+			where_props={ 'id': id }
+		)
+
+
 	def find_by_fields(self, table_name, where_props={}, limit=None):
 		"""
 		MySQL driver interface method for finding records by conditionals.
-
-		TODO:
-			- add AND/OR specification to WHERE clause
-			- add conditional type specification to WHERE clause:
-				(=, !=, >, <, >=, <=)
 
 		Args:
 			table_name (str): Name of MySQL table.
@@ -113,20 +137,20 @@ class MySqlDriver(BaseDatabaseDriver):
 		query_stmt_components = []
 
 		select_component = 'SELECT * FROM `{}`'.format(
-			self.__escape(table_name)
+			self.escape(table_name)
 		)
 		query_stmt_components.append(select_component)
 
 		where_values = None
 		if len(where_props.keys()) > 0:
-			where_component, where_values = self.__construct_where_clause(
+			where_component, where_values = self.construct_where_clause(
 				where_props=where_props
 			)
 			query_stmt_components.append(where_component)
 			where_values = tuple(where_values)
 
 		if(limit is not None and int(limit) > 0):
-			limit_component = 'LIMIT {}'.format(self.__escape(str(limit)))
+			limit_component = 'LIMIT {}'.format(self.escape(str(limit)))
 			query_stmt_components.append(limit_component)
 
 		query_stmt = ' '.join(query_stmt_components) + ';'
@@ -139,14 +163,17 @@ class MySqlDriver(BaseDatabaseDriver):
 			return self.cur.fetchall()
 
 
+	def update_by_id(self, table_name, id, value_props={}):
+		return self.update_by_fields(
+			table_name=table_name,
+			value_props=value_props,
+			where_props={ 'id': id }
+		)
+
+
 	def update_by_fields(self, table_name, value_props={}, where_props={}):
 		"""
 		MySQL driver interface method for updating records by conditionals.
-
-		TODO:
-			- add AND/OR specification to WHERE clause
-			- add conditional type specification to WHERE clause:
-				(=, !=, >, <, >=, <=)
 
 		Args:
 			table_name (str): Name of MySQL table.
@@ -173,7 +200,7 @@ class MySqlDriver(BaseDatabaseDriver):
 		query_stmt_components = []
 
 		update_component = 'UPDATE `{}`'.format(
-			self.__escape(table_name)
+			self.escape(table_name)
 		)
 		query_stmt_components.append(update_component)
 
@@ -185,7 +212,7 @@ class MySqlDriver(BaseDatabaseDriver):
 				set_fields.append(key)
 				set_values.append(val)
 			set_component = 'SET ' + ', '.join([
-				'`{}`=%s'.format(self.__escape(field))
+				'`{}`=%s'.format(self.escape(field))
 				for field in set_fields
 			])
 			query_stmt_components.append(set_component)
@@ -196,7 +223,7 @@ class MySqlDriver(BaseDatabaseDriver):
 
 		where_values = None
 		if len(where_props.keys()) > 0:
-			where_component, where_values = self.__construct_where_clause(
+			where_component, where_values = self.construct_where_clause(
 				where_props=where_props
 			)
 			query_stmt_components.append(where_component)
@@ -213,14 +240,16 @@ class MySqlDriver(BaseDatabaseDriver):
 			return self.cur.rowcount
 
 
+	def delete_by_id(self, table_name, id):
+		return self.delete_by_fields(
+			table_name=table_name,
+			where_props={ 'id': id }
+		)
+
+
 	def delete_by_fields(self, table_name, where_props={}):
 		"""
 		MySQL driver interface method for deleting records by conditionals.
-
-		TODO:
-			- add AND/OR specification to WHERE clause
-			- add conditional type specification to WHERE clause:
-				(=, !=, >, <, >=, <=)
 
 		Args:
 			table_name (str): Name of MySQL table.
@@ -228,27 +257,29 @@ class MySqlDriver(BaseDatabaseDriver):
 				key=column name and value=column value.
 
 		Returns:
-			(integer) Number of rows updated.
+			(integer) Number of rows deleted.
 
 		"""
 
 		query_stmt_components = []
 
 		delete_component = 'DELETE FROM `{}`'.format(
-			self.__escape(table_name)
+			self.escape(table_name)
 		)
 		query_stmt_components.append(delete_component)
 
 		where_values = None
 		if len(where_props.keys()) > 0:
-			where_component, where_values = self.__construct_where_clause(
+			where_component, where_values = self.construct_where_clause(
 				where_props=where_props
 			)
 			query_stmt_components.append(where_component)
 		else:
 			raise RuntimeError(
-				"argument 'where_props' required with at least one WHERE " +
-				"condition"
+				"""
+					argument 'where_props' required with at least one WHERE
+					condition
+				"""
 			)
 
 		query_stmt = ' '.join(query_stmt_components) + ';'
@@ -261,19 +292,31 @@ class MySqlDriver(BaseDatabaseDriver):
 	########## MYSQL SPECIFIC METHODS ##########
 
 
-	def query(self, query_string):
+	def query_bind(self, query_string, bind_vars={}):
 		"""
 		Performs a MySQL query from a raw query string and returns the result.
+		Uses bound variables to protect against SQL injection.
 
 		Args:
-			query_string (str): raw MySQL query string.
+			query_string (str): formatted MySQL query string.
+				Ex. 'SELECT * FROM table where id=:id'
+			bind_vars (dict): named variables to be escaped and injected into
+				the query string.
+				Ex. { 'id': 1234 }
 
 		Returns:
 			(tuple) Tuple of dictionary representations of records.
 
 		"""
 
-		self.cur.execute(query_string)
+		for key, val in bind_vars.items():
+			bind_str = ':{0}'.format(key)
+			if bind_str in query_string:
+				query_string = query_string.replace(
+					bind_str,
+					'%({0})s'.format(key)
+				)
+		self.cur.execute(query_string, bind_vars)
 		return self.cur.fetchall()
 
 
@@ -282,7 +325,7 @@ class MySqlDriver(BaseDatabaseDriver):
 
 	def describe_table(self, table_name):
 		query_stmt = "DESC {};".format(
-			self.__escape(table_name)
+			self.escape(table_name)
 		)
 		with self.conn:
 			self.cur.execute(query_stmt)
@@ -312,10 +355,11 @@ class MySqlDriver(BaseDatabaseDriver):
 		return self.cur.fetchall()
 
 
-	########## PRIVATE HELPERS ##########
+	########## SQL UTILITIES ##########
 
 
-	def __escape(self, string):
+	@staticmethod
+	def escape(string):
 		"""
 		Escape strings for use in query strings.
 
@@ -324,20 +368,51 @@ class MySqlDriver(BaseDatabaseDriver):
 		return mdb.escape_string(string).decode('utf-8')
 
 
-	def __construct_where_clause(self, where_props={}):
+	@classmethod
+	def construct_where_clause(cls, where_props={}):
 		"""
-		'WHERE' clause string constructor.
+		'WHERE' clause string builder with parameter bindings.
+
+		TODO: account for None types
 
 		"""
-		where_fields = []
+
+		where_strings = []
 		where_values = []
-		for key, val in where_props.items():
-			where_fields.append(key)
-			where_values.append(val)
-		where_component = 'WHERE ' + ' AND '.join([
-			'`{}`=%s'.format(self.__escape(field))
-			for field in where_fields
-		])
+		for prop_col, prop_cond in where_props.items():
+			if type(prop_cond) is dict:
+				for cond_key, cond_val in prop_cond.items():
+					if cond_key in cls.WHERE_MAP:
+						s = '`{0}` {1} %s'.format(
+							cls.escape(prop_col),
+							cls.WHERE_MAP[cond_key],
+						)
+						where_strings.append(s)
+						where_values.append(cond_val)
+					elif cond_key in cls.WHERE_IN_MAP and \
+					type(cond_val) is list:
+						s = '`{0}` {1} ({2})'.format(
+							cls.escape(prop_col),
+							cls.WHERE_IN_MAP[cond_key],
+							','.join(['%s' for x in cond_val])
+						)
+						where_strings.append(s)
+						where_values = where_values + cond_val
+					else:
+						raise RuntimeError(
+							"""
+								invalid WHERE conditional
+							"""
+						)
+			else:
+				if prop_cond is None:
+					s = '`{0}` IS %s'.format(cls.escape(prop_col))
+				else:
+					s = '`{0}` = %s'.format(cls.escape(prop_col))
+				where_strings.append(s)
+				where_values.append(prop_cond)
+
+		where_component = 'WHERE ' + ' AND '.join(where_strings)
 		return where_component, where_values
 
 

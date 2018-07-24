@@ -22,4 +22,4 @@ create_table_query = """
 """
 query_result = mysql_driver.query(query_string=create_table_query)
 
-ppp(['result of create table query:', query_result])
+ppp('result of create table query:', query_result)

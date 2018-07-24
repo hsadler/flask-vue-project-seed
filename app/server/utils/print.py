@@ -10,16 +10,17 @@ INDENT = 2
 pp = pprint.PrettyPrinter(indent=INDENT)
 
 
-def ppp(to_print, as_json=False):
+def ppp(*args, as_json=False):
 	print('')
-	if as_json:
-		print(
-			json.dumps(
-				to_print,
-				sort_keys=True,
-				indent=INDENT,
-				separators=(',', ': ')
+	for arg in args:
+		if as_json:
+			print(
+				json.dumps(
+					arg,
+					sort_keys=True,
+					indent=INDENT,
+					separators=(',', ': ')
+				)
 			)
-		)
-	else:
-		pp.pprint(to_print)
+		else:
+			pp.pprint(arg)
