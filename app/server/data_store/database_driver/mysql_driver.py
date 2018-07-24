@@ -292,7 +292,7 @@ class MySqlDriver(BaseDatabaseDriver):
 	########## MYSQL SPECIFIC METHODS ##########
 
 
-	def query_bind(self, query_string, bind_vars):
+	def query_bind(self, query_string, bind_vars={}):
 		"""
 		Performs a MySQL query from a raw query string and returns the result.
 		Uses bound variables to protect against SQL injection.
@@ -309,6 +309,13 @@ class MySqlDriver(BaseDatabaseDriver):
 
 		"""
 
+		for key, val in bind_vars.items():
+			bind_str = ':{0}'.format(key)
+			if bind_str in query_string:
+				query_string = query_string.replace(
+					bind_str,
+					'%({0})s'.format(key)
+				)
 		self.cur.execute(query_string, bind_vars)
 		return self.cur.fetchall()
 

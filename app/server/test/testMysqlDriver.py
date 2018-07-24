@@ -67,10 +67,6 @@ query_result = mysql_driver.query_bind(query_string=create_table_query)
 ppp('result of create table query:', query_result)
 
 
-# TODO: needed?
-######## POPULATE TEST TABLE WITH RECORDS ########
-
-
 ######## TEST CRUD INTERFACE ########
 
 
@@ -93,17 +89,19 @@ t.should_be_equal(
 )
 
 
-# test read
+# test find
 found_records = mysql_driver.find_by_fields(
 	table_name=TABLE_NAME,
 	where_props={
-		'id': insert_id
+		'id': {
+			'>': 0
+		}
 	},
 	limit=1
 )
 found_record = found_records[0]
 
-ppp(['found record:', found_record])
+ppp('found record:', found_record)
 
 t.should_be_equal(
 	expected=insert_message,
@@ -154,14 +152,29 @@ t.should_be_equal(
 ######## TEST MYSQL SPECIFIC METHODS ########
 
 
-query_id = 0
-query_limit = 5
-select_query = 'SELECT * FROM {0} WHERE id > {1} LIMIT {2}'.format(
-	TABLE_NAME,
-	query_id,
-	query_limit
+# insert
+insert_message = 'i am the query bind!'
+insert_attribution = 'mr. query bind'
+insert_id = mysql_driver.insert(
+	table_name=TABLE_NAME,
+	value_props={
+		'message': insert_message,
+		'attribution': insert_attribution
+	}
 )
-select_query_result = mysql_driver.query_bind(query_string=select_query)
+
+# test query_bind method
+bind_vars = {
+	'id': 0,
+	'limit': 5
+}
+select_query = 'SELECT * FROM {0} WHERE id > :id LIMIT :limit'.format(
+	TABLE_NAME
+)
+select_query_result = mysql_driver.query_bind(
+	query_string=select_query,
+	bind_vars=bind_vars
+)
 
 ppp(['result of select query:', select_query_result])
 
@@ -187,10 +200,10 @@ ppp(['database size: ', db_size])
 ######## DELETE TEST TABLE ########
 
 
-create_table_query = """
+drop_table_query = """
 	DROP TABLE {0}
 """.format(TABLE_NAME)
-query_result = mysql_driver.query(query_string=create_table_query)
+query_result = mysql_driver.query_bind(query_string=drop_table_query)
 ppp('result of drop table query:', query_result)
 
 
