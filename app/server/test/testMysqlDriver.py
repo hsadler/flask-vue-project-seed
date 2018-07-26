@@ -149,6 +149,10 @@ t.should_be_equal(
 )
 
 
+# TODO:
+# test where conditions types
+
+
 ######## TEST MYSQL SPECIFIC METHODS ########
 
 

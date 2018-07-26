@@ -7,61 +7,10 @@
 
 
 // DB DRIVER (mysql driver)
-	- more options for query conditionals (where clauses)
-	- methods for select, update, and delete by primary key id
-	- rewrite testMysqlDriver.py
-
-	methods that need work:
-		- (new) find_by_id()
-		- (new) update_by_id()
-		- (new) delete_by_id()
-		- (update) construct_where_clause()
-
-	new interface for where_props:
-		where_props = {
-			'prop_1': 1,					// prop_1 = 1
-			'prop_1a': {					// prop_1a = 1
-				'=': 1
-			},
-			'prop_1b': {					// prop_1b <> 1
-				'!=': 1
-			},
-			'prop_2': {  					// prop_2 < 5
-				'lt': 5
-			},
-			'prop_2a': {  					// prop_2a < 5
-				'<': 5
-			},
-			'prop_3': {  					// prop_3 >= 0 AND prop_3 <= 3
-				'gte': 0,
-				'lte': 3
-			},
-			'prop_3a': {  					// prop_3a >= 0 AND prop_3a <= 3
-				'>=': 0,
-				'<=': 3
-			},
-			'prop_4': {  					// prop4 in (1,2,3)
-				'in': [1,2,3]
-			},
-			'prop_5': None, 				// prop_5 is NULL
-			'prop_5a': {					// prop_5a is NULL
-				'is': None
-			},
-			'prop_6': {						// prop_6 is not NULL
-				'is not': None
-			},
-			'prop_7': {						// prop_7 like '%substring%'
-				'like': '%substring%'
-			},
-			'prop_8': {						// prop_8 not like '%substring%'
-				'not like': '%substring%'
-			}
-		}
-		find_by_fields(
-			table_name='my_table',
-			where_props=where_props,
-			limit=None
-		)
+	X more options for query conditionals (where clauses)
+	X methods for select, update, and delete by primary key id
+	X rewrite testMysqlDriver.py
+	- more thorough testing of where conditions
 
 
 // BASE DATA OBJECT

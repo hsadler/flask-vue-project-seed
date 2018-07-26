@@ -399,11 +399,7 @@ class MySqlDriver(BaseDatabaseDriver):
 						where_strings.append(s)
 						where_values = where_values + cond_val
 					else:
-						raise RuntimeError(
-							"""
-								invalid WHERE conditional
-							"""
-						)
+						raise RuntimeError("invalid WHERE conditional")
 			else:
 				if prop_cond is None:
 					s = '`{0}` IS %s'.format(cls.escape(prop_col))
