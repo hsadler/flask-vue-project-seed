@@ -149,8 +149,27 @@ t.should_be_equal(
 )
 
 
-# TODO:
 # test where conditions types
+insert_message = None
+insert_attribution = 'bot #1'
+insert_id = mysql_driver.insert(
+	table_name=TABLE_NAME,
+	value_props={
+		'message': insert_message,
+		'attribution': insert_attribution
+	}
+)
+insert_attribution = 'bot #2'
+insert_id = mysql_driver.insert(
+	table_name=TABLE_NAME,
+	value_props={ 'attribution': insert_attribution }
+)
+found_records = mysql_driver.find_by_fields(
+	table_name=TABLE_NAME,
+	where_props={ 'message': None }
+)
+
+ppp('found records:', found_records)
 
 
 ######## TEST MYSQL SPECIFIC METHODS ########
@@ -180,7 +199,7 @@ select_query_result = mysql_driver.query_bind(
 	bind_vars=bind_vars
 )
 
-ppp(['result of select query:', select_query_result])
+ppp('result of select query:', select_query_result)
 
 
 ######## TEST TABLE UTILS ########
