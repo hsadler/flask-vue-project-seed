@@ -10,7 +10,7 @@
 	X more options for query conditionals (where clauses)
 	X methods for select, update, and delete by primary key id
 	X rewrite testMysqlDriver.py
-	- more thorough testing of where conditions
+	X more thorough testing of where conditions
 
 
 // BASE DATA OBJECT

@@ -12,6 +12,7 @@ import time
 class MySqlDriver(BaseDatabaseDriver):
 	"""
 	MySQL database driver which implements CRUD and utility public methods.
+
 	"""
 
 
@@ -372,8 +373,6 @@ class MySqlDriver(BaseDatabaseDriver):
 	def construct_where_clause(cls, where_props={}):
 		"""
 		'WHERE' clause string builder with parameter bindings.
-
-		TODO: account for None types
 
 		"""
 
