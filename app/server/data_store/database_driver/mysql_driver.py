@@ -410,5 +410,3 @@ class MySqlDriver(BaseDatabaseDriver):
 		where_component = 'WHERE ' + ' AND '.join(where_strings)
 		return where_component, where_values
 
-
-

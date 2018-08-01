@@ -11,6 +11,12 @@ class BaseDataObject(metaclass=ABCMeta):
 	"""
 	Provides base methods and interface for all proper data objects.
 
+	TODO:
+		- batch queries
+		- batch caching of result items
+		- asses types of batching currently implemented and research
+			alternatives
+
 	"""
 
 
@@ -81,6 +87,8 @@ class BaseDataObject(metaclass=ABCMeta):
 		all properties in the prop_dict dictionary.
 
 		Note: There is NO CACHING for this 'batch find' method.
+
+		TODO: add caching to partials
 
 		Args:
 			prop_dict (dict): Dictionary representing data object state.
