@@ -228,7 +228,20 @@ t.should_be_equal(
 	expected=[ insert_amount_1, insert_amount_3 ],
 	actual=[ x['amount'] for x in found_records_3 ]
 )
-# TODO: test NOT IN conditional
+# test NOT IN conditional
+found_records_4 = mysql_driver.find_by_fields(
+	table_name=TABLE_NAME,
+	where_props={
+		'amount': {
+			'not in': [1, -1]
+		}
+	}
+)
+ppp('found records 4:', found_records_4)
+t.should_be_equal(
+	expected=[ insert_amount_1 ],
+	actual=[ x['amount'] for x in found_records_4 ]
+)
 
 
 ######## TEST MYSQL SPECIFIC METHODS ########
