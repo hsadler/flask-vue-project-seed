@@ -55,7 +55,7 @@ class BaseDataObject(metaclass=ABCMeta):
 	):
 		"""
 		Data object creation method. Basically a class method wrapper of the
-		constructor method.
+		constructor method. NOTE: Does not save to data store.
 
 		Args:
 			prop_dict (dict): Dictionary representing data object state.
@@ -215,7 +215,7 @@ class BaseDataObject(metaclass=ABCMeta):
 			cache_ttl (int): Cache time-to-live in seconds.
 
 		Returns:
-			(object) Data object instance.
+			(object) Data object instance or None if save fails.
 
 		"""
 

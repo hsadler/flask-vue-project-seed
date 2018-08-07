@@ -55,46 +55,62 @@ class TestUserDataObject(BaseDataObject):
 	TABLE_NAME = 'test_user'
 	DEFAULT_DB_DRIVER_CLASS = MySqlDriver
 	DEFAULT_CACHE_DRIVER_CLASS = RedisDriver
-	DEFAULT_CACHE_TTL = 30
+	DEFAULT_CACHE_TTL = 1
 
 
 ######## TEST DATA OBJECT INTERFACE ########
 
 
+# test 'create' method
 user_data = {
 	'name': 'Harry',
 	'age': 36,
 	'admin': True
 }
 test_user_DO = TestUserDataObject.create(prop_dict=user_data)
-ppp(test_user_DO.to_dict())
+ppp("'create' method data object:", test_user_DO.to_dict())
 t.should_be_equal(
 	expected=user_data,
 	actual=test_user_DO.to_dict()
 )
 
 
-# @classmethod
-# def find_many(
-# 	cls,
-# 	prop_dict={},
-# 	limit=None,
-# 	db_driver_class=None,
-# 	cache_driver_class=None
-# ):
+# test 'save' method
+saved_test_user_DO = test_user_DO.save()
+ppp("'save' method data object:", saved_test_user_DO.to_dict())
+t.should_be_equal(
+	expected=TestUserDataObject,
+	actual=type(saved_test_user_DO)
+)
 
 
-# @classmethod
-# def find_one(
-# 	cls,
-# 	prop_dict={},
-# 	db_driver_class=None,
-# 	cache_driver_class=None,
-# 	cache_ttl=None
-# ):
+# test 'find_many' method
+find_id = saved_test_user_DO.get_prop('id')
+found_test_user_DOs = TestUserDataObject.find_many(prop_dict={ 'id': find_id })
+found_test_user_DO = found_test_user_DOs[0]
+ppp("'find_many' method data object:", found_test_user_DO.to_dict())
+t.should_be_equal(
+	expected=saved_test_user_DO.to_dict(),
+	actual=found_test_user_DO.to_dict()
+)
 
 
-# def get_prop(self, prop_name):
+# test 'find_one' method
+found_test_user_DO = TestUserDataObject.find_one(prop_dict={ 'id': find_id })
+ppp("'find_one' method data object:", found_test_user_DO.to_dict())
+t.should_be_equal(
+	expected=saved_test_user_DO.to_dict(),
+	actual=found_test_user_DO.to_dict()
+)
+
+
+# test 'get_prop' method
+DO_name = found_test_user_DO.get_prop('name')
+ppp("'get_prop' method name:", DO_name)
+t.should_be_equal(
+	expected=user_data['name'],
+	actual=DO_name
+)
 
 
 # def set_prop(self, prop_name, prop_value):
