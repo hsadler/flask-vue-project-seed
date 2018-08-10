@@ -105,7 +105,7 @@ t.should_be_equal(
 
 
 # test 'get_prop' method
-DO_name = found_test_user_DO.get_prop('name')
+DO_name = found_test_user_DO.get_prop(prop_name='name')
 ppp("'get_prop' method name:", DO_name)
 t.should_be_equal(
 	expected=user_data['name'],
@@ -113,13 +113,24 @@ t.should_be_equal(
 )
 
 
-# def set_prop(self, prop_name, prop_value):
+# test 'set_prop' method
+new_age = 101
+set_prop_res = found_test_user_DO.set_prop(prop_name='age', prop_value=new_age)
+ppp("'set_prop' res:", set_prop_res)
+ppp("test user data object after 'set_prop':", found_test_user_DO.to_dict())
+t.should_be_equal(
+	expected=new_age,
+	actual=found_test_user_DO.get_prop(prop_name='age')
+)
 
 
-# def save(self, cache_ttl=None):
-
-
-# def delete(self):
+# test 'delete' method
+delete_res = found_test_user_DO.delete()
+ppp("'delete' res:", delete_res)
+t.should_be_equal(
+	expected=bool,
+	actual=type(delete_res)
+)
 
 
 ######## DELETE TEST TABLE ########

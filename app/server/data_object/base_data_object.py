@@ -16,6 +16,7 @@ class BaseDataObject(metaclass=ABCMeta):
 		- batch caching of result items
 		- asses types of batching currently implemented and research
 			alternatives
+		- better management of attribute types (int, str, bool, etc.)
 
 	"""
 
