@@ -11,6 +11,13 @@ class BaseDataObject(metaclass=ABCMeta):
 	"""
 	Provides base methods and interface for all proper data objects.
 
+	TODO:
+		- batch queries
+		- batch caching of result items
+		- asses types of caching currently implemented and research
+			alternatives
+		- better management of attribute types (int, str, bool, etc.)
+
 	"""
 
 
@@ -49,7 +56,7 @@ class BaseDataObject(metaclass=ABCMeta):
 	):
 		"""
 		Data object creation method. Basically a class method wrapper of the
-		constructor method.
+		constructor method. NOTE: Does not save to data store.
 
 		Args:
 			prop_dict (dict): Dictionary representing data object state.
@@ -81,6 +88,8 @@ class BaseDataObject(metaclass=ABCMeta):
 		all properties in the prop_dict dictionary.
 
 		Note: There is NO CACHING for this 'batch find' method.
+
+		TODO: add caching to partials
 
 		Args:
 			prop_dict (dict): Dictionary representing data object state.
@@ -207,7 +216,7 @@ class BaseDataObject(metaclass=ABCMeta):
 			cache_ttl (int): Cache time-to-live in seconds.
 
 		Returns:
-			(object) Data object instance.
+			(object) Data object instance or None if save fails.
 
 		"""
 
@@ -294,6 +303,9 @@ class BaseDataObject(metaclass=ABCMeta):
 
 
 	########## PRIVATE HELPERS ##########
+
+
+	# TODO: decide on private vs. public helper methods
 
 
 	@classmethod

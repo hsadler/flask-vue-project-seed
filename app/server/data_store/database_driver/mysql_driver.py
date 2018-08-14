@@ -12,6 +12,7 @@ import time
 class MySqlDriver(BaseDatabaseDriver):
 	"""
 	MySQL database driver which implements CRUD and utility public methods.
+
 	"""
 
 
@@ -373,8 +374,6 @@ class MySqlDriver(BaseDatabaseDriver):
 		"""
 		'WHERE' clause string builder with parameter bindings.
 
-		TODO: account for None types
-
 		"""
 
 		where_strings = []
@@ -399,11 +398,7 @@ class MySqlDriver(BaseDatabaseDriver):
 						where_strings.append(s)
 						where_values = where_values + cond_val
 					else:
-						raise RuntimeError(
-							"""
-								invalid WHERE conditional
-							"""
-						)
+						raise RuntimeError("invalid WHERE conditional")
 			else:
 				if prop_cond is None:
 					s = '`{0}` IS %s'.format(cls.escape(prop_col))
@@ -414,6 +409,4 @@ class MySqlDriver(BaseDatabaseDriver):
 
 		where_component = 'WHERE ' + ' AND '.join(where_strings)
 		return where_component, where_values
-
-
 

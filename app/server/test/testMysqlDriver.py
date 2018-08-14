@@ -60,7 +60,8 @@ create_table_query = """
 		created_ts INT(11) NOT NULL,
 		updated_ts INT(11) NOT NULL,
 		message VARCHAR(1000),
-		attribution VARCHAR(255)
+		attribution VARCHAR(255),
+		amount INT(11)
 	)
 """.format(TABLE_NAME)
 query_result = mysql_driver.query_bind(query_string=create_table_query)
@@ -149,13 +150,107 @@ t.should_be_equal(
 )
 
 
+# test IS NULL where condition
+insert_attribution_1 = 'bot #1'
+mysql_driver.insert(
+	table_name=TABLE_NAME,
+	value_props={
+		'message': None,
+		'attribution': insert_attribution_1
+	}
+)
+insert_attribution_2 = 'bot #2'
+mysql_driver.insert(
+	table_name=TABLE_NAME,
+	value_props={ 'attribution': insert_attribution_2 }
+)
+found_records = mysql_driver.find_by_fields(
+	table_name=TABLE_NAME,
+	where_props={ 'message': None }
+)
+ppp('found records:', found_records)
+t.should_be_equal(
+	expected=[ insert_attribution_1, insert_attribution_2 ],
+	actual=[ x['attribution'] for x in found_records ]
+)
+# test number where conditions
+insert_amount_1 = 0
+mysql_driver.insert(
+	table_name=TABLE_NAME,
+	value_props={ 'amount': insert_amount_1 }
+)
+insert_amount_2 = 1
+mysql_driver.insert(
+	table_name=TABLE_NAME,
+	value_props={ 'amount': insert_amount_2 }
+)
+insert_amount_3 = -1
+mysql_driver.insert(
+	table_name=TABLE_NAME,
+	value_props={ 'amount': insert_amount_3 }
+)
+found_records_1 = mysql_driver.find_by_fields(
+	table_name=TABLE_NAME,
+	where_props={
+		'amount': {
+			'>': 0
+		}
+	}
+)
+ppp('found records 1:', found_records_1)
+t.should_be_equal(
+	expected=[ insert_amount_2 ],
+	actual=[ x['amount'] for x in found_records_1 ]
+)
+found_records_2 = mysql_driver.find_by_fields(
+	table_name=TABLE_NAME,
+	where_props={
+		'amount': {
+			'>=': 0
+		}
+	}
+)
+ppp('found records 2:', found_records_2)
+t.should_be_equal(
+	expected=[ insert_amount_1, insert_amount_2 ],
+	actual=[ x['amount'] for x in found_records_2 ]
+)
+found_records_3 = mysql_driver.find_by_fields(
+	table_name=TABLE_NAME,
+	where_props={
+		'amount': {
+			'lte': 0
+		}
+	}
+)
+ppp('found records 3:', found_records_3)
+t.should_be_equal(
+	expected=[ insert_amount_1, insert_amount_3 ],
+	actual=[ x['amount'] for x in found_records_3 ]
+)
+# test NOT IN conditional
+found_records_4 = mysql_driver.find_by_fields(
+	table_name=TABLE_NAME,
+	where_props={
+		'amount': {
+			'not in': [1, -1]
+		}
+	}
+)
+ppp('found records 4:', found_records_4)
+t.should_be_equal(
+	expected=[ insert_amount_1 ],
+	actual=[ x['amount'] for x in found_records_4 ]
+)
+
+
 ######## TEST MYSQL SPECIFIC METHODS ########
 
 
 # insert
 insert_message = 'i am the query bind!'
 insert_attribution = 'mr. query bind'
-insert_id = mysql_driver.insert(
+mysql_driver.insert(
 	table_name=TABLE_NAME,
 	value_props={
 		'message': insert_message,
@@ -176,7 +271,7 @@ select_query_result = mysql_driver.query_bind(
 	bind_vars=bind_vars
 )
 
-ppp(['result of select query:', select_query_result])
+ppp('result of select query:', select_query_result)
 
 
 ######## TEST TABLE UTILS ########
