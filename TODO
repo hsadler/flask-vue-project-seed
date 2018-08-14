@@ -15,4 +15,8 @@
 
 // BASE DATA OBJECT
 	- batch query and batch caching of query result items
-	- asses types of batching currently implemented and research alternatives
+	- asses types of caching currently implemented and research alternatives
+	- think about db replication schemes (master->slave vs master->master)
+	- think about data consistency problems (in-memory, cache, master, slave)
+	- think about data type consistency and enforcement
+	- switch from auto-incremented ids to UUIDs (better for application)

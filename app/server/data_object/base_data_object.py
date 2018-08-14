@@ -14,7 +14,7 @@ class BaseDataObject(metaclass=ABCMeta):
 	TODO:
 		- batch queries
 		- batch caching of result items
-		- asses types of batching currently implemented and research
+		- asses types of caching currently implemented and research
 			alternatives
 		- better management of attribute types (int, str, bool, etc.)
 
