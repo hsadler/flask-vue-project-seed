@@ -23,13 +23,6 @@ mysql_driver = MySqlDriver(
 )
 
 
-# Steps:
-# create a mysql test table test_user
-# create test_user_data_object
-# test base_data_object methods on test_user_data_object
-# drop test table
-
-
 ######## CREATE TEST TABLE ########
 
 
