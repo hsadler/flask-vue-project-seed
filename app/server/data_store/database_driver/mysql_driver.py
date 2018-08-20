@@ -1,6 +1,7 @@
 
 # MySQL Database Driver
 
+import uuid
 import MySQLdb as mdb
 import config.config as config
 from data_store.database_driver.base_database_driver import BaseDatabaseDriver
@@ -16,6 +17,7 @@ class MySqlDriver(BaseDatabaseDriver):
 	"""
 
 
+	RECORD_UUID_COLUMN = 'uuid'
 	RECORD_CREATED_TS_COLUMN = 'created_ts'
 	RECORD_UPDATED_TS_COLUMN = 'updated_ts'
 
@@ -83,6 +85,7 @@ class MySqlDriver(BaseDatabaseDriver):
 
 		"""
 
+		value_props[self.RECORD_UUID_COLUMN] = uuid.uuid4().hex
 		value_props[self.RECORD_CREATED_TS_COLUMN] = int(time.time())
 		value_props[self.RECORD_UPDATED_TS_COLUMN] = int(time.time())
 
@@ -108,7 +111,8 @@ class MySqlDriver(BaseDatabaseDriver):
 		)
 
 		with self.conn:
-			self.cur.execute(query_stmt, tuple(values))
+			insert_count = self.cur.execute(query_stmt, tuple(values))
+			self.cur.commit()
 			return self.cur.lastrowid
 
 

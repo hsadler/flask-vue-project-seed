@@ -20,3 +20,6 @@
 	- think about data consistency problems (in-memory, cache, master, slave)
 	- think about data type consistency and enforcement
 	- switch from auto-incremented ids to UUIDs (better for application)
+	- think about db transactions
+	- move all 'created' and 'updated' timestamp setting from base_db_driver and
+		mysql_driver to base_data_object (MAYBE NO, THINK ABOUT CONSEQUENCES)
