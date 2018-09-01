@@ -1,7 +1,6 @@
 
 # MySQL Database Driver
 
-import uuid
 import MySQLdb as mdb
 import config.config as config
 from data_store.database_driver.base_database_driver import BaseDatabaseDriver
@@ -14,10 +13,16 @@ class MySqlDriver(BaseDatabaseDriver):
 	"""
 	MySQL database driver which implements CRUD and utility public methods.
 
+	TODO:
+		X enforce uuid as a required input for record creation
+		- enforce uuid as immutable once record exists
+		- transactions?
+		- type checking, type consistency?
+
 	"""
 
+	REQUIRED_RECORD_PROPERTIES = [ 'uuid' ]
 
-	RECORD_UUID_COLUMN = 'uuid'
 	RECORD_CREATED_TS_COLUMN = 'created_ts'
 	RECORD_UPDATED_TS_COLUMN = 'updated_ts'
 
@@ -55,6 +60,7 @@ class MySqlDriver(BaseDatabaseDriver):
 			database_name (str): Name of MySQL database.
 
 		"""
+
 		self.database_name = self.escape(database_name)
 		self.conn = mdb.connect(
 			host=config.MYSQL_HOST,
@@ -85,22 +91,29 @@ class MySqlDriver(BaseDatabaseDriver):
 
 		"""
 
-		value_props[self.RECORD_UUID_COLUMN] = uuid.uuid4().hex
+		# validate value_props for necessary items
+		if not self.validate_record_props(value_props):
+			raise RuntimeError("record properties invalid for INSERT")
+
+		# set 'created' and 'updated' record metadata
 		value_props[self.RECORD_CREATED_TS_COLUMN] = int(time.time())
 		value_props[self.RECORD_UPDATED_TS_COLUMN] = int(time.time())
 
+		# gather fields and values for record data
 		fields = []
 		values = []
 		for key, val in value_props.items():
 			fields.append(key)
 			values.append(val)
 
+		# construct fields and values substring
 		fields_str = ', '.join([
 			"`{}`".format(self.escape(field))
 			for field in fields
 		])
 		values_str_sub = ', '.join(['%s' for item in values])
 
+		# construct full insert SQL string
 		query_stmt = """
 			INSERT INTO `{0}` ({1})
 			VALUES ({2});
@@ -110,9 +123,11 @@ class MySqlDriver(BaseDatabaseDriver):
 			values_str_sub
 		)
 
+		# commit the insert to the table
 		with self.conn:
 			insert_count = self.cur.execute(query_stmt, tuple(values))
 			self.cur.commit()
+			# TODO: return record data instead
 			return self.cur.lastrowid
 
 
@@ -371,6 +386,19 @@ class MySqlDriver(BaseDatabaseDriver):
 		"""
 
 		return mdb.escape_string(string).decode('utf-8')
+
+
+	@staticmethod
+	def validate_record_props(value_props):
+		"""
+		Ensure required record properties exist.
+
+		"""
+
+		for property_name in self.REQUIRED_RECORD_PROPERTIES:
+			if property_name not in value_props:
+				return False
+		return True
 
 
 	@classmethod

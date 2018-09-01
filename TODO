@@ -18,8 +18,10 @@
 	- asses types of caching currently implemented and research alternatives
 	- think about db replication schemes (master->slave vs master->master)
 	- think about data consistency problems (in-memory, cache, master, slave)
-	- think about data type consistency and enforcement
+	V think about data type consistency and enforcement
 	- switch from auto-incremented ids to UUIDs (better for application)
-	- think about db transactions
-	- move all 'created' and 'updated' timestamp setting from base_db_driver and
-		mysql_driver to base_data_object (MAYBE NO, THINK ABOUT CONSEQUENCES)
+	V think about db transactions
+	- 'created' and 'updated' should remain in the mysql driver. 'uuid' should
+		be in the base_data_object.
+	- 'created' and 'updated' should be set as metadata attributes in the
+		base_data_object instance state

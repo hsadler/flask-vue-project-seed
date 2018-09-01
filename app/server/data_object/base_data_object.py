@@ -12,6 +12,8 @@ class BaseDataObject(metaclass=ABCMeta):
 	Provides base methods and interface for all proper data objects.
 
 	TODO:
+		- add uuid creation and interaction with datastore
+			(replace auto-incremented id)
 		- batch queries
 		- batch caching of result items
 		- asses types of caching currently implemented and research
