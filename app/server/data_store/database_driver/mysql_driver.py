@@ -15,16 +15,24 @@ class MySqlDriver(BaseDatabaseDriver):
 
 	TODO:
 		X enforce uuid as a required input for record creation
-		- enforce uuid as immutable once record exists
+		- enforce uuid and created_ts as immutable once record exists
 		- transactions?
 		- type checking, type consistency?
 
 	"""
 
-	REQUIRED_RECORD_PROPERTIES = [ 'uuid' ]
-
+	RECORD_UUID_COLUMN = 'uuid'
 	RECORD_CREATED_TS_COLUMN = 'created_ts'
 	RECORD_UPDATED_TS_COLUMN = 'updated_ts'
+
+	REQUIRED_RECORD_PROPERTIES = [
+		self.RECORD_UUID_COLUMN
+	]
+
+	IMMUTABLE_RECORD_PROPERTIES = [
+		self.RECORD_UUID_COLUMN,
+		self.RECORD_CREATED_TS_COLUMN
+	]
 
 	WHERE_MAP = {
 		'=': '=',
@@ -131,10 +139,10 @@ class MySqlDriver(BaseDatabaseDriver):
 			return self.cur.lastrowid
 
 
-	def find_by_id(self, table_name, id):
+	def find_by_uuid(self, table_name, uuid):
 		return self.find_by_fields(
 			table_name=table_name,
-			where_props={ 'id': id }
+			where_props={ 'uuid': uuid }
 		)
 
 
@@ -183,11 +191,11 @@ class MySqlDriver(BaseDatabaseDriver):
 			return self.cur.fetchall()
 
 
-	def update_by_id(self, table_name, id, value_props={}):
+	def update_by_uuid(self, table_name, uuid, value_props={}):
 		return self.update_by_fields(
 			table_name=table_name,
 			value_props=value_props,
-			where_props={ 'id': id }
+			where_props={ 'uuid': uuid }
 		)
 
 
@@ -207,12 +215,11 @@ class MySqlDriver(BaseDatabaseDriver):
 
 		"""
 
-		# filter 'id' and 'created_ts' keys from value_props since they should
-		# never be mutated
+		# filter immutable properties from value_props
 		unfiltered_value_props = value_props
 		value_props = {}
 		for key, val in unfiltered_value_props.items():
-			if key != 'id' and key != self.RECORD_CREATED_TS_COLUMN:
+			if key not in self.IMMUTABLE_RECORD_PROPERTIES:
 				value_props[key] = val
 		# mutate 'updated_ts' column to current time on update
 		value_props[self.RECORD_UPDATED_TS_COLUMN] = int(time.time())
@@ -260,10 +267,10 @@ class MySqlDriver(BaseDatabaseDriver):
 			return self.cur.rowcount
 
 
-	def delete_by_id(self, table_name, id):
+	def delete_by_uuid(self, table_name, uuid):
 		return self.delete_by_fields(
 			table_name=table_name,
-			where_props={ 'id': id }
+			where_props={ 'uuid': uuid }
 		)
 
 
