@@ -16,6 +16,7 @@ class MySqlDriver(BaseDatabaseDriver):
 	TODO:
 		X enforce uuid as a required input for record creation
 		- enforce uuid and created_ts as immutable once record exists
+		- update returns to make sense with new interface
 		- transactions?
 		- type checking, type consistency?
 
@@ -104,8 +105,8 @@ class MySqlDriver(BaseDatabaseDriver):
 			raise RuntimeError("record properties invalid for INSERT")
 
 		# set 'created' and 'updated' record metadata
-		value_props[self.RECORD_CREATED_TS_COLUMN] = int(time.time())
-		value_props[self.RECORD_UPDATED_TS_COLUMN] = int(time.time())
+		value_props[self.RECORD_CREATED_TS_COLUMN] = self.get_curr_timestamp()
+		value_props[self.RECORD_UPDATED_TS_COLUMN] = self.get_curr_timestamp()
 
 		# gather fields and values for record data
 		fields = []
@@ -221,16 +222,20 @@ class MySqlDriver(BaseDatabaseDriver):
 		for key, val in unfiltered_value_props.items():
 			if key not in self.IMMUTABLE_RECORD_PROPERTIES:
 				value_props[key] = val
-		# mutate 'updated_ts' column to current time on update
-		value_props[self.RECORD_UPDATED_TS_COLUMN] = int(time.time())
 
+		# mutate 'updated_ts' column to current time on update
+		value_props[self.RECORD_UPDATED_TS_COLUMN] = self.get_curr_timestamp()
+
+		# start gathering query parts
 		query_stmt_components = []
 
+		# add the UPDATE component
 		update_component = 'UPDATE `{}`'.format(
 			self.escape(table_name)
 		)
 		query_stmt_components.append(update_component)
 
+		# add the SET component
 		set_values = None
 		if len(value_props.keys()) > 0:
 			set_fields = []
@@ -248,6 +253,7 @@ class MySqlDriver(BaseDatabaseDriver):
 				"argument 'value_props' required with at least one SET item"
 			)
 
+		# add the WHERE component
 		where_values = None
 		if len(where_props.keys()) > 0:
 			where_component, where_values = self.construct_where_clause(
@@ -260,8 +266,10 @@ class MySqlDriver(BaseDatabaseDriver):
 				"condition"
 			)
 
+		# join the query components together
 		query_stmt = ' '.join(query_stmt_components) + ';'
 
+		# commit the update to the datastore
 		with self.conn:
 			self.cur.execute(query_stmt, tuple(set_values + where_values))
 			return self.cur.rowcount
@@ -406,6 +414,16 @@ class MySqlDriver(BaseDatabaseDriver):
 			if property_name not in value_props:
 				return False
 		return True
+
+
+	@staticmethod
+	def get_curr_timestamp():
+		"""
+		Get timestamp for current time.
+
+		"""
+
+		return int(time.time())
 
 
 	@classmethod
