@@ -15,7 +15,7 @@ class MySqlDriver(BaseDatabaseDriver):
 
 	TODO:
 		X enforce uuid as a required input for record creation
-		- enforce uuid and created_ts as immutable once record exists
+		X enforce uuid and created_ts as immutable once record exists
 		- update returns to make sense with new interface
 		- transactions?
 		- type checking, type consistency?
@@ -27,12 +27,12 @@ class MySqlDriver(BaseDatabaseDriver):
 	RECORD_UPDATED_TS_COLUMN = 'updated_ts'
 
 	REQUIRED_RECORD_PROPERTIES = [
-		self.RECORD_UUID_COLUMN
+		RECORD_UUID_COLUMN
 	]
 
 	IMMUTABLE_RECORD_PROPERTIES = [
-		self.RECORD_UUID_COLUMN,
-		self.RECORD_CREATED_TS_COLUMN
+		RECORD_UUID_COLUMN,
+		RECORD_CREATED_TS_COLUMN
 	]
 
 	WHERE_MAP = {
@@ -404,7 +404,17 @@ class MySqlDriver(BaseDatabaseDriver):
 
 
 	@staticmethod
-	def validate_record_props(value_props):
+	def get_curr_timestamp():
+		"""
+		Get timestamp for current time.
+
+		"""
+
+		return int(time.time())
+
+
+	@classmethod
+	def validate_record_props(self, value_props):
 		"""
 		Ensure required record properties exist.
 
@@ -414,16 +424,6 @@ class MySqlDriver(BaseDatabaseDriver):
 			if property_name not in value_props:
 				return False
 		return True
-
-
-	@staticmethod
-	def get_curr_timestamp():
-		"""
-		Get timestamp for current time.
-
-		"""
-
-		return int(time.time())
 
 
 	@classmethod

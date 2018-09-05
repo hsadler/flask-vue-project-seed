@@ -22,7 +22,7 @@ class BaseDatabaseDriver(metaclass=ABCMeta):
 		pass
 
 	@abstractmethod
-	def find_by_id(self, table_name, id):
+	def find_by_uuid(self, table_name, uuid):
 		pass
 
 	@abstractmethod
@@ -30,7 +30,7 @@ class BaseDatabaseDriver(metaclass=ABCMeta):
 		pass
 
 	@abstractmethod
-	def update_by_id(self, table_name, id, value_props={}):
+	def update_by_uuid(self, table_name, uuid, value_props={}):
 		pass
 
 	@abstractmethod
@@ -38,7 +38,7 @@ class BaseDatabaseDriver(metaclass=ABCMeta):
 		pass
 
 	@abstractmethod
-	def delete_by_id(self, table_name, id):
+	def delete_by_uuid(self, table_name, uuid):
 		pass
 
 	@abstractmethod

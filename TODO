@@ -11,6 +11,11 @@
 	X methods for select, update, and delete by primary key id
 	X rewrite testMysqlDriver.py
 	X more thorough testing of where conditions
+	X switch to UUIDs
+	- update interface to use UUIDs
+	- update test script
+	- transactions?
+	- type checking, type consistency?
 
 
 // BASE DATA OBJECT

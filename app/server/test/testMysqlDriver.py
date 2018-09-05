@@ -1,4 +1,5 @@
 
+import uuid
 import sys
 sys.path.append('..')
 
@@ -13,6 +14,13 @@ t = Testie()
 mysql_driver = MySqlDriver(
 	database_name=config.MYSQL_DB_NAME
 )
+
+
+######## HELPER FUNCTIONS ########
+
+
+def create_uuid():
+	return uuid.uuid4().hex
 
 
 ######## TEST WHERE CLAUSE BUILDER ########
@@ -56,7 +64,7 @@ t.should_be_equal(
 TABLE_NAME = 'test_table'
 create_table_query = """
 	CREATE TABLE IF NOT EXISTS {0} (
-		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		uuid VARCHAR(32) PRIMARY KEY,
 		created_ts INT(11) NOT NULL,
 		updated_ts INT(11) NOT NULL,
 		message VARCHAR(1000),
@@ -72,22 +80,30 @@ ppp('result of create table query:', query_result)
 
 
 # test insert
+insert_uuid = create_uuid()
 insert_message = 'hello!'
 insert_attribution = 'bot'
-insert_id = mysql_driver.insert(
+insert_record = mysql_driver.insert(
 	table_name=TABLE_NAME,
 	value_props={
+		'uuid': insert_uuid,
 		'message': insert_message,
 		'attribution': insert_attribution
 	}
 )
 
-ppp('insert id: {0}'.format(insert_id))
+ppp('insert record: ', insert_record)
 
 t.should_be_equal(
-	expected=int,
-	actual=type(insert_id)
+	expected={
+		'uuid': insert_uuid,
+		'message': insert_message,
+		'attribution': insert_attribution
+	},
+	actual=insert_record
 )
+
+sys.exit()
 
 
 # test find
