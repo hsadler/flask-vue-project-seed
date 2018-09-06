@@ -45,9 +45,6 @@ where_clause, where_vals = mysql_driver.construct_where_clause(where_props={
 	'maiden_name': None
 })
 
-ppp('where_clause:', where_clause)
-ppp('where_vals:', where_vals)
-
 expected_where_clause = "WHERE `id` = %s AND `name` LIKE %s AND `age` > %s AND \
 `age` <= %s AND `age` <> %s AND `height` IN (%s,%s,%s,%s) AND `race` IS NOT %s \
 AND `maiden_name` IS %s"
@@ -83,7 +80,7 @@ ppp('result of create table query:', query_result)
 insert_uuid = create_uuid()
 insert_message = 'hello!'
 insert_attribution = 'bot'
-insert_record = mysql_driver.insert(
+affected_count = mysql_driver.insert(
 	table_name=TABLE_NAME,
 	value_props={
 		'uuid': insert_uuid,
@@ -92,27 +89,17 @@ insert_record = mysql_driver.insert(
 	}
 )
 
-ppp('insert record: ', insert_record)
-
 t.should_be_equal(
-	expected={
-		'uuid': insert_uuid,
-		'message': insert_message,
-		'attribution': insert_attribution
-	},
-	actual=insert_record
+	expected=1,
+	actual=affected_count
 )
-
-sys.exit()
 
 
 # test find
 found_records = mysql_driver.find_by_fields(
 	table_name=TABLE_NAME,
 	where_props={
-		'id': {
-			'>': 0
-		}
+		'uuid': insert_uuid
 	},
 	limit=1
 )
@@ -138,7 +125,7 @@ rows_updated = mysql_driver.update_by_fields(
 		'message': new_insert_message
 	},
 	where_props={
-		'id': insert_id
+		'uuid': insert_uuid
 	}
 )
 
@@ -154,7 +141,7 @@ t.should_be_equal(
 rows_deleted = mysql_driver.delete_by_fields(
 	table_name=TABLE_NAME,
 	where_props={
-		'id': insert_id
+		'uuid': insert_uuid
 	}
 )
 
@@ -164,6 +151,8 @@ t.should_be_equal(
 	expected=1,
 	actual=rows_deleted
 )
+
+sys.exit()
 
 
 # test IS NULL where condition

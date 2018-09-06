@@ -135,16 +135,17 @@ class MySqlDriver(BaseDatabaseDriver):
 		# commit the insert to the table
 		with self.conn:
 			insert_count = self.cur.execute(query_stmt, tuple(values))
-			self.cur.commit()
-			# TODO: return record data instead
-			return self.cur.lastrowid
+			self.conn.commit()
+			return self.cur.rowcount
 
 
 	def find_by_uuid(self, table_name, uuid):
-		return self.find_by_fields(
+		records = self.find_by_fields(
 			table_name=table_name,
 			where_props={ 'uuid': uuid }
 		)
+		if len(records) > 0:
+			return records[0]
 
 
 	def find_by_fields(self, table_name, where_props={}, limit=None):

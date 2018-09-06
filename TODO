@@ -30,3 +30,24 @@
 		be in the base_data_object.
 	- 'created' and 'updated' should be set as metadata attributes in the
 		base_data_object instance state
+
+
+
+insert into test_table
+	(uuid, created_ts, updated_ts, message, attribution, amount)
+values
+	(
+		951f87406bd049b180a3a1cd8a41f039,
+		1536213754,
+		1536213754,
+		nothing,
+		harry,
+		10
+	);
+
+insert into test_table (uuid, created_ts, updated_ts, message, attribution, amount) values ('951f87406bd049b180a3a1cd8a41f03h', 1536213754, 1536213754, 'nothing', 'harry', 10);
+
+
+
+
+
