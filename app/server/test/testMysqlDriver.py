@@ -152,14 +152,13 @@ t.should_be_equal(
 	actual=rows_deleted
 )
 
-sys.exit()
-
 
 # test IS NULL where condition
 insert_attribution_1 = 'bot #1'
 mysql_driver.insert(
 	table_name=TABLE_NAME,
 	value_props={
+		'uuid': create_uuid(),
 		'message': None,
 		'attribution': insert_attribution_1
 	}
@@ -167,32 +166,48 @@ mysql_driver.insert(
 insert_attribution_2 = 'bot #2'
 mysql_driver.insert(
 	table_name=TABLE_NAME,
-	value_props={ 'attribution': insert_attribution_2 }
+	value_props={
+		'uuid': create_uuid(),
+		'attribution': insert_attribution_2
+	}
 )
 found_records = mysql_driver.find_by_fields(
 	table_name=TABLE_NAME,
 	where_props={ 'message': None }
 )
 ppp('found records:', found_records)
+expected = [ insert_attribution_1, insert_attribution_2 ]
+expected.sort()
+actual = [ x['attribution'] for x in found_records ]
+actual.sort()
 t.should_be_equal(
-	expected=[ insert_attribution_1, insert_attribution_2 ],
-	actual=[ x['attribution'] for x in found_records ]
+	expected=expected,
+	actual=actual
 )
 # test number where conditions
 insert_amount_1 = 0
 mysql_driver.insert(
 	table_name=TABLE_NAME,
-	value_props={ 'amount': insert_amount_1 }
+	value_props={
+		'uuid': create_uuid(),
+		'amount': insert_amount_1
+	}
 )
 insert_amount_2 = 1
 mysql_driver.insert(
 	table_name=TABLE_NAME,
-	value_props={ 'amount': insert_amount_2 }
+	value_props={
+		'uuid': create_uuid(),
+		'amount': insert_amount_2
+	}
 )
 insert_amount_3 = -1
 mysql_driver.insert(
 	table_name=TABLE_NAME,
-	value_props={ 'amount': insert_amount_3 }
+	value_props={
+		'uuid': create_uuid(),
+		'amount': insert_amount_3
+	}
 )
 found_records_1 = mysql_driver.find_by_fields(
 	table_name=TABLE_NAME,
@@ -216,9 +231,13 @@ found_records_2 = mysql_driver.find_by_fields(
 	}
 )
 ppp('found records 2:', found_records_2)
+expected = [ insert_amount_1, insert_amount_2 ]
+expected.sort()
+actual = [ x['amount'] for x in found_records_2 ]
+actual.sort()
 t.should_be_equal(
-	expected=[ insert_amount_1, insert_amount_2 ],
-	actual=[ x['amount'] for x in found_records_2 ]
+	expected=expected,
+	actual=actual
 )
 found_records_3 = mysql_driver.find_by_fields(
 	table_name=TABLE_NAME,
@@ -229,9 +248,13 @@ found_records_3 = mysql_driver.find_by_fields(
 	}
 )
 ppp('found records 3:', found_records_3)
+expected = [ insert_amount_1, insert_amount_3 ]
+expected.sort()
+actual = [ x['amount'] for x in found_records_3 ]
+actual.sort()
 t.should_be_equal(
-	expected=[ insert_amount_1, insert_amount_3 ],
-	actual=[ x['amount'] for x in found_records_3 ]
+	expected=expected,
+	actual=actual
 )
 # test NOT IN conditional
 found_records_4 = mysql_driver.find_by_fields(
@@ -247,6 +270,9 @@ t.should_be_equal(
 	expected=[ insert_amount_1 ],
 	actual=[ x['amount'] for x in found_records_4 ]
 )
+
+
+sys.exit()
 
 
 ######## TEST MYSQL SPECIFIC METHODS ########
