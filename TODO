@@ -14,8 +14,8 @@
 	X switch to UUIDs
 	X update interface to use UUIDs
 	X update test script
-	- transactions?
-	- type checking, type consistency?
+	- transactions? (not at this time)
+	- type checking, type consistency? (not at this time)
 
 
 // BASE DATA OBJECT

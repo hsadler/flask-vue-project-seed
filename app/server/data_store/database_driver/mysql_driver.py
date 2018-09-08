@@ -17,8 +17,8 @@ class MySqlDriver(BaseDatabaseDriver):
 		X enforce uuid as a required input for record creation
 		X enforce uuid and created_ts as immutable once record exists
 		X update returns to make sense with new interface
-		- transactions?
-		- type checking, type consistency?
+		- transactions? (not at this time)
+		- type checking, type consistency? (not at this time)
 
 	"""
 
@@ -142,7 +142,7 @@ class MySqlDriver(BaseDatabaseDriver):
 	def find_by_uuid(self, table_name, uuid):
 		records = self.find_by_fields(
 			table_name=table_name,
-			where_props={ 'uuid': uuid }
+			where_props={ self.RECORD_UUID_COLUMN: uuid }
 		)
 		if len(records) > 0:
 			return records[0]
@@ -165,11 +165,13 @@ class MySqlDriver(BaseDatabaseDriver):
 
 		query_stmt_components = []
 
+		# add SELECT query component
 		select_component = 'SELECT * FROM `{}`'.format(
 			self.escape(table_name)
 		)
 		query_stmt_components.append(select_component)
 
+		# add WHERE query components
 		where_values = None
 		if len(where_props.keys()) > 0:
 			where_component, where_values = self.construct_where_clause(
@@ -178,12 +180,15 @@ class MySqlDriver(BaseDatabaseDriver):
 			query_stmt_components.append(where_component)
 			where_values = tuple(where_values)
 
+		# add LIMIT query component
 		if(limit is not None and int(limit) > 0):
 			limit_component = 'LIMIT {}'.format(self.escape(str(limit)))
 			query_stmt_components.append(limit_component)
 
+		# join query components together to create entire statement
 		query_stmt = ' '.join(query_stmt_components) + ';'
 
+		# execute the query and return the results
 		with self.conn:
 			if where_values is not None:
 				self.cur.execute(query_stmt, where_values)
@@ -196,7 +201,7 @@ class MySqlDriver(BaseDatabaseDriver):
 		return self.update_by_fields(
 			table_name=table_name,
 			value_props=value_props,
-			where_props={ 'uuid': uuid }
+			where_props={ self.RECORD_UUID_COLUMN: uuid }
 		)
 
 
@@ -278,7 +283,7 @@ class MySqlDriver(BaseDatabaseDriver):
 	def delete_by_uuid(self, table_name, uuid):
 		return self.delete_by_fields(
 			table_name=table_name,
-			where_props={ 'uuid': uuid }
+			where_props={ self.RECORD_UUID_COLUMN: uuid }
 		)
 
 
@@ -298,11 +303,13 @@ class MySqlDriver(BaseDatabaseDriver):
 
 		query_stmt_components = []
 
+		# add the DELETE component
 		delete_component = 'DELETE FROM `{}`'.format(
 			self.escape(table_name)
 		)
 		query_stmt_components.append(delete_component)
 
+		# add the WHERE components
 		where_values = None
 		if len(where_props.keys()) > 0:
 			where_component, where_values = self.construct_where_clause(
@@ -310,6 +317,7 @@ class MySqlDriver(BaseDatabaseDriver):
 			)
 			query_stmt_components.append(where_component)
 		else:
+			# don't allow DELETE without at least one WHERE condition
 			raise RuntimeError(
 				"""
 					argument 'where_props' required with at least one WHERE
@@ -317,8 +325,10 @@ class MySqlDriver(BaseDatabaseDriver):
 				"""
 			)
 
+		# join the query components together
 		query_stmt = ' '.join(query_stmt_components) + ';'
 
+		# execute the query and return the number of deleted records
 		with self.conn:
 			self.cur.execute(query_stmt, tuple(where_values))
 			return self.cur.rowcount

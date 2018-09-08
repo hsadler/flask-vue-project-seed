@@ -2,6 +2,7 @@
 # Base Data Object
 
 import sys
+import uuid
 import simplejson as json
 import config.config as config
 from abc import ABCMeta, abstractmethod
@@ -12,8 +13,8 @@ class BaseDataObject(metaclass=ABCMeta):
 	Provides base methods and interface for all proper data objects.
 
 	TODO:
-		- add uuid creation and interaction with datastore
-			(replace auto-incremented id)
+		X add uuid creation on data object create
+		- add partials caching by uuid to find_many
 		- batch queries
 		- batch caching of result items
 		- asses types of caching currently implemented and research
@@ -21,6 +22,9 @@ class BaseDataObject(metaclass=ABCMeta):
 		- better management of attribute types (int, str, bool, etc.)
 
 	"""
+
+
+	UUID_PROPERTY = 'uuid'
 
 
 	def __init__(self, prop_dict, db_driver_class, cache_driver_class):
@@ -57,8 +61,7 @@ class BaseDataObject(metaclass=ABCMeta):
 		cache_driver_class=None
 	):
 		"""
-		Data object creation method. Basically a class method wrapper of the
-		constructor method. NOTE: Does not save to data store.
+		Data object creation method. NOTE: Does not save to data store.
 
 		Args:
 			prop_dict (dict): Dictionary representing data object state.
@@ -69,6 +72,8 @@ class BaseDataObject(metaclass=ABCMeta):
 			(object) Data object instance.
 
 		"""
+
+		prop_dict[cls.UUID_PROPERTY] = uuid.uuid4().hex
 
 		return cls(
 			prop_dict=prop_dict,
@@ -150,11 +155,11 @@ class BaseDataObject(metaclass=ABCMeta):
 
 		"""
 
-		# only check cache if finding solely by id
+		# only check cache if finding solely by uuid
 		find_props = list(prop_dict.keys())
-		if len(find_props) == 1 and find_props[0] == 'id':
+		if len(find_props) == 1 and find_props[0] == cls.UUID_PROPERTY:
 			instance = cls.__load_from_cache(
-				id=prop_dict['id'],
+				id=prop_dict[cls.UUID_PROPERTY],
 				db_driver_class=db_driver_class,
 				cache_driver_class=cache_driver_class
 			)
@@ -173,6 +178,18 @@ class BaseDataObject(metaclass=ABCMeta):
 			return instance_list[0]
 		else:
 			return None
+
+
+	@classmethod
+	def find_by_uuids(
+		cls,
+		uuids=[],
+		db_driver_class=None,
+		cache_driver_class=None,
+		cache_ttl=None
+	):
+		# TODO
+		pass
 
 
 	def get_prop(self, prop_name):
