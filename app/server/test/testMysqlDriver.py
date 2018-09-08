@@ -59,6 +59,15 @@ t.should_be_equal(
 
 
 TABLE_NAME = 'test_table'
+
+# drop table just in case it exists
+drop_table_query = """
+	DROP TABLE IF EXISTS {0}
+""".format(TABLE_NAME)
+query_result = mysql_driver.query_bind(query_string=drop_table_query)
+ppp('result of drop table query:', query_result)
+
+# create test table
 create_table_query = """
 	CREATE TABLE IF NOT EXISTS {0} (
 		uuid VARCHAR(32) PRIMARY KEY,
@@ -178,7 +187,11 @@ found_records = mysql_driver.find_by_fields(
 ppp('found records:', found_records)
 expected = [ insert_attribution_1, insert_attribution_2 ]
 expected.sort()
-actual = [ x['attribution'] for x in found_records ]
+actual = [
+	x['attribution'] for x
+	in found_records
+	if x['attribution'] is not None
+]
 actual.sort()
 t.should_be_equal(
 	expected=expected,
@@ -272,18 +285,17 @@ t.should_be_equal(
 )
 
 
-sys.exit()
-
-
 ######## TEST MYSQL SPECIFIC METHODS ########
 
 
 # insert
+insert_uuid = create_uuid()
 insert_message = 'i am the query bind!'
 insert_attribution = 'mr. query bind'
 mysql_driver.insert(
 	table_name=TABLE_NAME,
 	value_props={
+		'uuid': insert_uuid,
 		'message': insert_message,
 		'attribution': insert_attribution
 	}
@@ -291,10 +303,10 @@ mysql_driver.insert(
 
 # test query_bind method
 bind_vars = {
-	'id': 0,
+	'uuid': insert_uuid,
 	'limit': 5
 }
-select_query = 'SELECT * FROM {0} WHERE id > :id LIMIT :limit'.format(
+select_query = 'SELECT * FROM {0} WHERE uuid = :uuid LIMIT :limit'.format(
 	TABLE_NAME
 )
 select_query_result = mysql_driver.query_bind(
@@ -334,8 +346,4 @@ ppp('result of drop table query:', query_result)
 
 
 t.print_report()
-
-
-
-
 

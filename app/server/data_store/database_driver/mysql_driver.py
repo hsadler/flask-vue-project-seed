@@ -16,7 +16,7 @@ class MySqlDriver(BaseDatabaseDriver):
 	TODO:
 		X enforce uuid as a required input for record creation
 		X enforce uuid and created_ts as immutable once record exists
-		- update returns to make sense with new interface
+		X update returns to make sense with new interface
 		- transactions?
 		- type checking, type consistency?
 
@@ -96,13 +96,13 @@ class MySqlDriver(BaseDatabaseDriver):
 				key=column name and value=column value.
 
 		Returns:
-			(int) 'id' of the inserted record.
+			(int) Number of records inserted.
 
 		"""
 
 		# validate value_props for necessary items
 		if not self.validate_record_props(value_props):
-			raise RuntimeError("record properties invalid for INSERT")
+			raise RuntimeError("invalid record properties for INSERT")
 
 		# set 'created' and 'updated' record metadata
 		value_props[self.RECORD_CREATED_TS_COLUMN] = self.get_curr_timestamp()
@@ -159,8 +159,7 @@ class MySqlDriver(BaseDatabaseDriver):
 			limit (int or None): Positive integer limit for query results list.
 
 		Returns:
-			(tuple) Tuple of dictionaries representing MySQL records
-			(deserialized).
+			(tuple) Tuple of dictionaries representing MySQL records.
 
 		"""
 
