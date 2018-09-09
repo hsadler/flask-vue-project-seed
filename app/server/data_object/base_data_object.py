@@ -15,9 +15,14 @@ class BaseDataObject(metaclass=ABCMeta):
 	TODO:
 		X add uuid creation on data object create
 		- update all 'id's to be 'uuid'
-		- add partials caching by uuid to find_many
+		- add partials caching by uuid to find_many() method
+		- add metadata attribute to keep track of:
+			- whether or not dataobject exists in the datastore as a record
+			- created_ts column
+			- updated_ts column
 		- refactor test script
 
+		- add consistency options to 'find' methods (skip cache on read)
 		- batch queries
 		- batch caching of result items
 		- asses types of caching currently implemented and research
@@ -28,9 +33,18 @@ class BaseDataObject(metaclass=ABCMeta):
 
 
 	UUID_PROPERTY = 'uuid'
+	RECORD_EXISTS_METADATA = 'record_exists'
+	CREATED_TS_METADATA = 'created_ts'
+	UPDATED_TS_METADATA = 'updated_ts'
 
 
-	def __init__(self, prop_dict, db_driver_class, cache_driver_class):
+	def __init__(
+		self,
+		prop_dict,
+		metadata_dict,
+		db_driver_class,
+		cache_driver_class
+	):
 		"""
 		Data object instance constructor. Configures the database driver, cache
 		driver, and state dictionary.
@@ -42,6 +56,7 @@ class BaseDataObject(metaclass=ABCMeta):
 
 		"""
 
+		# set database driver and cache driver classes and instances
 		self.db_driver_class = db_driver_class
 		self.cache_driver_class = cache_driver_class
 		db_driver, cache_driver = self.__get_drivers(
@@ -50,10 +65,19 @@ class BaseDataObject(metaclass=ABCMeta):
 		)
 		self.db_driver = db_driver
 		self.cache_driver = cache_driver
+
+		# set state of dataobject as a dictionary
 		self.state = prop_dict
 
+		# set metadata initial values
+		self.metadata = {
+			self.RECORD_EXISTS_METADATA: False,
+			self.CREATED_TS_METADATA: None,
+			self.UPDATED_TS_METADATA: None
+		}
 
-	########## BASE METHODS ##########
+
+	########## PRIMARY PUBLIC METHODS ##########
 
 
 	@classmethod
@@ -76,8 +100,10 @@ class BaseDataObject(metaclass=ABCMeta):
 
 		"""
 
+		# set uuid upon dataobject creation
 		prop_dict[cls.UUID_PROPERTY] = uuid.uuid4().hex
 
+		# use the constructor to set state, database driver and cache driver
 		return cls(
 			prop_dict=prop_dict,
 			db_driver_class=db_driver_class,
@@ -294,47 +320,11 @@ class BaseDataObject(metaclass=ABCMeta):
 			return False
 
 
-	########## UTILITY METHODS ##########
-
-
-	def to_dict(self):
-		"""
-		Get data object's state in dictionary format.
-
-		Returns:
-			(dict) Dictionary representation of data object.
-
-		"""
-
-		return self.state
-
-
-	def to_json(self, pretty=False):
-		"""
-		Get data object's state formatted as JSON string.
-
-		Args:
-			pretty (bool): Option for getting JSON string in pretty format.
-
-		Returns:
-			(str) JSON string.
-
-		"""
-
-		if pretty:
-			return json.dumps(self.to_dict(), sort_keys=True, indent=2)
-		else:
-			return json.dumps(self.to_dict())
-
-
-	########## PRIVATE HELPERS ##########
-
-
-	# TODO: decide on private vs. public helper methods
+	########## SECONDARY PUBLIC METHODS ##########
 
 
 	@classmethod
-	def __get_drivers(cls, db_driver_class=None, cache_driver_class=None):
+	def get_drivers(cls, db_driver_class=None, cache_driver_class=None):
 
 		db_driver_class = db_driver_class \
 		if db_driver_class is not None \
@@ -359,63 +349,27 @@ class BaseDataObject(metaclass=ABCMeta):
 
 
 	@classmethod
-	def get_drivers(cls, db_driver_class=None, cache_driver_class=None):
-		"""
-		Public version of the __get_drivers() private method
-
-		"""
-
-		return cls.__get_drivers(
-			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class
-		)
-
-
-	def __get_prop_names(self):
-		return self.db_driver.get_table_field_names(self.TABLE_NAME)
-
-
-	@classmethod
-	def __construct_cache_key(cls, id):
-		cache_key = '{0}_id={1}'.format(
+	def construct_cache_key(cls, uuid):
+		cache_key = '{0}_uuid={1}'.format(
 			cls.TABLE_NAME,
-			id
+			uuid
 		)
 		return cache_key
 
 
-	def __set_to_cache(self, ttl=None):
-		cache_key = self.__construct_cache_key(id=self.get_prop('id'))
-		cache_value = self.to_dict()
-		ttl = ttl if ttl is not None else self.DEFAULT_CACHE_TTL
-		self.cache_driver.set(
-			key=cache_key,
-			value=cache_value,
-			ttl=ttl
-		)
+	@classmethod
+	def load_from_cache_by_ids(cls, uuids, db_driver_class, cache_driver_class):
+		# TODO
+		pass
 
 
 	@classmethod
-	def load_from_cache(cls, id, db_driver_class, cache_driver_class):
-		"""
-		This public method is a wrapper of the private method
-		'__load_from_cache()', and only exists for testing purposes.
-
-		"""
-		return cls.__load_from_cache(
-			id=id,
+	def load_from_cache_by_id(cls, uuid, db_driver_class, cache_driver_class):
+		db_driver, cache_driver = cls.get_drivers(
 			db_driver_class=db_driver_class,
 			cache_driver_class=cache_driver_class
 		)
-
-
-	@classmethod
-	def __load_from_cache(cls, id, db_driver_class, cache_driver_class):
-		db_driver, cache_driver = cls.__get_drivers(
-			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class
-		)
-		cache_key = cls.__construct_cache_key(id=id)
+		cache_key = cls.construct_cache_key(uuid=uuid)
 		cached_value = cache_driver.get(cache_key)
 		if cached_value is not None:
 			instance = cls(
@@ -428,8 +382,65 @@ class BaseDataObject(metaclass=ABCMeta):
 			return None
 
 
-	def __delete_from_cache(self):
-		cache_key = self.__construct_cache_key(id=self.get_prop('id'))
-		self.cache_driver.delete(cache_key)
+	########## UTILITY PUBLIC METHODS ##########
 
+
+	def to_dict(self):
+		"""
+		Get data object's state and metadata in dictionary format.
+
+		Returns:
+			(dict) Dictionary representation of data object.
+
+		"""
+
+		return {
+			'state': self.state,
+			'metadata': self.metadata
+		}
+
+
+	def to_json(self, pretty=False):
+		"""
+		Get data object's state and metadata formatted as JSON string.
+
+		Args:
+			pretty (bool): Option for getting JSON string in pretty format.
+
+		Returns:
+			(str) JSON string.
+
+		"""
+
+		if pretty:
+			return json.dumps(self.to_dict(), sort_keys=True, indent=2)
+		else:
+			return json.dumps(self.to_dict())
+
+
+	########## PRIVATE METHODS ##########
+
+
+	def __get_prop_names(self):
+		return self.db_driver.get_table_field_names(self.TABLE_NAME)
+
+
+	def __set_to_cache(self, ttl=None):
+		cache_key = self.construct_cache_key(
+			uuid=self.get_prop(self.UUID_PROPERTY)
+		)
+		cache_value = self.to_dict()
+		ttl = ttl if ttl is not None else self.DEFAULT_CACHE_TTL
+		self.cache_driver.set(
+			key=cache_key,
+			value=cache_value,
+			ttl=ttl
+		)
+
+
+	def __delete_from_cache(self):
+		cache_key = self.construct_cache_key(
+			uuid=self.get_prop(self.UUID_PROPERTY)
+		)
+		self.cache_driver.delete(cache_key)
 
