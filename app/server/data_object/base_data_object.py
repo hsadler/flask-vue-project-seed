@@ -14,7 +14,10 @@ class BaseDataObject(metaclass=ABCMeta):
 
 	TODO:
 		X add uuid creation on data object create
+		- update all 'id's to be 'uuid'
 		- add partials caching by uuid to find_many
+		- refactor test script
+
 		- batch queries
 		- batch caching of result items
 		- asses types of caching currently implemented and research
@@ -159,7 +162,7 @@ class BaseDataObject(metaclass=ABCMeta):
 		find_props = list(prop_dict.keys())
 		if len(find_props) == 1 and find_props[0] == cls.UUID_PROPERTY:
 			instance = cls.__load_from_cache(
-				id=prop_dict[cls.UUID_PROPERTY],
+				uuid=prop_dict[cls.UUID_PROPERTY],
 				db_driver_class=db_driver_class,
 				cache_driver_class=cache_driver_class
 			)
@@ -237,17 +240,20 @@ class BaseDataObject(metaclass=ABCMeta):
 		Returns:
 			(object) Data object instance or None if save fails.
 
+		TODO: requires major refactor for use of uuids instead of
+			auto-incremented ids
+
 		"""
 
 		result = None
 
 		# existing record
-		if 'id' in self.state:
+		if self.UUID_PROPERTY in self.state:
 			record_update_count = self.db_driver.update_by_fields(
 				table_name=self.TABLE_NAME,
 				value_props=self.state,
 				where_props={
-					'id': self.get_prop('id')
+					self.UUID_PROPERTY: self.get_prop(self.UUID_PROPERTY)
 				}
 			)
 			result = self if record_update_count == 1 else None
@@ -278,7 +284,7 @@ class BaseDataObject(metaclass=ABCMeta):
 		record_delete_count = self.db_driver.delete_by_fields(
 			table_name=self.TABLE_NAME,
 			where_props={
-				'id': self.get_prop('id')
+				self.UUID_PROPERTY: self.get_prop(self.UUID_PROPERTY)
 			}
 		)
 		if record_delete_count > 0:

@@ -89,7 +89,7 @@ ppp('result of create table query:', query_result)
 insert_uuid = create_uuid()
 insert_message = 'hello!'
 insert_attribution = 'bot'
-affected_count = mysql_driver.insert(
+inserted_record_dict = mysql_driver.insert(
 	table_name=TABLE_NAME,
 	value_props={
 		'uuid': insert_uuid,
@@ -99,8 +99,16 @@ affected_count = mysql_driver.insert(
 )
 
 t.should_be_equal(
-	expected=1,
-	actual=affected_count
+	expected={
+		'uuid': insert_uuid,
+		'insert_message': insert_message,
+		'insert_attribution': insert_attribution
+	},
+	actual={
+		'uuid': inserted_record_dict['uuid'],
+		'insert_message': inserted_record_dict['message'],
+		'insert_attribution': inserted_record_dict['attribution']
+	}
 )
 
 

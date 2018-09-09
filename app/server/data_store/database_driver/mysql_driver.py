@@ -136,7 +136,8 @@ class MySqlDriver(BaseDatabaseDriver):
 		with self.conn:
 			insert_count = self.cur.execute(query_stmt, tuple(values))
 			self.conn.commit()
-			return self.cur.rowcount
+			if self.cur.rowcount == 1:
+				return value_props
 
 
 	def find_by_uuid(self, table_name, uuid):
