@@ -357,14 +357,74 @@ class BaseDataObject(metaclass=ABCMeta):
 		return cache_key
 
 
+	def set_to_cache(self, ttl=None):
+		cache_key = self.construct_cache_key(
+			uuid=self.get_prop(self.UUID_PROPERTY)
+		)
+		cache_value = self.to_dict()
+		ttl = ttl if ttl is not None else self.DEFAULT_CACHE_TTL
+		self.cache_driver.set(
+			key=cache_key,
+			value=cache_value,
+			ttl=ttl
+		)
+
+
 	@classmethod
-	def load_from_cache_by_ids(cls, uuids, db_driver_class, cache_driver_class):
+	def set_batch_to_cache(
+		cls,
+		dataobjects=[],
+		ttl=None,
+		db_driver_class,
+		cache_driver_class
+	):
+		db_driver, cache_driver = cls.get_drivers(
+			db_driver_class=db_driver_class,
+			cache_driver_class=cache_driver_class
+		)
+		cache_items = {}
+		for DO in dataobjects:
+			cache_key = cls.construct_cache_key(
+				uuid=DO.get_prop(cls.UUID_PROPERTY)
+			)
+			cache_value = DO.to_dict()
+			cache_items[cache_key] = cache_value
+		cache_driver.batch_set(items=cache_items, ttl=ttl)
+
+
+	def delete_from_cache(self):
+		cache_key = self.construct_cache_key(
+			uuid=self.get_prop(self.UUID_PROPERTY)
+		)
+		self.cache_driver.delete(cache_key)
+
+
+	@classmethod
+	def delete_batch_from_cache(cls, dataobjects=[]):
+		db_driver, cache_driver = cls.get_drivers(
+			db_driver_class=db_driver_class,
+			cache_driver_class=cache_driver_class
+		)
+		cache_keys = [
+			cls.construct_cache_key(uuid=DO.get_prop(cls.UUID_PROPERTY))
+			for DO in dataobjects
+		]
+		return cache_driver.batch_delete(keys=cache_keys)
+
+
+	@classmethod
+	def load_from_cache_by_uuids(
+		cls,
+		uuids,
+		db_driver_class,
+		cache_driver_class
+	):
 		# TODO
 		pass
 
 
 	@classmethod
-	def load_from_cache_by_id(cls, uuid, db_driver_class, cache_driver_class):
+	def load_from_cache_by_uuid(cls, uuid, db_driver_class, cache_driver_class):
 		db_driver, cache_driver = cls.get_drivers(
 			db_driver_class=db_driver_class,
 			cache_driver_class=cache_driver_class
@@ -423,24 +483,4 @@ class BaseDataObject(metaclass=ABCMeta):
 
 	def __get_prop_names(self):
 		return self.db_driver.get_table_field_names(self.TABLE_NAME)
-
-
-	def __set_to_cache(self, ttl=None):
-		cache_key = self.construct_cache_key(
-			uuid=self.get_prop(self.UUID_PROPERTY)
-		)
-		cache_value = self.to_dict()
-		ttl = ttl if ttl is not None else self.DEFAULT_CACHE_TTL
-		self.cache_driver.set(
-			key=cache_key,
-			value=cache_value,
-			ttl=ttl
-		)
-
-
-	def __delete_from_cache(self):
-		cache_key = self.construct_cache_key(
-			uuid=self.get_prop(self.UUID_PROPERTY)
-		)
-		self.cache_driver.delete(cache_key)
 
