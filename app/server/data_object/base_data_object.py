@@ -32,10 +32,18 @@ class BaseDataObject(metaclass=ABCMeta):
 	"""
 
 
+	# properties
 	UUID_PROPERTY = 'uuid'
+
+	# metadata
 	RECORD_EXISTS_METADATA = 'record_exists'
 	CREATED_TS_METADATA = 'created_ts'
 	UPDATED_TS_METADATA = 'updated_ts'
+	METADATA_FIELDS = [
+		RECORD_EXISTS_METADATA,
+		CREATED_TS_METADATA,
+		UPDATED_TS_METADATA
+	]
 
 
 	def __init__(
@@ -75,6 +83,11 @@ class BaseDataObject(metaclass=ABCMeta):
 			self.CREATED_TS_METADATA: None,
 			self.UPDATED_TS_METADATA: None
 		}
+
+		# replace metadata initial values with passed values
+		for key, val in metadata_dict.items():
+			if key in self.METADATA_FIELDS:
+				self.metadata[key] = val
 
 
 	########## PRIMARY PUBLIC METHODS ##########
@@ -419,8 +432,16 @@ class BaseDataObject(metaclass=ABCMeta):
 		db_driver_class,
 		cache_driver_class
 	):
-		# TODO
-		pass
+		db_driver, cache_driver = cls.get_drivers(
+			db_driver_class=db_driver_class,
+			cache_driver_class=cache_driver_class
+		)
+		cache_keys = [
+			cls.construct_cache_key(uuid=uuid)
+			for uuid in uuids
+		]
+		cached_values = cache_driver.batch_get(keys=cache_keys)
+		# TODO...
 
 
 	@classmethod
@@ -433,7 +454,8 @@ class BaseDataObject(metaclass=ABCMeta):
 		cached_value = cache_driver.get(cache_key)
 		if cached_value is not None:
 			instance = cls(
-				prop_dict=cached_value,
+				prop_dict=cached_value['state'],
+				metadata=cached_value['metadata'],
 				db_driver_class=db_driver_class,
 				cache_driver_class=cache_driver_class
 			)
