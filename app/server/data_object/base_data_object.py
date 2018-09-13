@@ -16,6 +16,7 @@ class BaseDataObject(metaclass=ABCMeta):
 		X add uuid creation on data object create
 		- update all 'id's to be 'uuid'
 		- add partials caching by uuid to find_many() method
+		- refactor save() method
 		- add metadata attribute to keep track of:
 			- whether or not dataobject exists in the datastore as a record
 			- created_ts column
@@ -234,6 +235,18 @@ class BaseDataObject(metaclass=ABCMeta):
 		pass
 
 
+	@classmethod
+	def find_by_uuid(
+		cls,
+		uuid,
+		db_driver_class=None,
+		cache_driver_class=None,
+		cache_ttl=None
+	):
+		# TODO
+		pass
+
+
 	def get_prop(self, prop_name):
 		"""
 		Data object property getter method.
@@ -306,7 +319,7 @@ class BaseDataObject(metaclass=ABCMeta):
 				result = self.find_one(prop_dict={ 'id': new_record_id })
 
 		if result is not None:
-			result.__set_to_cache(ttl=cache_ttl)
+			result.set_to_cache(ttl=cache_ttl)
 
 		return result
 
@@ -320,14 +333,12 @@ class BaseDataObject(metaclass=ABCMeta):
 
 		"""
 
-		record_delete_count = self.db_driver.delete_by_fields(
+		record_delete_count = self.db_driver.delete_by_uuid(
 			table_name=self.TABLE_NAME,
-			where_props={
-				self.UUID_PROPERTY: self.get_prop(self.UUID_PROPERTY)
-			}
+			uuid=self.get_prop(self.UUID_PROPERTY)
 		)
 		if record_delete_count > 0:
-			self.__delete_from_cache()
+			self.delete_from_cache()
 			return True
 		else:
 			return False
@@ -395,14 +406,14 @@ class BaseDataObject(metaclass=ABCMeta):
 			db_driver_class=db_driver_class,
 			cache_driver_class=cache_driver_class
 		)
-		cache_items = {}
+		cache_key_to_value = {}
 		for DO in dataobjects:
 			cache_key = cls.construct_cache_key(
 				uuid=DO.get_prop(cls.UUID_PROPERTY)
 			)
 			cache_value = DO.to_dict()
-			cache_items[cache_key] = cache_value
-		cache_driver.batch_set(items=cache_items, ttl=ttl)
+			cache_key_to_value[cache_key] = cache_value
+		cache_driver.batch_set(items=cache_key_to_value, ttl=ttl)
 
 
 	def delete_from_cache(self):
@@ -463,23 +474,6 @@ class BaseDataObject(metaclass=ABCMeta):
 			cache_driver_class=cache_driver_class
 		)
 		return uuids_to_instances[uuid]
-
-		# db_driver, cache_driver = cls.get_drivers(
-		# 	db_driver_class=db_driver_class,
-		# 	cache_driver_class=cache_driver_class
-		# )
-		# cache_key = cls.construct_cache_key(uuid=uuid)
-		# cached_value = cache_driver.get(cache_key)
-		# if cached_value is not None:
-		# 	instance = cls(
-		# 		prop_dict=cached_value['state'],
-		# 		metadata=cached_value['metadata'],
-		# 		db_driver_class=db_driver_class,
-		# 		cache_driver_class=cache_driver_class
-		# 	)
-		# 	return instance
-		# else:
-		# 	return None
 
 
 	########## UTILITY PUBLIC METHODS ##########
