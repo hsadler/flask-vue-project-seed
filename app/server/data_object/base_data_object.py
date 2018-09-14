@@ -282,6 +282,41 @@ class BaseDataObject(metaclass=ABCMeta):
 			return False
 
 
+	def get_metadata(self, metadata_name):
+		"""
+		Data object metadata property getter method.
+
+		Args:
+			metadata_name (str): Name of metadata property.
+
+		Returns:
+			(mixed) Data object metadata property.
+
+		"""
+
+		return self.metadata[metadata_name]
+
+
+	def set_metadata(self, metadata_name, metadata_value):
+		"""
+		Data object metadata property setter method.
+
+		Args:
+			metadata_name (str): Name of metadata property.
+			metadata_value (mixed): metadata property value.
+
+		Returns:
+			(bool) metadataerty set success.
+
+		"""
+
+		if metadata_name in self.metadata:
+			self.metadata[metadata_name] = metadata_value
+			return True
+		else:
+			return False
+
+
 	def save(self, cache_ttl=None):
 		"""
 		Data object database save method.
