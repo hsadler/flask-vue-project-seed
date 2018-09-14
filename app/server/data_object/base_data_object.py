@@ -68,7 +68,7 @@ class BaseDataObject(metaclass=ABCMeta):
 		# set database driver and cache driver classes and instances
 		self.db_driver_class = db_driver_class
 		self.cache_driver_class = cache_driver_class
-		db_driver, cache_driver = self.__get_drivers(
+		db_driver, cache_driver = self.get_drivers(
 			db_driver_class=db_driver_class,
 			cache_driver_class=cache_driver_class
 		)
@@ -152,10 +152,12 @@ class BaseDataObject(metaclass=ABCMeta):
 
 		"""
 
-		db_driver, cache_driver = cls.__get_drivers(
+		db_driver, cache_driver = cls.get_drivers(
 			db_driver_class=db_driver_class,
 			cache_driver_class=cache_driver_class
 		)
+
+		# TODO: check cache for partials...............
 
 		records = db_driver.find_by_fields(
 			table_name=cls.TABLE_NAME,
@@ -201,13 +203,12 @@ class BaseDataObject(metaclass=ABCMeta):
 		# only check cache if finding solely by uuid
 		find_props = list(prop_dict.keys())
 		if len(find_props) == 1 and find_props[0] == cls.UUID_PROPERTY:
-			instance = cls.__load_from_cache(
+			instance = cls.load_from_cache(
 				uuid=prop_dict[cls.UUID_PROPERTY],
 				db_driver_class=db_driver_class,
 				cache_driver_class=cache_driver_class
 			)
 			if instance is not None:
-				instance.__set_to_cache(ttl=cache_ttl)
 				return instance
 
 		instance_list = cls.find_many(
