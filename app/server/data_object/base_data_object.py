@@ -157,8 +157,19 @@ class BaseDataObject(metaclass=ABCMeta):
 			cache_driver_class=cache_driver_class
 		)
 
-		# TODO: check cache for partials...............
+		# only check cache if finding solely by single uuid
+		find_props = list(prop_dict.keys())
+		if len(find_props) == 1 and find_props[0] == cls.UUID_PROPERTY and\
+		type(prop_dict[cls.UUID_PROPERTY]) is str:
+			instance = cls.load_from_cache(
+				uuid=prop_dict[cls.UUID_PROPERTY],
+				db_driver_class=db_driver_class,
+				cache_driver_class=cache_driver_class
+			)
+			if instance is not None:
+				return instance
 
+		# get records from DB
 		records = db_driver.find_by_fields(
 			table_name=cls.TABLE_NAME,
 			where_props=prop_dict,
@@ -199,17 +210,6 @@ class BaseDataObject(metaclass=ABCMeta):
 			(object) Data object instance.
 
 		"""
-
-		# only check cache if finding solely by uuid
-		find_props = list(prop_dict.keys())
-		if len(find_props) == 1 and find_props[0] == cls.UUID_PROPERTY:
-			instance = cls.load_from_cache(
-				uuid=prop_dict[cls.UUID_PROPERTY],
-				db_driver_class=db_driver_class,
-				cache_driver_class=cache_driver_class
-			)
-			if instance is not None:
-				return instance
 
 		instance_list = cls.find_many(
 			prop_dict=prop_dict,
