@@ -37,11 +37,11 @@ class BaseDataObject(metaclass=ABCMeta):
 	UUID_PROPERTY = 'uuid'
 
 	# metadata
-	RECORD_EXISTS_METADATA = 'record_exists'
+	NEW_RECORD_METADATA = 'new_record'
 	CREATED_TS_METADATA = 'created_ts'
 	UPDATED_TS_METADATA = 'updated_ts'
 	METADATA_FIELDS = [
-		RECORD_EXISTS_METADATA,
+		NEW_RECORD_METADATA,
 		CREATED_TS_METADATA,
 		UPDATED_TS_METADATA
 	]
@@ -80,7 +80,7 @@ class BaseDataObject(metaclass=ABCMeta):
 
 		# set metadata initial values
 		self.metadata = {
-			self.RECORD_EXISTS_METADATA: False,
+			self.NEW_RECORD_METADATA: True,
 			self.CREATED_TS_METADATA: None,
 			self.UPDATED_TS_METADATA: None
 		}
