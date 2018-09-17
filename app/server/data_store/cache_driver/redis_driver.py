@@ -56,7 +56,10 @@ class RedisDriver(BaseCacheDriver):
 		for i, key in enumerate(keys):
 			value = values[i]
 			json_value = json.dumps(value)
-			pipe.set(key, json_value)
+			if ttl is not None:
+				return pipe.set(key, json_value, ex=ttl)
+			else:
+				return pipe.set(key, json_value)
 
 		set_statuses = pipe.execute()
 
@@ -108,6 +111,7 @@ class RedisDriver(BaseCacheDriver):
 			pipe.get(key)
 
 		redis_response = pipe.execute()
+		# TODO: bug
 		cached_values = [ json.loads(x) for x in redis_response ]
 
 		result = {}

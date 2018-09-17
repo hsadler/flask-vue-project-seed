@@ -131,15 +131,12 @@ class BaseDataObject(metaclass=ABCMeta):
 		prop_dict={},
 		limit=None,
 		db_driver_class=None,
-		cache_driver_class=None
+		cache_driver_class=None,
+		cache_ttl=None
 	):
 		"""
 		Data object database search method. Search for multiple records matching
 		all properties in the prop_dict dictionary.
-
-		Note: There is NO CACHING for this 'batch find' method.
-
-		TODO: add caching to partials
 
 		Args:
 			prop_dict (dict): Dictionary representing data object state.
@@ -159,8 +156,11 @@ class BaseDataObject(metaclass=ABCMeta):
 
 		# only check cache if finding solely by single uuid
 		find_props = list(prop_dict.keys())
-		if len(find_props) == 1 and find_props[0] == cls.UUID_PROPERTY and\
-		type(prop_dict[cls.UUID_PROPERTY]) is str:
+		if (
+			len(find_props) == 1 and
+			find_props[0] == cls.UUID_PROPERTY and
+			type(prop_dict[cls.UUID_PROPERTY]) is str
+		):
 			instance = cls.load_from_cache(
 				uuid=prop_dict[cls.UUID_PROPERTY],
 				db_driver_class=db_driver_class,
@@ -184,6 +184,15 @@ class BaseDataObject(metaclass=ABCMeta):
 			)
 			for record in records
 		]
+
+		# batch cache found instances on the way out
+		if len(instances) > 0:
+			cls.set_batch_to_cache(
+				dataobjects=instances,
+				ttl=cache_ttl,
+				db_driver_class=db_driver_class,
+				cache_driver_class=cache_driver_class
+			)
 
 		return instances
 
@@ -215,7 +224,8 @@ class BaseDataObject(metaclass=ABCMeta):
 			prop_dict=prop_dict,
 			limit=1,
 			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class
+			cache_driver_class=cache_driver_class,
+			cache_ttl=cache_ttl
 		)
 
 		if len(instance_list) > 0:
@@ -449,6 +459,7 @@ class BaseDataObject(metaclass=ABCMeta):
 			)
 			cache_value = DO.to_dict()
 			cache_key_to_value[cache_key] = cache_value
+		ttl = ttl if ttl is not None else self.DEFAULT_CACHE_TTL
 		cache_driver.batch_set(items=cache_key_to_value, ttl=ttl)
 
 
