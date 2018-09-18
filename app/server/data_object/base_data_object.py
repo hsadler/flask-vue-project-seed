@@ -242,9 +242,41 @@ class BaseDataObject(metaclass=ABCMeta):
 		cache_driver_class=None,
 		cache_ttl=None
 	):
-		# TODO
-		# here....
-		pass
+
+		# get drivers
+		db_driver, cache_driver = cls.get_drivers(
+			db_driver_class=db_driver_class,
+			cache_driver_class=cache_driver_class
+		)
+
+		# for aggregating cache found and database found instances
+		all_found_instances_dict = {}
+
+		# batch query cache
+		cache_found_instances_dict = cls.load_from_cache_by_uuids(
+			uuids=uuids,
+			db_driver_class=db_driver_class,
+			cache_driver_class=cache_driver_class
+		)
+
+		# get keys not found in cache
+
+		# for those not found in the cache, batch query database
+		where_props = {
+			cls.UUID_PROPERTY: {
+				'in': uuids_yet_to_be_found
+			}
+		}
+		records = mysql_driver.find_by_fields(
+			table_name=cls.TABLE_NAME,
+			where_props=where_props
+		)
+
+		# load records into dataobject instances
+
+		# set all instances in cache on the way out
+
+		# here..
 
 
 	@classmethod
@@ -255,8 +287,15 @@ class BaseDataObject(metaclass=ABCMeta):
 		cache_driver_class=None,
 		cache_ttl=None
 	):
-		# TODO
-		pass
+		prop_dict = {
+			cls.UUID_PROPERTY: uuid
+		}
+		return cls.find_one(
+			prop_dict=prop_dict,
+			db_driver_class=db_driver_class,
+			cache_driver_class=cache_driver_class,
+			cache_ttl=cache_ttl
+		)
 
 
 	def get_prop(self, prop_name):
