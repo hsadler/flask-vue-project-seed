@@ -37,11 +37,9 @@ class BaseDataObject(metaclass=ABCMeta):
 	UUID_PROPERTY = 'uuid'
 
 	# metadata
-	NEW_RECORD_METADATA = 'new_record'
 	CREATED_TS_METADATA = 'created_ts'
 	UPDATED_TS_METADATA = 'updated_ts'
 	METADATA_FIELDS = [
-		NEW_RECORD_METADATA,
 		CREATED_TS_METADATA,
 		UPDATED_TS_METADATA
 	]
@@ -50,9 +48,10 @@ class BaseDataObject(metaclass=ABCMeta):
 	def __init__(
 		self,
 		prop_dict,
-		metadata_dict,
 		db_driver_class,
-		cache_driver_class
+		cache_driver_class,
+		metadata_dict={},
+		new_record=True
 	):
 		"""
 		Data object instance constructor. Configures the database driver, cache
@@ -80,10 +79,12 @@ class BaseDataObject(metaclass=ABCMeta):
 
 		# set metadata initial values
 		self.metadata = {
-			self.NEW_RECORD_METADATA: True,
 			self.CREATED_TS_METADATA: None,
 			self.UPDATED_TS_METADATA: None
 		}
+
+		# set new_record attribute
+		self.new_record = new_record
 
 		# replace metadata initial values with passed values
 		for key, val in metadata_dict.items():
@@ -143,6 +144,7 @@ class BaseDataObject(metaclass=ABCMeta):
 			limit (int): Limit lenth of returned data object list.
 			db_driver_class (class): Database driver class.
 			cache_driver_class (class): Cache driver class.
+			cache_ttl (int): Cache time-to-live in seconds.
 
 		Returns:
 			(list) List of data object instances.
@@ -176,14 +178,12 @@ class BaseDataObject(metaclass=ABCMeta):
 			limit=limit
 		)
 
-		instances = [
-			cls(
-				prop_dict=record,
-				db_driver_class=db_driver_class,
-				cache_driver_class=cache_driver_class
-			)
-			for record in records
-		]
+		# deserialize records to instances
+		instances = cls.load_records(
+			records=records,
+			db_driver_class=db_driver_class,
+			cache_driver_class=cache_driver_class
+		)
 
 		# batch cache found instances on the way out
 		if len(instances) > 0:
@@ -243,6 +243,7 @@ class BaseDataObject(metaclass=ABCMeta):
 		cache_ttl=None
 	):
 		# TODO
+		# here....
 		pass
 
 
@@ -391,6 +392,34 @@ class BaseDataObject(metaclass=ABCMeta):
 
 
 	########## SECONDARY PUBLIC METHODS ##########
+
+
+	@classmethod
+	def load_records(
+		cls,
+		records,
+		db_driver_class,
+		cache_driver_class,
+		records_are_new=False
+	):
+		instances = []
+		for record in records:
+			for prop, val in record.items():
+				prop_dict = {}
+				metadata_dict = {}
+				if prop in cls.METADATA_FIELDS:
+					metadata_dict[prop] = val
+				else:
+					prop_dict[prop] = value
+			instance = cls(
+				prop_dict=prop_dict,
+				db_driver_class=db_driver_class,
+				cache_driver_class=cache_driver_class,
+				metadata_dict=metadata_dict,
+				new_record=records_are_new
+			)
+			instances.append(instance)
+		return instances
 
 
 	@classmethod
