@@ -17,6 +17,7 @@ class BaseDataObject(metaclass=ABCMeta):
 		- update all 'id's to be 'uuid'
 		- add partials caching by uuid to find_many() method
 		- refactor save() method
+		- don't recache if found in cache
 		- add metadata attribute to keep track of:
 			- whether or not dataobject exists in the datastore as a record
 			- created_ts column
@@ -92,7 +93,7 @@ class BaseDataObject(metaclass=ABCMeta):
 				self.metadata[key] = val
 
 
-	########## PRIMARY PUBLIC METHODS ##########
+	########## CRUD PUBLIC METHODS ##########
 
 
 	@classmethod
@@ -249,28 +250,35 @@ class BaseDataObject(metaclass=ABCMeta):
 			cache_driver_class=cache_driver_class
 		)
 
-		# for aggregating cache found and database found instances
-		all_found_instances_dict = {}
-
 		# batch query cache
-		cache_found_instances_dict = cls.load_from_cache_by_uuids(
+		instances_dict = cls.load_from_cache_by_uuids(
 			uuids=uuids,
 			db_driver_class=db_driver_class,
 			cache_driver_class=cache_driver_class
 		)
 
 		# get keys not found in cache
+		uuids_not_found_in_cache = [
+			key for key, val in instances_dict.items()
+			if val is None
+		]
 
 		# for those not found in the cache, batch query database
-		where_props = {
-			cls.UUID_PROPERTY: {
-				'in': uuids_yet_to_be_found
+		instances_from_database = {}
+		if len(uuids_not_found_in_cache) > 0:
+			where_props = {
+				cls.UUID_PROPERTY: {
+					'in': uuids_not_found_in_cache
+				}
 			}
-		}
-		records = mysql_driver.find_by_fields(
-			table_name=cls.TABLE_NAME,
-			where_props=where_props
-		)
+			uuids_to_instances = cls.load_from_database_by_uuids()
+			# records = db_driver.find_by_fields(
+			# 	table_name=cls.TABLE_NAME,
+			# 	where_props=where_props
+			# )
+			# here....
+			# instances =
+
 
 		# load records into dataobject instances
 
@@ -296,6 +304,70 @@ class BaseDataObject(metaclass=ABCMeta):
 			cache_driver_class=cache_driver_class,
 			cache_ttl=cache_ttl
 		)
+
+	def save(self, cache_ttl=None):
+		"""
+		Data object database save method.
+
+		Args:
+			cache_ttl (int): Cache time-to-live in seconds.
+
+		Returns:
+			(object) Data object instance or None if save fails.
+
+		TODO: requires major refactor for use of uuids instead of
+			auto-incremented ids
+
+		"""
+
+		result = None
+
+		# existing record
+		if self.UUID_PROPERTY in self.state:
+			record_update_count = self.db_driver.update_by_fields(
+				table_name=self.TABLE_NAME,
+				value_props=self.state,
+				where_props={
+					self.UUID_PROPERTY: self.get_prop(self.UUID_PROPERTY)
+				}
+			)
+			result = self if record_update_count == 1 else None
+		# new record
+		else:
+			new_record_id = self.db_driver.insert(
+				table_name=self.TABLE_NAME,
+				value_props=self.state
+			)
+			if new_record_id > 0:
+				result = self.find_one(prop_dict={ 'id': new_record_id })
+
+		if result is not None:
+			result.set_to_cache(ttl=cache_ttl)
+
+		return result
+
+
+	def delete(self):
+		"""
+		Data object database delete method.
+
+		Returns:
+			(bool) Database delete success.
+
+		"""
+
+		record_delete_count = self.db_driver.delete_by_uuid(
+			table_name=self.TABLE_NAME,
+			uuid=self.get_prop(self.UUID_PROPERTY)
+		)
+		if record_delete_count > 0:
+			self.delete_from_cache()
+			return True
+		else:
+			return False
+
+
+	########## DATA ACCESS PUBLIC METHODS ##########
 
 
 	def get_prop(self, prop_name):
@@ -368,69 +440,7 @@ class BaseDataObject(metaclass=ABCMeta):
 			return False
 
 
-	def save(self, cache_ttl=None):
-		"""
-		Data object database save method.
-
-		Args:
-			cache_ttl (int): Cache time-to-live in seconds.
-
-		Returns:
-			(object) Data object instance or None if save fails.
-
-		TODO: requires major refactor for use of uuids instead of
-			auto-incremented ids
-
-		"""
-
-		result = None
-
-		# existing record
-		if self.UUID_PROPERTY in self.state:
-			record_update_count = self.db_driver.update_by_fields(
-				table_name=self.TABLE_NAME,
-				value_props=self.state,
-				where_props={
-					self.UUID_PROPERTY: self.get_prop(self.UUID_PROPERTY)
-				}
-			)
-			result = self if record_update_count == 1 else None
-		# new record
-		else:
-			new_record_id = self.db_driver.insert(
-				table_name=self.TABLE_NAME,
-				value_props=self.state
-			)
-			if new_record_id > 0:
-				result = self.find_one(prop_dict={ 'id': new_record_id })
-
-		if result is not None:
-			result.set_to_cache(ttl=cache_ttl)
-
-		return result
-
-
-	def delete(self):
-		"""
-		Data object database delete method.
-
-		Returns:
-			(bool) Database delete success.
-
-		"""
-
-		record_delete_count = self.db_driver.delete_by_uuid(
-			table_name=self.TABLE_NAME,
-			uuid=self.get_prop(self.UUID_PROPERTY)
-		)
-		if record_delete_count > 0:
-			self.delete_from_cache()
-			return True
-		else:
-			return False
-
-
-	########## SECONDARY PUBLIC METHODS ##########
+	########## SERIALIZATION, DATABASE, CACHE PUBLIC METHODS ##########
 
 
 	@classmethod
@@ -484,6 +494,30 @@ class BaseDataObject(metaclass=ABCMeta):
 			cache_driver = cache_driver_class()
 
 		return db_driver, cache_driver
+
+
+	@classmethod
+	def load_from_database_by_uuids(
+		cls,
+		uuids,
+		db_driver_class,
+		cache_driver_class
+	):
+		# TODO: stub
+		pass
+		# return uuids_to_instances
+
+
+	@classmethod
+	def load_from_database_by_uuid(
+		cls,
+		uuid,
+		db_driver_class,
+		cache_driver_class
+	):
+		# TODO: stub
+		pass
+		return instance
 
 
 	@classmethod
