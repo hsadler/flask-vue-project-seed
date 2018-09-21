@@ -141,7 +141,7 @@ class BaseDataObject(metaclass=ABCMeta):
 		all properties in the prop_dict dictionary.
 
 		Args:
-			prop_dict (dict): Dictionary representing data object state.
+			prop_dict (dict): Dictionary of propery name to values.
 			limit (int): Limit lenth of returned data object list.
 			db_driver_class (class): Database driver class.
 			cache_driver_class (class): Cache driver class.
@@ -186,7 +186,7 @@ class BaseDataObject(metaclass=ABCMeta):
 			cache_driver_class=cache_driver_class
 		)
 
-		# batch cache found instances on the way out
+		# batch cache database found instances on the way out
 		if len(instances) > 0:
 			cls.set_batch_to_cache(
 				dataobjects=instances,
@@ -211,7 +211,7 @@ class BaseDataObject(metaclass=ABCMeta):
 		all properties in the prop_dict dictionary.
 
 		Args:
-			prop_dict (dict): Dictionary representing data object state.
+			prop_dict (dict): Dictionary of propery name to values.
 			db_driver_class (class): Database driver class.
 			cache_driver_class (class): Cache driver class.
 			cache_ttl (int): Cache time-to-live in seconds.
@@ -264,27 +264,26 @@ class BaseDataObject(metaclass=ABCMeta):
 		]
 
 		# for those not found in the cache, batch query database
-		instances_from_database = {}
 		if len(uuids_not_found_in_cache) > 0:
-			where_props = {
-				cls.UUID_PROPERTY: {
-					'in': uuids_not_found_in_cache
-				}
-			}
-			uuids_to_instances = cls.load_from_database_by_uuids()
-			# records = db_driver.find_by_fields(
-			# 	table_name=cls.TABLE_NAME,
-			# 	where_props=where_props
-			# )
-			# here....
-			# instances =
+			uuids_to_instances = cls.load_from_database_by_uuids(
+				uuids=uuids_not_found_in_cache,
+				db_driver_class=db_driver_class,
+				cache_driver_class=cache_driver_class
+			)
+			# add found DB record instances to the aggregate
+			for key, val in uuids_to_instances.items():
+				instances_dict[key] = val
+			# batch set to cache only the instances which came from the DB call
+			cls.set_batch_to_cache(
+				dataobjects=uuids_to_instances.values(),
+				ttl=cache_ttl,
+				db_driver_class=db_driver_class,
+				cache_driver_class=cache_driver_class
+			)
 
-
-		# load records into dataobject instances
-
-		# set all instances in cache on the way out
-
-		# here..
+		# return the aggregated cache found and database found instances in a
+		# uuid->instance dictionary
+		return instances_dict
 
 
 	@classmethod
@@ -319,6 +318,8 @@ class BaseDataObject(metaclass=ABCMeta):
 			auto-incremented ids
 
 		"""
+
+		# here...
 
 		result = None
 
