@@ -164,7 +164,7 @@ class BaseDataObject(metaclass=ABCMeta):
 			find_props[0] == cls.UUID_PROPERTY and
 			type(prop_dict[cls.UUID_PROPERTY]) is str
 		):
-			instance = cls.load_from_cache(
+			instance = cls.load_from_cache_by_uuid(
 				uuid=prop_dict[cls.UUID_PROPERTY],
 				db_driver_class=db_driver_class,
 				cache_driver_class=cache_driver_class
@@ -180,10 +180,11 @@ class BaseDataObject(metaclass=ABCMeta):
 		)
 
 		# deserialize records to instances
-		instances = cls.load_records(
+		instances = cls.load_database_records(
 			records=records,
 			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class
+			cache_driver_class=cache_driver_class,
+			records_are_new=False
 		)
 
 		# batch cache database found instances on the way out
@@ -270,7 +271,7 @@ class BaseDataObject(metaclass=ABCMeta):
 				db_driver_class=db_driver_class,
 				cache_driver_class=cache_driver_class
 			)
-			# add found DB record instances to the aggregate
+			# add found database record instances to the aggregate
 			for key, val in uuids_to_instances.items():
 				instances_dict[key] = val
 			# batch set to cache only the instances which came from the DB call
@@ -321,31 +322,37 @@ class BaseDataObject(metaclass=ABCMeta):
 
 		# here...
 
-		result = None
-
-		# existing record
-		if self.UUID_PROPERTY in self.state:
-			record_update_count = self.db_driver.update_by_fields(
-				table_name=self.TABLE_NAME,
-				value_props=self.state,
-				where_props={
-					self.UUID_PROPERTY: self.get_prop(self.UUID_PROPERTY)
-				}
-			)
-			result = self if record_update_count == 1 else None
-		# new record
+		if self.new_record:
+			pass
 		else:
-			new_record_id = self.db_driver.insert(
-				table_name=self.TABLE_NAME,
-				value_props=self.state
-			)
-			if new_record_id > 0:
-				result = self.find_one(prop_dict={ 'id': new_record_id })
+			pass
 
-		if result is not None:
-			result.set_to_cache(ttl=cache_ttl)
 
-		return result
+		# result = None
+
+		# # existing record
+		# if self.UUID_PROPERTY in self.state:
+		# 	record_update_count = self.db_driver.update_by_fields(
+		# 		table_name=self.TABLE_NAME,
+		# 		value_props=self.state,
+		# 		where_props={
+		# 			self.UUID_PROPERTY: self.get_prop(self.UUID_PROPERTY)
+		# 		}
+		# 	)
+		# 	result = self if record_update_count == 1 else None
+		# # new record
+		# else:
+		# 	new_record_id = self.db_driver.insert(
+		# 		table_name=self.TABLE_NAME,
+		# 		value_props=self.state
+		# 	)
+		# 	if new_record_id > 0:
+		# 		result = self.find_one(prop_dict={ 'id': new_record_id })
+
+		# if result is not None:
+		# 	result.set_to_cache(ttl=cache_ttl)
+
+		# return result
 
 
 	def delete(self):
@@ -445,7 +452,7 @@ class BaseDataObject(metaclass=ABCMeta):
 
 
 	@classmethod
-	def load_records(
+	def load_database_records(
 		cls,
 		records,
 		db_driver_class,
@@ -468,6 +475,7 @@ class BaseDataObject(metaclass=ABCMeta):
 				metadata_dict=metadata_dict,
 				new_record=records_are_new
 			)
+			instance.new_record = records_are_new
 			instances.append(instance)
 		return instances
 
@@ -534,7 +542,7 @@ class BaseDataObject(metaclass=ABCMeta):
 		cache_key = self.construct_cache_key(
 			uuid=self.get_prop(self.UUID_PROPERTY)
 		)
-		cache_value = self.to_dict()
+		cache_value = self.__serialize_instance_for_cache(instance=self)
 		ttl = ttl if ttl is not None else self.DEFAULT_CACHE_TTL
 		self.cache_driver.set(
 			key=cache_key,
@@ -560,7 +568,7 @@ class BaseDataObject(metaclass=ABCMeta):
 			cache_key = cls.construct_cache_key(
 				uuid=DO.get_prop(cls.UUID_PROPERTY)
 			)
-			cache_value = DO.to_dict()
+			cache_value = cls.__serialize_instance_for_cache(instance=DO)
 			cache_key_to_value[cache_key] = cache_value
 		ttl = ttl if ttl is not None else self.DEFAULT_CACHE_TTL
 		cache_driver.batch_set(items=cache_key_to_value, ttl=ttl)
@@ -602,16 +610,16 @@ class BaseDataObject(metaclass=ABCMeta):
 			for uuid in uuids
 		}
 		cache_keys = cache_keys_to_uuids.values()
-		cached_keys_to_values = cache_driver.batch_get(keys=cache_keys)
+		cache_keys_to_values = cache_driver.batch_get(keys=cache_keys)
 		uuids_to_instances = {
-			cache_keys_to_uuids[cache_key]: cls(
-				prop_dict=cached_value['state'],
-				metadata=cached_value['metadata'],
+			cache_keys_to_uuids[cache_key]: cls.__deserialize_value_from_cache(
+				cache_value=cache_value,
 				db_driver_class=db_driver_class,
 				cache_driver_class=cache_driver_class
-			) if cached_value is not None else None
-			for cache_key, cached_value
-			in cached_keys_to_values.items()
+			)
+			if cache_value is not None else None
+			for cache_key, cache_value
+			in cache_keys_to_values.items()
 		}
 		return uuids_to_instances
 
@@ -640,7 +648,8 @@ class BaseDataObject(metaclass=ABCMeta):
 
 		return {
 			'state': self.state,
-			'metadata': self.metadata
+			'metadata': self.metadata,
+			'new_record': self.new_record
 		}
 
 
@@ -663,6 +672,51 @@ class BaseDataObject(metaclass=ABCMeta):
 
 
 	########## PRIVATE METHODS ##########
+
+
+	@classmethod
+	def __serialize_instances_for_cache(cls, instances):
+		serialized = [ inst.to_dict() for inst in instances ]
+		return serialized
+
+
+	@classmethod
+	def __serialize_instance_for_cache(instance=DOcls, instance):
+		return cls.__serialize_instances_for_cache(instances=[ instance ])
+
+
+	@classmethod
+	def __deserialize_values_from_cache(
+		cls,
+		cache_values,
+		db_driver_class,
+		cache_driver_class
+	):
+		deserialized = [
+			cls(
+				prop_dict=val['state'],
+				db_driver_class=db_driver_class,
+				cache_driver_class=cache_driver_class,
+				metadata_dict=val['metadata'],
+				new_record=val['new_record']
+			)
+			for val in cache_values
+		]
+		return deserialized
+
+
+	@classmethod
+	def __deserialize_value_from_cache(
+		cls,
+		cache_value,
+		db_driver_class,
+		cache_driver_class
+	):
+		return cls.__deserialize_values_from_cache(
+			cache_values=[ cache_value ],
+			db_driver_class=db_driver_class,
+			cache_driver_class=cache_driver_class
+		)
 
 
 	def __get_prop_names(self):
