@@ -275,8 +275,13 @@ class BaseDataObject(metaclass=ABCMeta):
 			for key, val in uuids_to_instances.items():
 				instances_dict[key] = val
 			# batch set to cache only the instances which came from the DB call
+			instances_to_cache = [
+				inst for inst
+				in uuids_to_instances.values()
+				if inst is not None
+			]
 			cls.set_batch_to_cache(
-				dataobjects=uuids_to_instances.values(),
+				dataobjects=instances_to_cache,
 				ttl=cache_ttl,
 				db_driver_class=db_driver_class,
 				cache_driver_class=cache_driver_class
