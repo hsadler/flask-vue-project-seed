@@ -512,9 +512,39 @@ class BaseDataObject(metaclass=ABCMeta):
 		db_driver_class,
 		cache_driver_class
 	):
-		# TODO: stub
-		pass
-		# return uuids_to_instances
+
+		# get drivers
+		db_driver, cache_driver = cls.get_drivers(
+			db_driver_class=db_driver_class,
+			cache_driver_class=cache_driver_class
+		)
+
+		# query for records from the database
+		records = db_driver.find_by_fields(
+			table_name=cls.TABLE_NAME,
+			where_props={
+				cls.UUID_PROPERTY: {
+					'in': uuids
+				}
+			},
+			limit=None
+		)
+
+		# load instances from records
+		instances = cls.load_database_records(
+			records=records,
+			db_driver_class=db_driver_class,
+			cache_driver_class=cache_driver_class,
+			records_are_new=False
+		)
+
+		# map uuids to instances
+		uuids_to_instances = {
+			instance.get_prop(cls.UUID_PROPERTY): instance
+			for instance in instances
+		}
+
+		return uuids_to_instances
 
 
 	@classmethod
