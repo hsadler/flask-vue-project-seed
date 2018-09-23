@@ -15,13 +15,13 @@ class BaseDataObject(metaclass=ABCMeta):
 	TODO:
 		X add uuid creation on data object create
 		- update all 'id's to be 'uuid'
-		- add partials caching by uuid to find_many() method
+		X add partials caching by uuid to find_many() method
 		- refactor save() method
-		- don't recache if found in cache
+		X don't recache if found in cache
 		- add metadata attribute to keep track of:
-			- whether or not dataobject exists in the datastore as a record
 			- created_ts column
 			- updated_ts column
+		- add 'new record' property
 		- refactor test script
 
 		- add consistency options to 'find' methods (skip cache on read)
@@ -275,13 +275,13 @@ class BaseDataObject(metaclass=ABCMeta):
 			for key, val in uuids_to_instances.items():
 				instances_dict[key] = val
 			# batch set to cache only the instances which came from the DB call
-			instances_to_cache = [
+			instances_to_be_cached = [
 				inst for inst
 				in uuids_to_instances.values()
 				if inst is not None
 			]
 			cls.set_batch_to_cache(
-				dataobjects=instances_to_cache,
+				dataobjects=instances_to_be_cached,
 				ttl=cache_ttl,
 				db_driver_class=db_driver_class,
 				cache_driver_class=cache_driver_class
@@ -320,44 +320,26 @@ class BaseDataObject(metaclass=ABCMeta):
 		Returns:
 			(object) Data object instance or None if save fails.
 
-		TODO: requires major refactor for use of uuids instead of
-			auto-incremented ids
-
 		"""
 
 		# here...
 
 		if self.new_record:
+			# call database driver to insert record
+			self.db_driver.insert(
+				table_name=self.TABLE_NAME,
+				value_props={}
+			)
 			pass
 		else:
+			# call database driver to update record
 			pass
 
+		# if database set is successful set 'new_record' propery to False
 
-		# result = None
+		# call cache driver to set by uuid
 
-		# # existing record
-		# if self.UUID_PROPERTY in self.state:
-		# 	record_update_count = self.db_driver.update_by_fields(
-		# 		table_name=self.TABLE_NAME,
-		# 		value_props=self.state,
-		# 		where_props={
-		# 			self.UUID_PROPERTY: self.get_prop(self.UUID_PROPERTY)
-		# 		}
-		# 	)
-		# 	result = self if record_update_count == 1 else None
-		# # new record
-		# else:
-		# 	new_record_id = self.db_driver.insert(
-		# 		table_name=self.TABLE_NAME,
-		# 		value_props=self.state
-		# 	)
-		# 	if new_record_id > 0:
-		# 		result = self.find_one(prop_dict={ 'id': new_record_id })
-
-		# if result is not None:
-		# 	result.set_to_cache(ttl=cache_ttl)
-
-		# return result
+		# return instance or None
 
 
 	def delete(self):
@@ -480,7 +462,6 @@ class BaseDataObject(metaclass=ABCMeta):
 				metadata_dict=metadata_dict,
 				new_record=records_are_new
 			)
-			instance.new_record = records_are_new
 			instances.append(instance)
 		return instances
 
