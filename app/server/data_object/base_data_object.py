@@ -544,6 +544,11 @@ class BaseDataObject(metaclass=ABCMeta):
 			for instance in instances
 		}
 
+		# fill in records not found with None values
+		for uuid in uuids:
+			if uuid not in uuids_to_instances:
+				uuids_to_instances[uuid] = None
+
 		return uuids_to_instances
 
 
@@ -554,9 +559,15 @@ class BaseDataObject(metaclass=ABCMeta):
 		db_driver_class,
 		cache_driver_class
 	):
-		# TODO: stub
-		pass
-		return instance
+		uuids_to_instances = cls.load_from_database_by_uuids(
+			uuids=[uuid],
+			db_driver_class=db_driver_class,
+			cache_driver_class=cache_driver_class
+		)
+		if uuid in uuids_to_instances:
+			return uuids_to_instances[uuid]
+		else:
+			return None
 
 
 	@classmethod
