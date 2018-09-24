@@ -322,24 +322,32 @@ class BaseDataObject(metaclass=ABCMeta):
 
 		"""
 
-		# here...
+		# serialize
+		serialized_record = self.__serialize_instance_for_database(
+			instance=self
+		)
 
+		# upsert database record
+		upsert_res = None
 		if self.new_record:
-			# call database driver to insert record
-			self.db_driver.insert(
+			upsert_res = self.db_driver.insert(
 				table_name=self.TABLE_NAME,
-				value_props={}
+				value_props=serialized_record
 			)
-			pass
 		else:
-			# call database driver to update record
-			pass
+			upsert_res = self.db_driver.update_by_uuid(
+				table_name=self.TABLE_NAME,
+				uuid=self.get_prop(self.UUID_PROPERTY),
+				value_props=serialized_record
+			)
 
-		# if database set is successful set 'new_record' propery to False
+		# if database set is successful, set 'new_record' propery to False
+		if type(upsert_res) == int and len(upsert_res) > 0:
+
 
 		# call cache driver to set by uuid
 
-		# return instance or None
+		return saved_instance
 
 
 	def delete(self):
@@ -702,6 +710,30 @@ class BaseDataObject(metaclass=ABCMeta):
 
 
 	@classmethod
+	def __serialize_instances_for_database(cls, instances):
+		serialized_records = []
+		for inst in instances:
+			serialized_record = {}
+			for m_field, m_value in inst.metadata.items():
+				serialized_record[m_field] = m_value
+			for s_field, s_value in inst.state.items():
+				serialized_record[s_field] = s_value
+			serialized_records.append(serialized_record)
+		return serialized_records
+
+
+	@classmethod
+	def __serialize_instance_for_database(cls, instance):
+		serialized_records = cls.__serialize_instances_for_cache(
+			instances=[instance]
+		)
+		if len(serialized_records) > 0:
+			return serialized_records[0]
+		else:
+			return None
+
+
+	@classmethod
 	def __serialize_instances_for_cache(cls, instances):
 		serialized = [ inst.to_dict() for inst in instances ]
 		return serialized
@@ -746,6 +778,6 @@ class BaseDataObject(metaclass=ABCMeta):
 		)
 
 
-	def __get_prop_names(self):
+	def __get_database_prop_names(self):
 		return self.db_driver.get_table_field_names(self.TABLE_NAME)
 
