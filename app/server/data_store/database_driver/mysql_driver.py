@@ -14,9 +14,6 @@ class MySqlDriver(BaseDatabaseDriver):
 	MySQL database driver which implements CRUD and utility public methods.
 
 	TODO:
-		X enforce uuid as a required input for record creation
-		X enforce uuid and created_ts as immutable once record exists
-		X update returns to make sense with new interface
 		- transactions? (not at this time)
 		- type checking, type consistency? (not at this time)
 

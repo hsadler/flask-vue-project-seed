@@ -13,20 +13,8 @@ class BaseDataObject(metaclass=ABCMeta):
 	Provides base methods and interface for all proper data objects.
 
 	TODO:
-		X add uuid creation on data object create
-		X update all 'id's to be 'uuid'
-		X add partials caching by uuid to find_many() method
-		X refactor save() method
-		X don't recache if found in cache
-		X add metadata attribute to keep track of:
-			X created_ts column
-			X updated_ts column
-		X add 'new record' property
 		- refactor test script
-
 		- add consistency options to 'find' methods (skip cache on read)
-		X batch queries
-		X batch caching of result items
 		- asses types of caching currently implemented and research
 			alternatives
 		- better management of attribute types (int, str, bool, etc.)
