@@ -136,7 +136,7 @@ t.should_be_equal(
 
 # test update
 new_insert_message = 'hello2!'
-rows_updated = mysql_driver.update_by_fields(
+update_res = mysql_driver.update_by_fields(
 	table_name=TABLE_NAME,
 	value_props={
 		'message': new_insert_message
@@ -146,11 +146,18 @@ rows_updated = mysql_driver.update_by_fields(
 	}
 )
 
-ppp('rows updated: {0}'.format(rows_updated))
+ppp(
+	'rows affected: {0}'.format(update_res['rows_affected']),
+	'updated_ts: {0}'.format(update_res['updated_ts'])
+)
 
 t.should_be_equal(
 	expected=1,
-	actual=rows_updated
+	actual=update_res['rows_affected']
+)
+t.should_be_equal(
+	expected=int,
+	actual=type(update_res['updated_ts'])
 )
 
 
