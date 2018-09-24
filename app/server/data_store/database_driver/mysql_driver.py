@@ -86,6 +86,7 @@ class MySqlDriver(BaseDatabaseDriver):
 
 	########## CRUD INTERFACE METHODS ##########
 
+
 	def insert(self, table_name, value_props={}):
 		"""
 		MySQL driver interface method for single record inserts.
@@ -96,7 +97,8 @@ class MySqlDriver(BaseDatabaseDriver):
 				key=column name and value=column value.
 
 		Returns:
-			(int) Number of records inserted.
+			(dict) Dictionary representing MySQL record or None if insert is
+				unsuccessful.
 
 		"""
 
@@ -138,6 +140,8 @@ class MySqlDriver(BaseDatabaseDriver):
 			self.conn.commit()
 			if self.cur.rowcount == 1:
 				return value_props
+			else:
+				return None
 
 
 	def find_by_uuid(self, table_name, uuid):
@@ -218,9 +222,14 @@ class MySqlDriver(BaseDatabaseDriver):
 				key=column name and value=column value.
 
 		Returns:
-			(integer) Number of rows updated.
+			{
+				'rows_affected': (integer) Number of rows updated,
+				'updated_ts': (integer) Current timestamp
+			}
 
 		"""
+
+		res = {}
 
 		# filter immutable properties from value_props
 		unfiltered_value_props = value_props
@@ -230,7 +239,8 @@ class MySqlDriver(BaseDatabaseDriver):
 				value_props[key] = val
 
 		# mutate 'updated_ts' column to current time on update
-		value_props[self.RECORD_UPDATED_TS_COLUMN] = self.get_curr_timestamp()
+		current_timestamp = self.get_curr_timestamp()
+		value_props[self.RECORD_UPDATED_TS_COLUMN] = current_timestamp
 
 		# start gathering query parts
 		query_stmt_components = []
@@ -278,7 +288,9 @@ class MySqlDriver(BaseDatabaseDriver):
 		# commit the update to the datastore
 		with self.conn:
 			self.cur.execute(query_stmt, tuple(set_values + where_values))
-			return self.cur.rowcount
+			res[self.RECORD_UPDATED_TS_COLUMN] = current_timestamp
+			res['rows_affected'] = self.cur.rowcount
+			return res
 
 
 	def delete_by_uuid(self, table_name, uuid):

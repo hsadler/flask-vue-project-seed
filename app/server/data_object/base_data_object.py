@@ -310,6 +310,7 @@ class BaseDataObject(metaclass=ABCMeta):
 			cache_ttl=cache_ttl
 		)
 
+
 	def save(self, cache_ttl=None):
 		"""
 		Data object database save method.
@@ -318,7 +319,7 @@ class BaseDataObject(metaclass=ABCMeta):
 			cache_ttl (int): Cache time-to-live in seconds.
 
 		Returns:
-			(object) Data object instance or None if save fails.
+			(bool) Database upsert success.
 
 		"""
 
@@ -328,26 +329,49 @@ class BaseDataObject(metaclass=ABCMeta):
 		)
 
 		# upsert database record
-		upsert_res = None
+		upsert_success = False
 		if self.new_record:
-			upsert_res = self.db_driver.insert(
+			# insert record in database
+			insert_res = self.db_driver.insert(
 				table_name=self.TABLE_NAME,
 				value_props=serialized_record
 			)
+			# update instance state
+			if insert_res is not None:
+				for m_field in self.METADATA_FIELDS:
+					self.set_metadata(
+						metadata_name=m_field,
+						metadata_value=insert_res[m_field]
+					)
+					del insert_res[m_field]
+				for prop_key, prop_val in insert_res:
+					self.set_prop(
+						prop_name=prop_key,
+						prop_value=prop_val
+					)
+				upsert_success = True
 		else:
-			upsert_res = self.db_driver.update_by_uuid(
+			# update record in database
+			update_res = self.db_driver.update_by_uuid(
 				table_name=self.TABLE_NAME,
 				uuid=self.get_prop(self.UUID_PROPERTY),
 				value_props=serialized_record
 			)
+			# update instance state
+			if update_res['rows_affected'] == 1:
+				self.set_metadata(
+					metadata_name=self.UPDATED_TS_METADATA,
+					metadata_value=update_res[self.UPDATED_TS_METADATA]
+				)
+				upsert_success = True
 
-		# if database set is successful, set 'new_record' propery to False
-		if type(upsert_res) == int and len(upsert_res) > 0:
+		# cache upserted record and set 'new_record' to False if upsert was
+		# successful
+		if upsert_success:
+			self.new_record = False
+			self.set_to_cache(ttl=cache_ttl)
 
-
-		# call cache driver to set by uuid
-
-		return saved_instance
+		return upsert_success
 
 
 	def delete(self):
