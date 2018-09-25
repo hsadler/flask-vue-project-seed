@@ -3,7 +3,6 @@ import time
 import sys
 sys.path.append('..')
 
-import config.config as config
 from data_store.cache_driver.redis_driver import RedisDriver
 from testie import Testie
 from utils.print import ppp
@@ -28,41 +27,63 @@ cache_items = {
 cache_ttl = 1
 
 # test single items
-for cache_key, cache_value in cache_items.items():
+# for cache_key, cache_value in cache_items.items():
 
-	# test set
-	set_response = redis_driver.set(
-		key=cache_key,
-		value=cache_value,
-		ttl=cache_ttl
-	)
-	ppp('set_response:', set_response)
-	t.should_be_equal(expected=True, actual=set_response)
+# 	# test set
+# 	set_response = redis_driver.set(
+# 		key=cache_key,
+# 		value=cache_value,
+# 		ttl=cache_ttl
+# 	)
+# 	ppp('set_response:', set_response)
+# 	t.should_be_equal(expected=True, actual=set_response)
 
-	# test get before expiration
-	get_response = redis_driver.get(key=cache_key)
-	ppp('get_response:', get_response)
-	t.should_be_equal(expected=cache_value, actual=get_response)
+# 	# test get before expiration
+# 	get_response = redis_driver.get(key=cache_key)
+# 	ppp('get_response:', get_response)
+# 	t.should_be_equal(expected=cache_value, actual=get_response)
 
-	# test get after expiration
-	time.sleep(2)
-	get_response = redis_driver.get(key=cache_key)
-	ppp('get_response:', get_response)
-	t.should_be_equal(expected=None, actual=get_response)
+# 	# test get after expiration
+# 	time.sleep(2)
+# 	get_response = redis_driver.get(key=cache_key)
+# 	ppp('get_response:', get_response)
+# 	t.should_be_equal(expected=None, actual=get_response)
 
-	# test delete
-	redis_driver.set(cache_key, cache_value)
-	delete_response = redis_driver.delete(cache_key)
-	ppp('delete_response:', delete_response)
-	t.should_be_equal(expected=1, actual=delete_response)
+# 	# test delete
+# 	redis_driver.set(cache_key, cache_value)
+# 	delete_response = redis_driver.delete(cache_key)
+# 	ppp('delete_response:', delete_response)
+# 	t.should_be_equal(expected=1, actual=delete_response)
+
+
+# test single item failures
+fail_key = 'fail'
+fail_val = None
+
+# fail set
+fail_set_response = redis_driver.set(
+	key=fail_key,
+	value=fail_val,
+	ttl=1
+)
+ppp('fail_set_response:', fail_set_response)
+t.should_be_equal(expected=False, actual=fail_set_response)
+
+# fail get
+fail_get_response = redis_driver.get(key=fail_key)
+ppp('fail_get_response:', fail_get_response)
+t.should_be_equal(expected=None, actual=fail_get_response)
+
+# fail delete
+fail_delete_response = redis_driver.delete(key=fail_key)
+ppp('fail_delete_response:', fail_delete_response)
+t.should_be_equal(expected=0, actual=fail_delete_response)
 
 
 # test batching
 batch_set_response = redis_driver.batch_set(items=cache_items, ttl=cache_ttl)
 ppp('batch_set_response:', batch_set_response)
-batch_set_expected = {}
-for key, val in cache_items.items():
-	batch_set_expected[key] = True
+batch_set_expected = { key: True for key, val in cache_items.items() }
 t.should_be_equal(expected=batch_set_expected, actual=batch_set_response)
 
 # test get of single after batch set
@@ -79,10 +100,18 @@ t.should_be_equal(expected=cache_items, actual=batch_get_response)
 
 batch_delete_response = redis_driver.batch_delete(keys=cache_key_list)
 ppp('batch_delete_response:', batch_delete_response)
-batch_delete_expected = {}
-for key, val in cache_items.items():
-	batch_delete_expected[key] = 1
+batch_delete_expected = { key: 1 for key, val in cache_items.items() }
 t.should_be_equal(expected=batch_delete_expected, actual=batch_delete_response)
+
+
+# test batch failures
+cache_items['fail'] = None
+cache_items[None] = 'fail'
+
+fail_batch_set_response = redis_driver.batch_set(items=cache_items, ttl=cache_ttl)
+ppp('fail_batch_set_response:', fail_batch_set_response)
+fail_batch_set_expected = { key: True for key, val in cache_items.items() }
+t.should_be_equal(expected=batch_set_expected, actual=batch_set_response)
 
 
 ######## TEST REDIS SPECIFIC METHODS ########
