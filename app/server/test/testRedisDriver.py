@@ -16,6 +16,7 @@ redis_driver = RedisDriver()
 ######## TEST INTERFACE ########
 
 
+# TODO: add more types to see how good json encoding and decoding are
 cache_items = {
 	'string': 'my_string',
 	'integer': 1234,
@@ -108,10 +109,56 @@ t.should_be_equal(expected=batch_delete_expected, actual=batch_delete_response)
 cache_items['fail'] = None
 cache_items[None] = 'fail'
 
-fail_batch_set_response = redis_driver.batch_set(items=cache_items, ttl=cache_ttl)
+# test batch set fail
+fail_batch_set_response = redis_driver.batch_set(
+	items=cache_items,
+	ttl=cache_ttl
+)
 ppp('fail_batch_set_response:', fail_batch_set_response)
-fail_batch_set_expected = { key: True for key, val in cache_items.items() }
-t.should_be_equal(expected=batch_set_expected, actual=batch_set_response)
+fail_batch_set_expected = {}
+for key, val in cache_items.items():
+	if key is None or val is None:
+		fail_batch_set_expected[key] = False
+	else:
+		fail_batch_set_expected[key] = True
+t.should_be_equal(
+	expected=fail_batch_set_expected,
+	actual=fail_batch_set_response
+)
+
+# test batch get fail
+fail_batch_get_response = redis_driver.batch_get(
+	keys=['string', None, 'fail', 123, 'key does not exist']
+)
+ppp('fail_batch_get_response:', fail_batch_get_response)
+fail_batch_get_expected = {
+	'string': cache_items['string'],
+	None: None,
+	'fail': None,
+	123: None,
+	'key does not exist': None
+}
+t.should_be_equal(
+	expected=fail_batch_get_expected,
+	actual=fail_batch_get_response
+)
+
+# test batch delete fail
+fail_batch_delete_response = redis_driver.batch_delete(
+	keys=['string', None, 'fail', 123, 'key does not exist']
+)
+ppp('fail_batch_delete_response:', fail_batch_delete_response)
+fail_batch_delete_expected = {
+	'string': 1,
+	None: 0,
+	'fail': 0,
+	123: 0,
+	'key does not exist': 0
+}
+t.should_be_equal(
+	expected=fail_batch_delete_expected,
+	actual=fail_batch_delete_response
+)
 
 
 ######## TEST REDIS SPECIFIC METHODS ########

@@ -118,8 +118,11 @@ class RedisDriver(BaseCacheDriver):
 			pipe.get(key)
 
 		redis_response = pipe.execute()
-		# TODO: bug
-		cached_values = [ json.loads(x) for x in redis_response ]
+
+		cached_values = [
+			json.loads(x) if x is not None else x
+			for x in redis_response
+		]
 
 		result = {}
 		for i, value in enumerate(cached_values):
