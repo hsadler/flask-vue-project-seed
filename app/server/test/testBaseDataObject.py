@@ -29,7 +29,7 @@ mysql_driver = MySqlDriver(
 TABLE_NAME = 'test_user'
 create_table_query = """
 	CREATE TABLE IF NOT EXISTS {0} (
-		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		uuid VARCHAR(32) PRIMARY KEY,
 		created_ts INT(11) NOT NULL,
 		updated_ts INT(11) NOT NULL,
 		name VARCHAR(255),
@@ -66,6 +66,8 @@ t.should_be_equal(
 	expected=user_data,
 	actual=test_user_DO.to_dict()
 )
+
+sys.exit()
 
 
 # test 'save' method

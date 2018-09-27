@@ -179,9 +179,9 @@ class BaseDataObject(metaclass=ABCMeta):
 		if len(instances) > 0:
 			cls.set_batch_to_cache(
 				dataobjects=instances,
-				ttl=cache_ttl,
 				db_driver_class=db_driver_class,
-				cache_driver_class=cache_driver_class
+				cache_driver_class=cache_driver_class,
+				ttl=cache_ttl
 			)
 
 		return instances
@@ -270,9 +270,9 @@ class BaseDataObject(metaclass=ABCMeta):
 			]
 			cls.set_batch_to_cache(
 				dataobjects=instances_to_be_cached,
-				ttl=cache_ttl,
 				db_driver_class=db_driver_class,
-				cache_driver_class=cache_driver_class
+				cache_driver_class=cache_driver_class,
+				ttl=cache_ttl
 			)
 
 		# return the aggregated cache found and database found instances in a
@@ -601,10 +601,10 @@ class BaseDataObject(metaclass=ABCMeta):
 	@classmethod
 	def set_batch_to_cache(
 		cls,
-		dataobjects=[],
-		ttl=None,
+		dataobjects,
 		db_driver_class,
-		cache_driver_class
+		cache_driver_class,
+		ttl=None,
 	):
 		db_driver, cache_driver = cls.get_drivers(
 			db_driver_class=db_driver_class,
@@ -752,7 +752,7 @@ class BaseDataObject(metaclass=ABCMeta):
 
 
 	@classmethod
-	def __serialize_instance_for_cache(instance=DOcls, instance):
+	def __serialize_instance_for_cache(cls, instance):
 		return cls.__serialize_instances_for_cache(instances=[ instance ])
 
 
