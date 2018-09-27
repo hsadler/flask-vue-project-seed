@@ -16,45 +16,52 @@ redis_driver = RedisDriver()
 ######## TEST INTERFACE ########
 
 
-# TODO: add more types to see how good json encoding and decoding are
 cache_items = {
 	'string': 'my_string',
+	'escaped_string': 'line1\nline2',
+	'raw_string': r'raw/tstring',
+	'binary_string': bin(1234),
+	'object_string': repr(bytearray()),
 	'integer': 1234,
-	'negative_decimal': -1.234,
+	'negative_float': -1.234,
+	# 'complex': 2+3j, # not json serializable
 	'boolean': True,
 	'list': [1, 'cats', False],
-	'dictionary': {'one': 1, 'two': 2}
+	'dictionary': {'one': 1, 'two': 2},
+	# 'empty_object': object(), # not json serializable
+	# 'set': set(), # not json serializable
+	# 'tuple': tuple() # serializes to list (array)
 }
 cache_ttl = 1
 
 # test single items
-# for cache_key, cache_value in cache_items.items():
+for cache_key, cache_value in cache_items.items():
 
-# 	# test set
-# 	set_response = redis_driver.set(
-# 		key=cache_key,
-# 		value=cache_value,
-# 		ttl=cache_ttl
-# 	)
-# 	ppp('set_response:', set_response)
-# 	t.should_be_equal(expected=True, actual=set_response)
+	# test set
+	set_response = redis_driver.set(
+		key=cache_key,
+		value=cache_value,
+		ttl=cache_ttl
+	)
+	ppp('set_response for {0}:'.format(cache_key), set_response)
+	t.should_be_equal(expected=True, actual=set_response)
 
-# 	# test get before expiration
-# 	get_response = redis_driver.get(key=cache_key)
-# 	ppp('get_response:', get_response)
-# 	t.should_be_equal(expected=cache_value, actual=get_response)
+	# test get before expiration
+	get_response = redis_driver.get(key=cache_key)
+	ppp('get_response for {0}:'.format(cache_key), get_response)
+	t.should_be_equal(expected=cache_value, actual=get_response)
 
-# 	# test get after expiration
-# 	time.sleep(2)
-# 	get_response = redis_driver.get(key=cache_key)
-# 	ppp('get_response:', get_response)
-# 	t.should_be_equal(expected=None, actual=get_response)
+	# test get after expiration
+	time.sleep(2)
+	get_response = redis_driver.get(key=cache_key)
+	ppp('get_response for {0}:'.format(cache_key), get_response)
+	t.should_be_equal(expected=None, actual=get_response)
 
-# 	# test delete
-# 	redis_driver.set(cache_key, cache_value)
-# 	delete_response = redis_driver.delete(cache_key)
-# 	ppp('delete_response:', delete_response)
-# 	t.should_be_equal(expected=1, actual=delete_response)
+	# test delete
+	redis_driver.set(cache_key, cache_value)
+	delete_response = redis_driver.delete(cache_key)
+	ppp('delete_response for {0}:'.format(cache_key), delete_response)
+	t.should_be_equal(expected=1, actual=delete_response)
 
 
 # test single item failures

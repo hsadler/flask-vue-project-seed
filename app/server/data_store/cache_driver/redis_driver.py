@@ -25,7 +25,7 @@ class RedisDriver(BaseCacheDriver):
 
 		self.r = redis.StrictRedis(
 			host=config.REDIS_HOST,
-			port=config.REDIS_PORT,
+			port=config.REDIS_PORT
 		)
 
 
@@ -60,11 +60,11 @@ class RedisDriver(BaseCacheDriver):
 			if type(key) is not str or value is None:
 				result[key] = False
 				continue
-			json_value = json.dumps(value)
+			serialized_value = self.serialize(value)
 			if ttl is not None:
-				pipe.set(key, json_value, ex=ttl)
+				pipe.set(key, serialized_value, ex=ttl)
 			else:
-				pipe.set(key, json_value)
+				pipe.set(key, serialized_value)
 
 		set_statuses = pipe.execute()
 
@@ -92,11 +92,11 @@ class RedisDriver(BaseCacheDriver):
 		if type(key) is not str or value is None:
 			return False
 
-		json_value = json.dumps(value)
+		serialized_value = self.serialize(value)
 		if ttl is not None:
-			return self.r.set(key, json_value, ex=ttl)
+			return self.r.set(key, serialized_value, ex=ttl)
 		else:
-			return self.r.set(key, json_value)
+			return self.r.set(key, serialized_value)
 
 
 	def batch_get(self, keys=[]):
@@ -120,7 +120,7 @@ class RedisDriver(BaseCacheDriver):
 		redis_response = pipe.execute()
 
 		cached_values = [
-			json.loads(x) if x is not None else x
+			self.deserialize(x) if x is not None else x
 			for x in redis_response
 		]
 
@@ -143,9 +143,9 @@ class RedisDriver(BaseCacheDriver):
 
 		"""
 
-		json_value = self.r.get(key)
-		if json_value is not None:
-			value = json.loads(json_value)
+		serialized_value = self.r.get(key)
+		if serialized_value is not None:
+			value = self.deserialize(serialized_value)
 			return value
 		else:
 			return None
@@ -191,6 +191,19 @@ class RedisDriver(BaseCacheDriver):
 		"""
 
 		return self.r.delete(key)
+
+
+	########## UTILITY INTERFACE METHODS ##########
+
+
+	@classmethod
+	def serialize(cls, value):
+		return json.dumps(value)
+
+
+	@classmethod
+	def deserialize(cls, value):
+		return json.loads(value)
 
 
 	########## REDIS SPECIFIC METHODS ##########
