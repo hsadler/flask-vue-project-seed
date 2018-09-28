@@ -64,10 +64,8 @@ test_user_DO = TestUserDataObject.create(prop_dict=user_data)
 ppp("'create' method data object:", test_user_DO.to_dict())
 t.should_be_equal(
 	expected=user_data,
-	actual=test_user_DO.to_dict()
+	actual=test_user_DO.to_dict()['state']
 )
-
-sys.exit()
 
 
 # test 'save' method
@@ -77,6 +75,8 @@ t.should_be_equal(
 	expected=TestUserDataObject,
 	actual=type(saved_test_user_DO)
 )
+
+sys.exit()
 
 
 # test 'find_many' method
