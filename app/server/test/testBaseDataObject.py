@@ -69,32 +69,32 @@ t.should_be_equal(
 
 
 # test 'save' method
-saved_test_user_DO = test_user_DO.save()
-ppp("'save' method data object:", saved_test_user_DO.to_dict())
+test_user_DO.save()
+ppp("saved data object:", test_user_DO.to_dict())
 t.should_be_equal(
 	expected=TestUserDataObject,
-	actual=type(saved_test_user_DO)
+	actual=type(test_user_DO)
 )
-
-sys.exit()
 
 
 # test 'find_many' method
-find_id = saved_test_user_DO.get_prop('id')
-found_test_user_DOs = TestUserDataObject.find_many(prop_dict={ 'id': find_id })
+find_id = test_user_DO.get_prop('uuid')
+found_test_user_DOs = TestUserDataObject.find_many(prop_dict={ 'uuid': find_id })
 found_test_user_DO = found_test_user_DOs[0]
 ppp("'find_many' method data object:", found_test_user_DO.to_dict())
 t.should_be_equal(
-	expected=saved_test_user_DO.to_dict(),
+	expected=test_user_DO.to_dict(),
 	actual=found_test_user_DO.to_dict()
 )
+
+sys.exit()
 
 
 # test 'find_one' method
 found_test_user_DO = TestUserDataObject.find_one(prop_dict={ 'id': find_id })
 ppp("'find_one' method data object:", found_test_user_DO.to_dict())
 t.should_be_equal(
-	expected=saved_test_user_DO.to_dict(),
+	expected=test_user_DO.to_dict(),
 	actual=found_test_user_DO.to_dict()
 )
 

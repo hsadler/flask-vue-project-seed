@@ -135,13 +135,10 @@ t.should_be_equal(
 
 # test batch get fail
 fail_batch_get_response = redis_driver.batch_get(
-	keys=['string', None, 'fail', 123, 'key does not exist']
+	keys=[123, 'key does not exist']
 )
 ppp('fail_batch_get_response:', fail_batch_get_response)
 fail_batch_get_expected = {
-	'string': cache_items['string'],
-	None: None,
-	'fail': None,
 	123: None,
 	'key does not exist': None
 }

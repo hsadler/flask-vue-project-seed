@@ -100,7 +100,6 @@ class MySqlDriver(BaseDatabaseDriver):
 		"""
 
 		# validate value_props for necessary items
-		ppp(value_props)
 		if not self.validate_record_props(value_props):
 			raise RuntimeError("invalid record properties for INSERT")
 

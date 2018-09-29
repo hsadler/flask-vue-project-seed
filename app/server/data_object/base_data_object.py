@@ -7,6 +7,8 @@ import simplejson as json
 import config.config as config
 from abc import ABCMeta, abstractmethod
 
+from utils.print import ppp
+
 
 class BaseDataObject(metaclass=ABCMeta):
 	"""
@@ -332,7 +334,7 @@ class BaseDataObject(metaclass=ABCMeta):
 						metadata_value=insert_res[m_field]
 					)
 					del insert_res[m_field]
-				for prop_key, prop_val in insert_res:
+				for prop_key, prop_val in insert_res.items():
 					self.set_prop(
 						prop_name=prop_key,
 						prop_value=prop_val
@@ -656,8 +658,13 @@ class BaseDataObject(metaclass=ABCMeta):
 			cls.construct_cache_key(uuid=uuid): uuid
 			for uuid in uuids
 		}
-		cache_keys = cache_keys_to_uuids.values()
+		# TODO: need constructed cache keys
+		cache_keys = list(cache_keys_to_uuids.values())
+		ppp('cache_keys:', cache_keys)
 		cache_keys_to_values = cache_driver.batch_get(keys=cache_keys)
+		ppp('cache_keys_to_values:', cache_keys_to_values)
+		# TODO: this dictionary needs to be composed another way
+		# (cache_value==None) is causing a problem
 		uuids_to_instances = {
 			cache_keys_to_uuids[cache_key]: cls.__deserialize_value_from_cache(
 				cache_value=cache_value,
@@ -668,6 +675,7 @@ class BaseDataObject(metaclass=ABCMeta):
 			for cache_key, cache_value
 			in cache_keys_to_values.items()
 		}
+		ppp('uuids_to_instances:', uuids_to_instances)
 		return uuids_to_instances
 
 
@@ -736,7 +744,7 @@ class BaseDataObject(metaclass=ABCMeta):
 
 	@classmethod
 	def __serialize_instance_for_database(cls, instance):
-		serialized_records = cls.__serialize_instances_for_cache(
+		serialized_records = cls.__serialize_instances_for_database(
 			instances=[instance]
 		)
 		if len(serialized_records) > 0:
