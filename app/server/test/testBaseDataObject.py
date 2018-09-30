@@ -77,9 +77,11 @@ t.should_be_equal(
 )
 
 
-# test 'find_many' method
+# test retrieve single by uuid from 'find_many' method
 find_id = test_user_DO.get_prop('uuid')
-found_test_user_DOs = TestUserDataObject.find_many(prop_dict={ 'uuid': find_id })
+found_test_user_DOs = TestUserDataObject.find_many(
+	prop_dict={ 'uuid': find_id }
+)
 found_test_user_DO = found_test_user_DOs[0]
 ppp("'find_many' method data object:", found_test_user_DO.to_dict())
 t.should_be_equal(
@@ -87,12 +89,47 @@ t.should_be_equal(
 	actual=found_test_user_DO.to_dict()
 )
 
-sys.exit()
+# test retrieve multiple by non-uuid prop from 'find_many' method
+second_test_user_DO = TestUserDataObject.create(prop_dict=user_data)
+second_test_user_DO.save()
+found_test_user_DOs = TestUserDataObject.find_many(
+	prop_dict={ 'age': user_data['age'] }
+)
+ppp(
+	"'find_many' method data objects:",
+	[ x.to_dict() for x in found_test_user_DOs ]
+)
+t.should_be_equal(
+	expected=True,
+	actual=len(found_test_user_DOs) > 1
+)
 
 
-# test 'find_one' method
-found_test_user_DO = TestUserDataObject.find_one(prop_dict={ 'id': find_id })
-ppp("'find_one' method data object:", found_test_user_DO.to_dict())
+# test retrieve by uuid 'find_one' method
+found_test_user_DO = TestUserDataObject.find_one(
+	prop_dict={ 'uuid': test_user_DO.get_prop('uuid') }
+)
+ppp("'find_one' method data object (by uuid):", found_test_user_DO.to_dict())
+t.should_be_equal(
+	expected=test_user_DO.to_dict(),
+	actual=found_test_user_DO.to_dict()
+)
+
+# test retrieve by non-uuid prop 'find_one' method
+user_data = {
+	'name': 'Jimbo',
+	'age': 40,
+	'admin': False
+}
+test_user_DO = TestUserDataObject.create(prop_dict=user_data)
+test_user_DO.save()
+found_test_user_DO = TestUserDataObject.find_one(
+	prop_dict={ 'name': test_user_DO.get_prop('name') }
+)
+ppp(
+	"'find_one' method data object (by non-uuid prop):",
+	found_test_user_DO.to_dict()
+)
 t.should_be_equal(
 	expected=test_user_DO.to_dict(),
 	actual=found_test_user_DO.to_dict()

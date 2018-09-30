@@ -160,9 +160,9 @@ class BaseDataObject(metaclass=ABCMeta):
 				cache_driver_class=cache_driver_class
 			)
 			if instance is not None:
-				return instance
+				return [instance]
 
-		# get records from DB
+		# get records from database
 		records = db_driver.find_by_fields(
 			table_name=cls.TABLE_NAME,
 			where_props=prop_dict,
@@ -389,7 +389,7 @@ class BaseDataObject(metaclass=ABCMeta):
 
 	def get_prop(self, prop_name):
 		"""
-		Data object property getter method.
+		Data object property getter method. Fails hard on key error.
 
 		Args:
 			prop_name (str): Name of property.
@@ -470,13 +470,13 @@ class BaseDataObject(metaclass=ABCMeta):
 	):
 		instances = []
 		for record in records:
+			prop_dict = {}
+			metadata_dict = {}
 			for prop, val in record.items():
-				prop_dict = {}
-				metadata_dict = {}
 				if prop in cls.METADATA_FIELDS:
 					metadata_dict[prop] = val
 				else:
-					prop_dict[prop] = value
+					prop_dict[prop] = val
 			instance = cls(
 				prop_dict=prop_dict,
 				db_driver_class=db_driver_class,
@@ -619,7 +619,7 @@ class BaseDataObject(metaclass=ABCMeta):
 			)
 			cache_value = cls.__serialize_instance_for_cache(instance=DO)
 			cache_key_to_value[cache_key] = cache_value
-		ttl = ttl if ttl is not None else self.DEFAULT_CACHE_TTL
+		ttl = ttl if ttl is not None else cls.DEFAULT_CACHE_TTL
 		cache_driver.batch_set(items=cache_key_to_value, ttl=ttl)
 
 
@@ -658,13 +658,8 @@ class BaseDataObject(metaclass=ABCMeta):
 			cls.construct_cache_key(uuid=uuid): uuid
 			for uuid in uuids
 		}
-		# TODO: need constructed cache keys
-		cache_keys = list(cache_keys_to_uuids.values())
-		ppp('cache_keys:', cache_keys)
+		cache_keys = list(cache_keys_to_uuids.keys())
 		cache_keys_to_values = cache_driver.batch_get(keys=cache_keys)
-		ppp('cache_keys_to_values:', cache_keys_to_values)
-		# TODO: this dictionary needs to be composed another way
-		# (cache_value==None) is causing a problem
 		uuids_to_instances = {
 			cache_keys_to_uuids[cache_key]: cls.__deserialize_value_from_cache(
 				cache_value=cache_value,
@@ -675,7 +670,6 @@ class BaseDataObject(metaclass=ABCMeta):
 			for cache_key, cache_value
 			in cache_keys_to_values.items()
 		}
-		ppp('uuids_to_instances:', uuids_to_instances)
 		return uuids_to_instances
 
 
@@ -761,7 +755,11 @@ class BaseDataObject(metaclass=ABCMeta):
 
 	@classmethod
 	def __serialize_instance_for_cache(cls, instance):
-		return cls.__serialize_instances_for_cache(instances=[ instance ])
+		serialized = cls.__serialize_instances_for_cache(instances=[ instance ])
+		if len(serialized) > 0:
+			return serialized[0]
+		else:
+			return None
 
 
 	@classmethod
@@ -791,11 +789,15 @@ class BaseDataObject(metaclass=ABCMeta):
 		db_driver_class,
 		cache_driver_class
 	):
-		return cls.__deserialize_values_from_cache(
+		values = cls.__deserialize_values_from_cache(
 			cache_values=[ cache_value ],
 			db_driver_class=db_driver_class,
 			cache_driver_class=cache_driver_class
 		)
+		if len(values) > 0:
+			return values[0]
+		else:
+			return None
 
 
 	def __get_database_prop_names(self):

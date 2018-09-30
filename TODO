@@ -31,6 +31,3 @@
 	X 'created' and 'updated' should be set as metadata attributes in the
 		base_data_object instance state
 
-
-
-
