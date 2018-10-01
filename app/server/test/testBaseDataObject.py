@@ -147,15 +147,42 @@ t.should_be_equal(
 )
 
 
+user_data = {
+	'name': 'Ferd',
+	'age': 32,
+	'admin': True
+}
+test_user_DO_1 = TestUserDataObject.create(prop_dict=user_data)
+test_user_DO_1.save()
+user_data = {
+	'name': 'Sam',
+	'age': 55,
+	'admin': True
+}
+test_user_DO_2 = TestUserDataObject.create(prop_dict=user_data)
+test_user_DO_2.save()
+
+
 # test 'find_by_uuids' method
-# @classmethod
-# def find_by_uuids(
-# 	cls,
-# 	uuids=[],
-# 	db_driver_class=None,
-# 	cache_driver_class=None,
-# 	cache_ttl=None
-# ):
+found_user_DOs = TestUserDataObject.find_by_uuids(
+	uuids=[ x.get_prop('uuid') for x in [test_user_DO_1, test_user_DO_2] ]
+)
+ppp(
+	"'find_by_uuids' method found user data objects:",
+	[ x.to_dict() for x in found_user_DOs.values() ]
+)
+t.should_be_equal(
+	expected=[str, str],
+	actual=[ type(x) for x in found_user_DOs.keys() ]
+)
+t.should_be_equal(
+	expected=2,
+	actual=len(found_user_DOs)
+)
+t.should_be_equal(
+	expected=[TestUserDataObject, TestUserDataObject],
+	actual=[ type(x) for x in found_user_DOs.values() ]
+)
 
 
 # test 'find_by_uuid' method
@@ -310,6 +337,12 @@ t.should_be_equal(
 
 
 ########## TEST DATA OBJECT UTILITY INTERFACE ##########
+
+
+# def to_dict(self):
+
+
+# def to_json(self, pretty=False):
 
 
 ######## DELETE TEST TABLE ########
