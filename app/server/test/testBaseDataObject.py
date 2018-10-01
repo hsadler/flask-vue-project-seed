@@ -370,14 +370,18 @@ ppp(
 	"loaded test users from 'load_from_cache_by_uuids':",
 	uuids_to_cache_loaded_user_DOs
 )
-# t.should_be_equal(
-# 	expected=TestUserDataObject,
-# 	actual=type(cache_loaded_user_DO)
-# )
-# t.should_be_equal(
-# 	expected=test_user_DO_1.get_prop('name'),
-# 	actual=cache_loaded_user_DO.get_prop('name')
-# )
+t.should_be_equal(
+	expected=[ TestUserDataObject, TestUserDataObject ],
+	actual=[ type(x) for x in uuids_to_cache_loaded_user_DOs.values() ]
+)
+t.should_be_equal(
+	expected=[ test_user_DO_1, test_user_DO_2 ],
+	actual=[
+		uuids_to_cache_loaded_user_DOs[x]
+		for x in [ y.get_prop('uuid') for y in test_user_DOs ]
+	]
+)
+
 
 sys.exit()
 
