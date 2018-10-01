@@ -1,4 +1,5 @@
 
+import time
 import sys
 sys.path.append('..')
 
@@ -12,6 +13,10 @@ from utils.print import ppp
 
 """
 Test Base Data Object.
+
+TODO:
+	- test all public methods on base data object
+	- add tests for failures
 
 """
 
@@ -186,14 +191,21 @@ t.should_be_equal(
 
 
 # test 'find_by_uuid' method
-# @classmethod
-# def find_by_uuid(
-# 	cls,
-# 	uuid,
-# 	db_driver_class=None,
-# 	cache_driver_class=None,
-# 	cache_ttl=None
-# ):
+found_user_DO = TestUserDataObject.find_by_uuid(
+	uuid=test_user_DO_1.get_prop('uuid')
+)
+ppp(
+	"'find_by_uuid' method found user data object:",
+	found_user_DO.to_dict()
+)
+t.should_be_equal(
+	expected=TestUserDataObject,
+	actual=type(found_user_DO)
+)
+t.should_be_equal(
+	expected=test_user_DO_1.get_prop('name'),
+	actual=found_user_DO.get_prop('name')
+)
 
 
 # test 'delete' method
@@ -267,6 +279,23 @@ t.should_be_equal(
 ########## TEST DATA OBJECT SERIALIZATION, DATABASE, CACHE INTERFACE ##########
 
 
+user_data = {
+	'name': 'Rocky',
+	'age': 40,
+	'admin': False
+}
+test_user_DO_1 = TestUserDataObject.create(prop_dict=user_data)
+test_user_DO_1.save()
+user_data = {
+	'name': 'Raccoon',
+	'age': 5,
+	'admin': True
+}
+test_user_DO_2 = TestUserDataObject.create(prop_dict=user_data)
+test_user_DO_2.save()
+test_user_DOs = [ test_user_DO_1, test_user_DO_2 ]
+
+
 # @classmethod
 # def load_database_records(
 # 	cls,
@@ -331,18 +360,110 @@ t.should_be_equal(
 # 	cache_driver_class
 # ):
 
+# test 'load_from_cache_by_uuids' method
+uuids_to_cache_loaded_user_DOs = TestUserDataObject.load_from_cache_by_uuids(
+	uuids=[ x.get_prop('uuid') for x in test_user_DOs ],
+	db_driver_class=MySqlDriver,
+	cache_driver_class=RedisDriver
+)
+ppp(
+	"loaded test users from 'load_from_cache_by_uuids':",
+	uuids_to_cache_loaded_user_DOs
+)
+# t.should_be_equal(
+# 	expected=TestUserDataObject,
+# 	actual=type(cache_loaded_user_DO)
+# )
+# t.should_be_equal(
+# 	expected=test_user_DO_1.get_prop('name'),
+# 	actual=cache_loaded_user_DO.get_prop('name')
+# )
 
-# @classmethod
-# def load_from_cache_by_uuid(cls, uuid, db_driver_class, cache_driver_class):
+sys.exit()
+
+
+# test 'load_from_cache_by_uuid' after 1 second (should not be found)
+# time.sleep(2)
+# cache_not_found_user_DO = TestUserDataObject.load_from_cache_by_uuid(
+# 	uuid=test_user_DO_1.get_prop('uuid'),
+# 	db_driver_class=MySqlDriver,
+# 	cache_driver_class=RedisDriver
+# )
+# ppp(
+# 	"loaded test user from 'load_from_cache_by_uuid' after ejected from cache:",
+# 	cache_not_found_user_DO
+# )
+# t.should_be_equal(
+# 	expected=None,
+# 	actual=cache_not_found_user_DO
+# )
+
+
+# reset test user 1 to cache
+test_user_DO_1.save()
+
+
+# test 'load_from_cache_by_uuid' method
+cache_loaded_user_DO = TestUserDataObject.load_from_cache_by_uuid(
+	uuid=test_user_DO_1.get_prop('uuid'),
+	db_driver_class=MySqlDriver,
+	cache_driver_class=RedisDriver
+)
+ppp(
+	"loaded test user from 'load_from_cache_by_uuid':",
+	cache_loaded_user_DO.to_dict()
+)
+t.should_be_equal(
+	expected=TestUserDataObject,
+	actual=type(cache_loaded_user_DO)
+)
+t.should_be_equal(
+	expected=test_user_DO_1.get_prop('name'),
+	actual=cache_loaded_user_DO.get_prop('name')
+)
+
+
+# test 'load_from_cache_by_uuid' after 1 second (should not be found)
+time.sleep(2)
+cache_not_found_user_DO = TestUserDataObject.load_from_cache_by_uuid(
+	uuid=test_user_DO_1.get_prop('uuid'),
+	db_driver_class=MySqlDriver,
+	cache_driver_class=RedisDriver
+)
+ppp(
+	"loaded test user from 'load_from_cache_by_uuid' after ejected from cache:",
+	cache_not_found_user_DO
+)
+t.should_be_equal(
+	expected=None,
+	actual=cache_not_found_user_DO
+)
 
 
 ########## TEST DATA OBJECT UTILITY INTERFACE ##########
 
 
-# def to_dict(self):
+user_data = {
+	'name': 'Larry',
+	'age': 11,
+	'admin': False
+}
+test_user_DO = TestUserDataObject.create(prop_dict=user_data)
+test_user_DO.save()
 
 
-# def to_json(self, pretty=False):
+# test 'to_dict' method
+test_user_dict = test_user_DO.to_dict()
+ppp("test user dataobject 'to_dict':", test_user_dict)
+t.should_be_equal(expected=True, actual='state' in test_user_dict)
+t.should_be_equal(expected=True, actual='metadata' in test_user_dict)
+t.should_be_equal(expected=True, actual='new_record' in test_user_dict)
+
+
+# test 'to_json' method
+test_user_json =  test_user_DO.to_json(pretty=True)
+ppp("test user dataobject 'to_json' pretty:", test_user_json)
+t.should_be_equal(expected=str, actual=type(test_user_json))
 
 
 ######## DELETE TEST TABLE ########
