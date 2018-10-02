@@ -306,8 +306,15 @@ test_user_DOs = [ test_user_DO_1, test_user_DO_2 ]
 # ):
 
 
-# @classmethod
-# def get_drivers(cls, db_driver_class=None, cache_driver_class=None):
+# test 'get_drivers' method
+db_driver, cache_driver = TestUserDataObject.get_drivers(
+	db_driver_class=MySqlDriver,
+	cache_driver_class=RedisDriver
+)
+ppp("mysql database driver:", db_driver)
+ppp("redis cache driver:", cache_driver)
+t.should_be_equal(expected=type(db_driver), actual=MySqlDriver)
+t.should_be_equal(expected=type(cache_driver), actual=RedisDriver)
 
 
 # @classmethod
@@ -317,6 +324,19 @@ test_user_DOs = [ test_user_DO_1, test_user_DO_2 ]
 # 	db_driver_class,
 # 	cache_driver_class
 # ):
+
+# test 'load_from_database_by_uuids' method
+uuid_to_db_loaded_user_DOs = TestUserDataObject.load_from_database_by_uuids(
+	uuids=[ x.get_prop('uuid') for x in test_user_DOs ],
+	db_driver_class=MySqlDriver,
+	cache_driver_class=RedisDriver
+)
+ppp(
+	"loaded test users from 'load_from_database_by_uuids':",
+	uuid_to_db_loaded_user_DOs
+)
+
+sys.exit()
 
 
 # @classmethod
@@ -352,14 +372,6 @@ test_user_DOs = [ test_user_DO_1, test_user_DO_2 ]
 # def delete_batch_from_cache(cls, dataobjects=[]):
 
 
-# @classmethod
-# def load_from_cache_by_uuids(
-# 	cls,
-# 	uuids,
-# 	db_driver_class,
-# 	cache_driver_class
-# ):
-
 # test 'load_from_cache_by_uuids' method
 uuids_to_cache_loaded_user_DOs = TestUserDataObject.load_from_cache_by_uuids(
 	uuids=[ x.get_prop('uuid') for x in test_user_DOs ],
@@ -375,32 +387,29 @@ t.should_be_equal(
 	actual=[ type(x) for x in uuids_to_cache_loaded_user_DOs.values() ]
 )
 t.should_be_equal(
-	expected=[ test_user_DO_1, test_user_DO_2 ],
+	expected=[ test_user_DO_1.to_dict(), test_user_DO_2.to_dict() ],
 	actual=[
-		uuids_to_cache_loaded_user_DOs[x]
-		for x in [ y.get_prop('uuid') for y in test_user_DOs ]
+		uuids_to_cache_loaded_user_DOs[test_user_DO_1.get_prop('uuid')].to_dict(),
+		uuids_to_cache_loaded_user_DOs[test_user_DO_2.get_prop('uuid')].to_dict()
 	]
 )
 
 
-sys.exit()
-
-
-# test 'load_from_cache_by_uuid' after 1 second (should not be found)
-# time.sleep(2)
-# cache_not_found_user_DO = TestUserDataObject.load_from_cache_by_uuid(
-# 	uuid=test_user_DO_1.get_prop('uuid'),
-# 	db_driver_class=MySqlDriver,
-# 	cache_driver_class=RedisDriver
-# )
-# ppp(
-# 	"loaded test user from 'load_from_cache_by_uuid' after ejected from cache:",
-# 	cache_not_found_user_DO
-# )
-# t.should_be_equal(
-# 	expected=None,
-# 	actual=cache_not_found_user_DO
-# )
+# test 'load_from_cache_by_uuids' after 1 second (should not be found)
+time.sleep(2)
+uuids_to_cache_loaded_user_DOs = TestUserDataObject.load_from_cache_by_uuids(
+	uuids=[ x.get_prop('uuid') for x in test_user_DOs ],
+	db_driver_class=MySqlDriver,
+	cache_driver_class=RedisDriver
+)
+ppp(
+	"loaded dataobjects from 'load_from_cache_by_uuids' after ejection:",
+	uuids_to_cache_loaded_user_DOs
+)
+t.should_be_equal(
+	expected=[ None, None ],
+	actual=list(uuids_to_cache_loaded_user_DOs.values())
+)
 
 
 # reset test user 1 to cache
@@ -435,7 +444,7 @@ cache_not_found_user_DO = TestUserDataObject.load_from_cache_by_uuid(
 	cache_driver_class=RedisDriver
 )
 ppp(
-	"loaded test user from 'load_from_cache_by_uuid' after ejected from cache:",
+	"loaded dataobject from 'load_from_cache_by_uuid' after ejection:",
 	cache_not_found_user_DO
 )
 t.should_be_equal(
