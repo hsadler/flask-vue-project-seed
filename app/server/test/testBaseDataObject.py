@@ -317,14 +317,6 @@ t.should_be_equal(expected=type(db_driver), actual=MySqlDriver)
 t.should_be_equal(expected=type(cache_driver), actual=RedisDriver)
 
 
-# @classmethod
-# def load_from_database_by_uuids(
-# 	cls,
-# 	uuids,
-# 	db_driver_class,
-# 	cache_driver_class
-# ):
-
 # test 'load_from_database_by_uuids' method
 uuid_to_db_loaded_user_DOs = TestUserDataObject.load_from_database_by_uuids(
 	uuids=[ x.get_prop('uuid') for x in test_user_DOs ],
@@ -335,21 +327,49 @@ ppp(
 	"loaded test users from 'load_from_database_by_uuids':",
 	uuid_to_db_loaded_user_DOs
 )
+t.should_be_equal(
+	expected=[ str, str ],
+	actual=[ type(x) for x in uuid_to_db_loaded_user_DOs.keys() ]
+)
+t.should_be_equal(
+	expected=[ TestUserDataObject, TestUserDataObject ],
+	actual=[ type(x) for x in uuid_to_db_loaded_user_DOs.values() ]
+)
+t.should_be_equal(
+	expected=[ test_user_DO_1.to_dict(), test_user_DO_2.to_dict() ],
+	actual=[
+		uuid_to_db_loaded_user_DOs[test_user_DO_1.get_prop('uuid')].to_dict(),
+		uuid_to_db_loaded_user_DOs[test_user_DO_2.get_prop('uuid')].to_dict()
+	]
+)
 
-sys.exit()
+
+# test 'load_from_database_by_uuids' method
+db_loaded_user_DO = TestUserDataObject.load_from_database_by_uuid(
+	uuid=test_user_DO_1.get_prop('uuid'),
+	db_driver_class=MySqlDriver,
+	cache_driver_class=RedisDriver
+)
+ppp(
+	"loaded test user from 'load_from_database_by_uuid':",
+	db_loaded_user_DO
+)
+t.should_be_equal(
+	expected=TestUserDataObject,
+	actual=type(db_loaded_user_DO)
+)
+t.should_be_equal(
+	expected=test_user_DO_1.get_prop('uuid'),
+	actual=db_loaded_user_DO.get_prop('uuid')
+)
 
 
-# @classmethod
-# def load_from_database_by_uuid(
-# 	cls,
-# 	uuid,
-# 	db_driver_class,
-# 	cache_driver_class
-# ):
-
-
-# @classmethod
-# def construct_cache_key(cls, uuid):
+# test 'construct_cache_key' method
+cache_key = TestUserDataObject.construct_cache_key(
+	uuid=test_user_DO_1.get_prop('uuid')
+)
+ppp('constructed cache key:', cache_key)
+t.should_be_equal(expected=str, actual=type(cache_key))
 
 
 # def set_to_cache(self, ttl=None):
