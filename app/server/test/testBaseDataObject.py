@@ -296,16 +296,6 @@ test_user_DO_2.save()
 test_user_DOs = [ test_user_DO_1, test_user_DO_2 ]
 
 
-# @classmethod
-# def load_database_records(
-# 	cls,
-# 	records,
-# 	db_driver_class,
-# 	cache_driver_class,
-# 	records_are_new=False
-# ):
-
-
 # test 'get_drivers' method
 db_driver, cache_driver = TestUserDataObject.get_drivers(
 	db_driver_class=MySqlDriver,
@@ -370,26 +360,6 @@ cache_key = TestUserDataObject.construct_cache_key(
 )
 ppp('constructed cache key:', cache_key)
 t.should_be_equal(expected=str, actual=type(cache_key))
-
-
-# def set_to_cache(self, ttl=None):
-
-
-# @classmethod
-# def set_batch_to_cache(
-# 	cls,
-# 	dataobjects,
-# 	db_driver_class,
-# 	cache_driver_class,
-# 	ttl=None,
-# ):
-
-
-# def delete_from_cache(self):
-
-
-# @classmethod
-# def delete_batch_from_cache(cls, dataobjects=[]):
 
 
 # test 'load_from_cache_by_uuids' method
@@ -471,6 +441,107 @@ t.should_be_equal(
 	expected=None,
 	actual=cache_not_found_user_DO
 )
+
+
+# first, make sure the dataobject tested is not in the cache
+cached_user_DO_1 = TestUserDataObject.load_from_cache_by_uuid(
+	uuid=test_user_DO_1.get_prop('uuid'),
+	db_driver_class=MySqlDriver,
+	cache_driver_class=RedisDriver
+)
+t.should_be_equal(
+	expected=None,
+	actual=cached_user_DO_1
+)
+
+
+# test 'set_to_cache' method
+set_to_cache_res = test_user_DO_1.set_to_cache()
+ppp("'set_to_cache' response: ", set_to_cache_res)
+cached_user_DO_1 = TestUserDataObject.load_from_cache_by_uuid(
+	uuid=test_user_DO_1.get_prop('uuid'),
+	db_driver_class=MySqlDriver,
+	cache_driver_class=RedisDriver
+)
+ppp('user DO 1 from cache:', cached_user_DO_1.to_dict())
+t.should_be_equal(
+	expected=True,
+	actual=set_to_cache_res
+)
+t.should_be_equal(
+	expected=test_user_DO_1.get_prop('uuid'),
+	actual=cached_user_DO_1.get_prop('uuid')
+)
+
+
+# test 'delete_from_cache' method
+delete_from_cache_res = test_user_DO_1.delete_from_cache()
+ppp("'delete_from_cache' response: ", delete_from_cache_res)
+deleted_cached_user_DO_1 = TestUserDataObject.load_from_cache_by_uuid(
+	uuid=test_user_DO_1.get_prop('uuid'),
+	db_driver_class=MySqlDriver,
+	cache_driver_class=RedisDriver
+)
+ppp('deleted user DO 1 from cache:', deleted_cached_user_DO_1)
+t.should_be_equal(
+	expected=True,
+	actual=delete_from_cache_res
+)
+t.should_be_equal(
+	expected=None,
+	actual=deleted_cached_user_DO_1
+)
+
+
+# first, make sure the dataobjects tested are not in the cache
+cached_user_DOs = TestUserDataObject.load_from_cache_by_uuids(
+	uuids=[ x.get_prop('uuid') for x in test_user_DOs ],
+	db_driver_class=MySqlDriver,
+	cache_driver_class=RedisDriver
+)
+t.should_be_equal(
+	expected=list(cached_user_DOs.values()),
+	actual=[ None, None ]
+)
+
+
+# @classmethod
+# def set_batch_to_cache(
+# 	cls,
+# 	dataobjects,
+# 	db_driver_class,
+# 	cache_driver_class,
+# 	ttl=None,
+# ):
+
+# test 'set_batch_to_cache' method
+# set_batch_to_cache_res = TestUserDataObject.set_batch_to_cache(
+# 	dataobjects,
+# 	db_driver_class,
+# 	cache_driver_class,
+# 	ttl
+# )
+
+
+# @classmethod
+# def delete_batch_from_cache(cls, dataobjects=[]):
+
+# test 'delete_batch_from_cache' method
+
+
+# get test user serialized record via MySqlDriver
+
+
+# @classmethod
+# def load_database_records(
+# 	cls,
+# 	records,
+# 	db_driver_class,
+# 	cache_driver_class,
+# 	records_are_new=False
+# ):
+
+# test the more specialized 'load_database_records' method
 
 
 ########## TEST DATA OBJECT UTILITY INTERFACE ##########

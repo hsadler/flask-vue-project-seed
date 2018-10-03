@@ -593,7 +593,7 @@ class BaseDataObject(metaclass=ABCMeta):
 		)
 		cache_value = self.__serialize_instance_for_cache(instance=self)
 		ttl = ttl if ttl is not None else self.DEFAULT_CACHE_TTL
-		self.cache_driver.set(
+		return self.cache_driver.set(
 			key=cache_key,
 			value=cache_value,
 			ttl=ttl
@@ -627,7 +627,8 @@ class BaseDataObject(metaclass=ABCMeta):
 		cache_key = self.construct_cache_key(
 			uuid=self.get_prop(self.UUID_PROPERTY)
 		)
-		self.cache_driver.delete(cache_key)
+		delete_res = self.cache_driver.delete(cache_key)
+		return True if delete_res == 1 else False
 
 
 	@classmethod
