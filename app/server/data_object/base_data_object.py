@@ -613,14 +613,25 @@ class BaseDataObject(metaclass=ABCMeta):
 			cache_driver_class=cache_driver_class
 		)
 		cache_key_to_value = {}
+		cache_key_to_uuid = {}
 		for DO in dataobjects:
+			DO_uuid = DO.get_prop(cls.UUID_PROPERTY)
 			cache_key = cls.construct_cache_key(
-				uuid=DO.get_prop(cls.UUID_PROPERTY)
+				uuid=DO_uuid
 			)
 			cache_value = cls.__serialize_instance_for_cache(instance=DO)
 			cache_key_to_value[cache_key] = cache_value
+			cache_key_to_uuid[cache_key] = DO_uuid
 		ttl = ttl if ttl is not None else cls.DEFAULT_CACHE_TTL
-		cache_driver.batch_set(items=cache_key_to_value, ttl=ttl)
+		cache_driver_res = cache_driver.batch_set(
+			items=cache_key_to_value,
+			ttl=ttl
+		)
+		uuid_to_cache_status = {}
+		for cache_key, status in cache_driver_res.items():
+			DO_uuid = cache_key_to_uuid[cache_key]
+			uuid_to_cache_status[DO_uuid] = status
+		return uuid_to_cache_status
 
 
 	def delete_from_cache(self):

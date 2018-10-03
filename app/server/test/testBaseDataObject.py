@@ -456,7 +456,7 @@ t.should_be_equal(
 
 
 # test 'set_to_cache' method
-set_to_cache_res = test_user_DO_1.set_to_cache()
+set_to_cache_res = test_user_DO_1.set_to_cache(ttl=1)
 ppp("'set_to_cache' response: ", set_to_cache_res)
 cached_user_DO_1 = TestUserDataObject.load_from_cache_by_uuid(
 	uuid=test_user_DO_1.get_prop('uuid'),
@@ -505,22 +505,31 @@ t.should_be_equal(
 )
 
 
-# @classmethod
-# def set_batch_to_cache(
-# 	cls,
-# 	dataobjects,
-# 	db_driver_class,
-# 	cache_driver_class,
-# 	ttl=None,
-# ):
-
 # test 'set_batch_to_cache' method
-# set_batch_to_cache_res = TestUserDataObject.set_batch_to_cache(
-# 	dataobjects,
-# 	db_driver_class,
-# 	cache_driver_class,
-# 	ttl
-# )
+set_batch_to_cache_res = TestUserDataObject.set_batch_to_cache(
+	dataobjects=test_user_DOs,
+	db_driver_class=MySqlDriver,
+	cache_driver_class=RedisDriver,
+	ttl=1
+)
+ppp("'set_batch_to_cache' response: ", set_batch_to_cache_res)
+# now load the batch from cache
+uuids_to_cache_loaded_user_DOs = TestUserDataObject.load_from_cache_by_uuids(
+	uuids=[ x.get_prop('uuid') for x in test_user_DOs ],
+	db_driver_class=MySqlDriver,
+	cache_driver_class=RedisDriver
+)
+t.should_be_equal(
+	expected=[TestUserDataObject, TestUserDataObject],
+	actual=[ type(x) for x in uuids_to_cache_loaded_user_DOs.values() ]
+)
+t.should_be_equal(
+	expected=[ test_user_DO_1.to_dict(), test_user_DO_2.to_dict() ],
+	actual=[
+		uuids_to_cache_loaded_user_DOs[test_user_DO_1.get_prop('uuid')].to_dict(),
+		uuids_to_cache_loaded_user_DOs[test_user_DO_2.get_prop('uuid')].to_dict()
+	]
+)
 
 
 # @classmethod
