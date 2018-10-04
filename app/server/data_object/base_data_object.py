@@ -643,16 +643,30 @@ class BaseDataObject(metaclass=ABCMeta):
 
 
 	@classmethod
-	def delete_batch_from_cache(cls, dataobjects=[]):
+	def delete_batch_from_cache(
+		cls,
+		dataobjects,
+		db_driver_class,
+		cache_driver_class
+	):
 		db_driver, cache_driver = cls.get_drivers(
 			db_driver_class=db_driver_class,
 			cache_driver_class=cache_driver_class
 		)
-		cache_keys = [
-			cls.construct_cache_key(uuid=DO.get_prop(cls.UUID_PROPERTY))
-			for DO in dataobjects
-		]
-		return cache_driver.batch_delete(keys=cache_keys)
+		cache_keys = []
+		cache_key_to_uuid = {}
+		for DO in dataobjects:
+			uuid = DO.get_prop(cls.UUID_PROPERTY)
+			cache_key = cls.construct_cache_key(uuid=uuid)
+			cache_keys.append(cache_key)
+			cache_key_to_uuid[cache_key] = uuid
+		batch_delete_res = cache_driver.batch_delete(keys=cache_keys)
+		uuids_to_cache_delete_status = {}
+		for cache_key, delete_count in batch_delete_res.items():
+			uuid = cache_key_to_uuid[cache_key]
+			status = True if delete_count == 1 else False
+			uuids_to_cache_delete_status[uuid] = status
+		return uuids_to_cache_delete_status
 
 
 	@classmethod

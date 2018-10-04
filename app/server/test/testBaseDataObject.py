@@ -513,7 +513,15 @@ set_batch_to_cache_res = TestUserDataObject.set_batch_to_cache(
 	ttl=1
 )
 ppp("'set_batch_to_cache' response: ", set_batch_to_cache_res)
-# now load the batch from cache
+t.should_be_equal(
+	expected=[ bool, bool ],
+	actual=[ type(x) for x in set_batch_to_cache_res.values() ]
+)
+t.should_be_equal(
+	expected=[ x.get_prop('uuid') for x in test_user_DOs ].sort(),
+	actual=list(set_batch_to_cache_res.keys()).sort()
+)
+# now load the batch from cache and test if keys are set
 uuids_to_cache_loaded_user_DOs = TestUserDataObject.load_from_cache_by_uuids(
 	uuids=[ x.get_prop('uuid') for x in test_user_DOs ],
 	db_driver_class=MySqlDriver,
@@ -534,7 +542,9 @@ t.should_be_equal(
 
 # test 'delete_batch_from_cache' method
 delete_batch_from_cache_res = TestUserDataObject.delete_batch_from_cache(
-	dataobjects=test_user_DOs
+	dataobjects=test_user_DOs,
+	db_driver_class=MySqlDriver,
+	cache_driver_class=RedisDriver
 )
 ppp("'delete_batch_from_cache' response:", delete_batch_from_cache_res)
 # now load the batch from cache
@@ -551,18 +561,44 @@ t.should_be_equal(
 
 # get test user serialized record via MySqlDriver
 mysql_driver = MySqlDriver(database_name=config.MYSQL_DB_NAME)
+found_records = mysql_driver.find_by_fields(
+	table_name=TABLE_NAME,
+	where_props={
+		'uuid': {
+			'in': [ x.get_prop('uuid') for x in test_user_DOs ]
+		}
+	}
+)
+ppp('found test user records:', found_records)
+t.should_be_equal(
+	expected=[ dict, dict ],
+	actual=[ type(x) for x in found_records ]
+)
 
-
-# @classmethod
-# def load_database_records(
-# 	cls,
-# 	records,
-# 	db_driver_class,
-# 	cache_driver_class,
-# 	records_are_new=False
-# ):
 
 # test the more specialized 'load_database_records' method
+loaded_test_user_DOs_from_records = TestUserDataObject.load_database_records(
+	records=found_records,
+	db_driver_class=MySqlDriver,
+	cache_driver_class=RedisDriver
+)
+ppp(
+	'"load_database_records" dataobjects loaded from records:',
+	[ x.to_dict() for x in loaded_test_user_DOs_from_records ]
+)
+test_user_uuids = [ x.get_prop('uuid') for x in test_user_DOs ]
+# one should be test_user_DO_1
+DO_1 = loaded_test_user_DOs_from_records[0]
+t.should_be_equal(
+	expected=True,
+	actual=DO_1.get_prop('uuid') in test_user_uuids
+)
+# one should be test_user_DO_2
+DO_2 = loaded_test_user_DOs_from_records[1]
+t.should_be_equal(
+	expected=True,
+	actual=DO_2.get_prop('uuid') in test_user_uuids
+)
 
 
 ########## TEST DATA OBJECT UTILITY INTERFACE ##########
