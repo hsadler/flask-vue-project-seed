@@ -532,13 +532,25 @@ t.should_be_equal(
 )
 
 
-# @classmethod
-# def delete_batch_from_cache(cls, dataobjects=[]):
-
 # test 'delete_batch_from_cache' method
+delete_batch_from_cache_res = TestUserDataObject.delete_batch_from_cache(
+	dataobjects=test_user_DOs
+)
+ppp("'delete_batch_from_cache' response:", delete_batch_from_cache_res)
+# now load the batch from cache
+uuids_to_cache_loaded_user_DOs = TestUserDataObject.load_from_cache_by_uuids(
+	uuids=[ x.get_prop('uuid') for x in test_user_DOs ],
+	db_driver_class=MySqlDriver,
+	cache_driver_class=RedisDriver
+)
+t.should_be_equal(
+	expected=[ None, None ],
+	actual=list(uuids_to_cache_loaded_user_DOs.values())
+)
 
 
 # get test user serialized record via MySqlDriver
+mysql_driver = MySqlDriver(database_name=config.MYSQL_DB_NAME)
 
 
 # @classmethod
