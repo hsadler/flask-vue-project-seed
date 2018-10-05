@@ -7,27 +7,16 @@
 
 
 // DB DRIVER (mysql driver)
-	X more options for query conditionals (where clauses)
-	X methods for select, update, and delete by primary key id
-	X rewrite testMysqlDriver.py
-	X more thorough testing of where conditions
-	X switch to UUIDs
-	X update interface to use UUIDs
-	X update test script
-	- transactions? (not at this time)
-	- type checking, type consistency? (not at this time)
+	- order by, ascending and descending
+	- transactions
+	- type checking, type consistency
 
 
 // BASE DATA OBJECT
-	X batch query and batch caching of query result items
+	- pass in datastore object (dependency injection)
+	V think about data type consistency and enforcement
+	V think about db transactions
 	- asses types of caching currently implemented and research alternatives
 	- think about db replication schemes (master->slave vs master->master)
 	- think about data consistency problems (in-memory, cache, master, slave)
-	V think about data type consistency and enforcement
-	X switch from auto-incremented ids to UUIDs (better for application)
-	V think about db transactions
-	X 'created' and 'updated' should remain in the mysql driver. 'uuid' should
-		be in the base_data_object.
-	X 'created' and 'updated' should be set as metadata attributes in the
-		base_data_object instance state
 
