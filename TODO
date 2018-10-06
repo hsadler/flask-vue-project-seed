@@ -17,8 +17,12 @@
 // BASE DATA OBJECT
 	- add docstrings to new methods
 	- pass in datastore information (dependency injection)
-	V think about data type consistency and enforcement
-	V think about db transactions
+	- transactions:
+		- two or more dataobjects saves with all or nothing commits to database
+		- implemented at database driver level?
+		- think about interface
+		- need rollbacks?
+	- think about data type consistency and enforcement
 	- asses types of caching currently implemented and research alternatives
 	- think about db replication schemes (master->slave vs master->master)
 	- think about data consistency problems (in-memory, cache, master, slave)
