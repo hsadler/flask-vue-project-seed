@@ -14,6 +14,7 @@ class MySqlDriver(BaseDatabaseDriver):
 	MySQL database driver which implements CRUD and utility public methods.
 
 	TODO:
+		- add docstrings to new methods
 		- order by, ascending and descending
 		- transactions
 		- type checking, type consistency

@@ -1,18 +1,21 @@
 
 
 // CACH DRIVER (redis driver)
+	- add docstrings to new methods
 	X batch sets
 	X batch gets
 	X batch deletes
 
 
 // DB DRIVER (mysql driver)
+	- add docstrings to new methods
 	- order by, ascending and descending
 	- transactions
 	- type checking, type consistency
 
 
 // BASE DATA OBJECT
+	- add docstrings to new methods
 	- pass in datastore information (dependency injection)
 	V think about data type consistency and enforcement
 	V think about db transactions

@@ -15,8 +15,7 @@ class BaseDataObject(metaclass=ABCMeta):
 	Provides base methods and interface for all proper data objects.
 
 	TODO:
-		- refactor test script
-		- add consistency options to 'find' methods (skip cache on read)
+		- add docstrings to new methods
 		- asses types of caching currently implemented and research
 			alternatives
 		- better management of attribute types (int, str, bool, etc.)
