@@ -41,3 +41,15 @@ class BaseCacheDriver(metaclass=ABCMeta):
 	def delete(self, key):
 		pass
 
+	########## UTILITY INTERFACE METHODS ##########
+
+	@classmethod
+	@abstractmethod
+	def serialize(cls, value):
+		pass
+
+	@classmethod
+	@abstractmethod
+	def deserialize(cls, value):
+		pass
+
