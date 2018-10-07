@@ -220,10 +220,7 @@ inserted_record_dict = mysql_driver.insert(
 	}
 )
 
-# TODO: more thorough testing of the 'find_by_fields' method
-	# - test complex where_props
-	# - test order by
-	# - test random
+# test 'find_by_fields' with order_props
 sorted_uuids = [insert_uuid_1, insert_uuid_2]
 sorted_uuids.sort()
 found_records = mysql_driver.find_by_fields(
@@ -238,13 +235,47 @@ found_records = mysql_driver.find_by_fields(
 	}
 )
 ppp('found records by 2 uuids:', found_records)
+found_uuids = [ x['uuid'] for x in found_records ]
 t.should_be_equal(
-	expected=insert_message,
-	actual=found_record['message']
+	expected=sorted_uuids,
+	actual=found_uuids
 )
+# reversed order by uuid and 'order by' direction 'descending'
+reverse_sorted_uuids = sorted_uuids.copy()
+reverse_sorted_uuids.reverse()
+found_records = mysql_driver.find_by_fields(
+	table_name=TABLE_NAME,
+	where_props={
+		'uuid': {
+			'in': sorted_uuids
+		}
+	},
+	order_props={
+		'field': 'uuid',
+		'direction': 'desc'
+	}
+)
+ppp('found records by 2 uuids:', found_records)
+found_uuids = [ x['uuid'] for x in found_records ]
 t.should_be_equal(
-	expected=insert_attribution,
-	actual=found_record['attribution']
+	expected=reverse_sorted_uuids,
+	actual=found_uuids
+)
+# test 'find_by_fields' with random order
+found_records = mysql_driver.find_by_fields(
+	table_name=TABLE_NAME,
+	where_props={},
+	order_props={
+		'random': True
+	},
+	limit=3
+)
+ppp('found records by random:', found_records)
+all_uuids = [ insert_uuid_1, insert_uuid_2, insert_uuid_3, insert_uuid_4 ]
+found_uuids = [ x['uuid'] for x in found_records ]
+t.should_be_equal(
+	expected=[ True, True, True ],
+	actual=[ (x in all_uuids) for x in found_uuids ]
 )
 
 
@@ -256,7 +287,7 @@ update_res = mysql_driver.update_by_fields(
 		'message': new_insert_message
 	},
 	where_props={
-		'uuid': insert_uuid
+		'uuid': insert_uuid_1
 	}
 )
 ppp(
@@ -277,7 +308,7 @@ t.should_be_equal(
 rows_deleted = mysql_driver.delete_by_fields(
 	table_name=TABLE_NAME,
 	where_props={
-		'uuid': insert_uuid
+		'uuid': insert_uuid_1
 	}
 )
 ppp('rows deleted: {0}'.format(rows_deleted))
