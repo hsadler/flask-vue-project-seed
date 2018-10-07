@@ -2,6 +2,7 @@
 
 // CACH DRIVER (redis driver)
 	- add docstrings to new methods
+	- pass in datastore information (dependency injection)
 	X batch sets
 	X batch gets
 	X batch deletes
@@ -9,7 +10,13 @@
 
 // DB DRIVER (mysql driver)
 	- add docstrings to new methods
-	- order by, ascending and descending
+	- pass in datastore information (dependency injection)
+	- order by, ascending and descending:
+		- sample order_props:
+			{
+				'field': 'col_name',
+				'direction': 'asc'|'ascending'|'desc'|'descending'
+			}
 	- transactions
 	- type checking, type consistency
 

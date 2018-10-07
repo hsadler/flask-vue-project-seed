@@ -23,10 +23,10 @@ def create_uuid():
 	return uuid.uuid4().hex
 
 
-######## TEST WHERE CLAUSE BUILDER ########
+######## TEST 'WHERE' CLAUSE BUILDER ########
 
 
-where_clause, where_vals = mysql_driver.construct_where_clause(where_props={
+where_clause, where_vals = MySqlDriver.construct_where_clause(where_props={
 	'id': 1,
 	'name': {
 		'like': '%Sh%'
@@ -52,6 +52,60 @@ AND `maiden_name` IS %s"
 t.should_be_equal(
 	expected=expected_where_clause,
 	actual=where_clause
+)
+
+
+######## TEST 'ORDER BY' CLAUSE BUILDER ########
+
+
+order_by_field = 'uuid'
+order_by_direction = 'descending'
+order_by_clause = MySqlDriver.construct_order_by_clause(
+	field=order_by_field,
+	direction=order_by_direction
+)
+ppp('order by uuid descending clause:', order_by_clause)
+t.should_be_equal(
+	expected='ORDER BY {} {}'.format(order_by_field, 'DESC'),
+	actual=order_by_clause
+)
+
+order_by_field = 'name'
+order_by_direction = None
+order_by_clause = MySqlDriver.construct_order_by_clause(
+	field=order_by_field,
+	direction=order_by_direction
+)
+ppp('order by name default order clause:', order_by_clause)
+t.should_be_equal(
+	expected='ORDER BY {}'.format(order_by_field),
+	actual=order_by_clause
+)
+
+order_by_field = 'name'
+order_by_direction = 'does not exist'
+order_by_clause = MySqlDriver.construct_order_by_clause(
+	field=order_by_field,
+	direction=order_by_direction
+)
+ppp('order by name bad direction input clause:', order_by_clause)
+t.should_be_equal(
+	expected='ORDER BY {}'.format(order_by_field),
+	actual=order_by_clause
+)
+
+order_by_field = 'name'
+order_by_direction = 'whatever'
+order_by_random = True
+order_by_clause = MySqlDriver.construct_order_by_clause(
+	field=order_by_field,
+	direction=order_by_direction,
+	random=True
+)
+ppp('order by random clause:', order_by_clause)
+t.should_be_equal(
+	expected='ORDER BY RAND()',
+	actual=order_by_clause
 )
 
 
@@ -86,23 +140,23 @@ ppp('result of create table query:', query_result)
 
 
 # test insert
-insert_uuid = create_uuid()
-insert_message = 'hello!'
-insert_attribution = 'bot'
+insert_uuid_1 = create_uuid()
+insert_message_1 = 'hello!'
+insert_attribution_1 = 'bot'
 inserted_record_dict = mysql_driver.insert(
 	table_name=TABLE_NAME,
 	value_props={
-		'uuid': insert_uuid,
-		'message': insert_message,
-		'attribution': insert_attribution
+		'uuid': insert_uuid_1,
+		'message': insert_message_1,
+		'attribution': insert_attribution_1
 	}
 )
-
+ppp('inserted records dict:', inserted_record_dict)
 t.should_be_equal(
 	expected={
-		'uuid': insert_uuid,
-		'insert_message': insert_message,
-		'insert_attribution': insert_attribution
+		'uuid': insert_uuid_1,
+		'insert_message': insert_message_1,
+		'insert_attribution': insert_attribution_1
 	},
 	actual={
 		'uuid': inserted_record_dict['uuid'],
@@ -116,14 +170,74 @@ t.should_be_equal(
 found_records = mysql_driver.find_by_fields(
 	table_name=TABLE_NAME,
 	where_props={
-		'uuid': insert_uuid
+		'uuid': insert_uuid_1
 	},
 	limit=1
 )
 found_record = found_records[0]
-
 ppp('found record:', found_record)
+t.should_be_equal(
+	expected=insert_message_1,
+	actual=found_record['message']
+)
+t.should_be_equal(
+	expected=insert_attribution_1,
+	actual=found_record['attribution']
+)
 
+# do a bunch of inserts
+insert_uuid_2 = create_uuid()
+insert_message_2 = 'im a message'
+insert_attribution_2 = 'jimmy'
+inserted_record_dict = mysql_driver.insert(
+	table_name=TABLE_NAME,
+	value_props={
+		'uuid': insert_uuid_2,
+		'message': insert_message_2,
+		'attribution': insert_attribution_2
+	}
+)
+insert_uuid_3 = create_uuid()
+insert_message_3 = 'anyone home?'
+insert_attribution_3 = 'questioner man'
+inserted_record_dict = mysql_driver.insert(
+	table_name=TABLE_NAME,
+	value_props={
+		'uuid': insert_uuid_3,
+		'message': insert_message_3,
+		'attribution': insert_attribution_3
+	}
+)
+insert_uuid_4 = create_uuid()
+insert_message_4 = 'get off my lawn'
+insert_attribution_4 = 'soldier76'
+inserted_record_dict = mysql_driver.insert(
+	table_name=TABLE_NAME,
+	value_props={
+		'uuid': insert_uuid_4,
+		'message': insert_message_4,
+		'attribution': insert_attribution_4
+	}
+)
+
+# TODO: more thorough testing of the 'find_by_fields' method
+	# - test complex where_props
+	# - test order by
+	# - test random
+sorted_uuids = [insert_uuid_1, insert_uuid_2]
+sorted_uuids.sort()
+found_records = mysql_driver.find_by_fields(
+	table_name=TABLE_NAME,
+	where_props={
+		'uuid': {
+			'in': sorted_uuids
+		}
+	},
+	order_props={
+		'field': 'uuid'
+	}
+)
+ppp('found records by 2 uuids:', found_records)
 t.should_be_equal(
 	expected=insert_message,
 	actual=found_record['message']
@@ -145,12 +259,10 @@ update_res = mysql_driver.update_by_fields(
 		'uuid': insert_uuid
 	}
 )
-
 ppp(
 	'rows affected: {0}'.format(update_res['rows_affected']),
 	'updated_ts: {0}'.format(update_res['updated_ts'])
 )
-
 t.should_be_equal(
 	expected=1,
 	actual=update_res['rows_affected']
@@ -168,9 +280,7 @@ rows_deleted = mysql_driver.delete_by_fields(
 		'uuid': insert_uuid
 	}
 )
-
 ppp('rows deleted: {0}'.format(rows_deleted))
-
 t.should_be_equal(
 	expected=1,
 	actual=rows_deleted
@@ -328,7 +438,6 @@ select_query_result = mysql_driver.query_bind(
 	query_string=select_query,
 	bind_vars=bind_vars
 )
-
 ppp('result of select query:', select_query_result)
 
 

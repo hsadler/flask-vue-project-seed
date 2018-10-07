@@ -15,7 +15,8 @@ class MySqlDriver(BaseDatabaseDriver):
 
 	TODO:
 		- add docstrings to new methods
-		- order by, ascending and descending
+		X order by, ascending and descending ('find_by_fields' method)
+		- pass in datastore information (dependency injection)
 		- transactions
 		- type checking, type consistency
 
@@ -152,7 +153,13 @@ class MySqlDriver(BaseDatabaseDriver):
 			return records[0]
 
 
-	def find_by_fields(self, table_name, where_props={}, limit=None):
+	def find_by_fields(
+		self,
+		table_name,
+		where_props={},
+		order_props={},
+		limit=None
+	):
 		"""
 		MySQL driver interface method for finding records by conditionals.
 
@@ -183,6 +190,22 @@ class MySqlDriver(BaseDatabaseDriver):
 			)
 			query_stmt_components.append(where_component)
 			where_values = tuple(where_values)
+
+		# add ORDER BY query component
+		if 'field' in order_props:
+			field = order_props['field']
+			direction = (
+				order_props['direction']
+				if 'direction' in order_props else None
+			)
+			order_by_component = self.construct_order_by_clause(
+				field=field,
+				direction=direction
+			)
+			query_stmt_components.append(order_by_component)
+		elif 'random' in order_props and order_props['random'] == True:
+			order_by_component = self.construct_order_by_clause(random=True)
+			query_stmt_components.append(order_by_component)
 
 		# add LIMIT query component
 		if(limit is not None and int(limit) > 0):
@@ -449,6 +472,41 @@ class MySqlDriver(BaseDatabaseDriver):
 
 
 	@classmethod
+	def construct_order_by_clause(
+		cls,
+		field=None,
+		direction=None,
+		random=False
+	):
+		"""
+		'ORDER BY' clause string builder.
+
+		"""
+
+		if random:
+			return 'ORDER BY RAND()'
+
+		order_by_component = 'ORDER BY {0}'.format(
+			cls.escape(str(field))
+		)
+		direction_map = {
+			'asc': 'ASC',
+			'ascending': 'ASC',
+			'desc': 'DESC',
+			'descending': 'DESC'
+		}
+		if(
+			direction is not None and
+			direction in direction_map
+		):
+			order_by_component = "{0} {1}".format(
+				order_by_component,
+				direction_map[direction]
+			)
+		return order_by_component
+
+
+	@classmethod
 	def construct_where_clause(cls, where_props={}):
 		"""
 		'WHERE' clause string builder with parameter bindings.
@@ -467,8 +525,10 @@ class MySqlDriver(BaseDatabaseDriver):
 						)
 						where_strings.append(s)
 						where_values.append(cond_val)
-					elif cond_key in cls.WHERE_IN_MAP and \
-					type(cond_val) is list:
+					elif(
+						cond_key in cls.WHERE_IN_MAP and
+						type(cond_val) is list
+					):
 						s = '`{0}` {1} ({2})'.format(
 							cls.escape(prop_col),
 							cls.WHERE_IN_MAP[cond_key],
