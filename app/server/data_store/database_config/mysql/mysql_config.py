@@ -1,12 +1,12 @@
 
-# Base MySQL Config
+# MySQL Config
 
 import MySQLdb as mdb
 
 
 class MySqlConfig():
 	"""
-	Provides interface for all MySQL database configurations.
+	Singleton base class for all MySQL database configurations.
 
 	"""
 

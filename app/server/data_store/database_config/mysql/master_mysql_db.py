@@ -7,7 +7,7 @@ import config.config as config
 
 class MasterMySqlDB(MySqlConfig):
 	"""
-	Provides interface for all MySQL database configurations.
+	Configuration for the master MySQL database.
 
 	"""
 
