@@ -4,7 +4,7 @@
 import MySQLdb as mdb
 
 
-class BaseMySqlConfig():
+class MySqlConfig():
 	"""
 	Provides interface for all MySQL database configurations.
 

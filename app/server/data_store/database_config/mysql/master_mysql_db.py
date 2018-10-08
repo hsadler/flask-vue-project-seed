@@ -1,10 +1,11 @@
 
 # Master MySQL Database Configuration
 
+from data_store.database_config.mysql.mysql_config import MySqlConfig
 import config.config as config
 
 
-class MasterMySqlDB(BaseMySqlConfig):
+class MasterMySqlDB(MySqlConfig):
 	"""
 	Provides interface for all MySQL database configurations.
 
