@@ -11,7 +11,7 @@
 // DB DRIVER (mysql driver)
 	- add docstrings to new methods
 	- pass in datastore information (dependency injection)
-	- order by, ascending and descending:
+	X order by, ascending and descending:
 		- sample order_props:
 			{
 				'field': 'col_name',

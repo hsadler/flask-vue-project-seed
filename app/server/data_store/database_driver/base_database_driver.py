@@ -7,6 +7,7 @@ from abc import ABCMeta, abstractmethod
 class BaseDatabaseDriver(metaclass=ABCMeta):
 	"""
 	Provides interface for all proper database drivers.
+
 	"""
 
 
