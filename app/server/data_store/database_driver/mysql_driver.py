@@ -58,30 +58,16 @@ class MySqlDriver(BaseDatabaseDriver):
 	}
 
 
-	def __init__(self, database_name):
+	def __init__(self, db_config):
 		"""
-		MySQL driver instance constructor.
-
-		Sets database name and configures the MySQL server connection and
-		cursor.
+		MySQL driver instance constructor. Accepts MySQL database configuration.
 
 		Args:
-			database_name (str): Name of MySQL database.
+			db_config (MySqlConfig): MySQL database configuration object.
 
 		"""
 
-		self.database_name = self.escape(database_name)
-		self.conn = mdb.connect(
-			host=config.MYSQL_HOST,
-			user=config.MYSQL_USER,
-			passwd=config.MYSQL_PASSWORD,
-			db=database_name
-		)
-		self.cur = self.conn.cursor(mdb.cursors.DictCursor)
-		self.conn.set_character_set('utf8')
-		self.cur.execute('SET NAMES utf8;')
-		self.cur.execute('SET CHARACTER SET utf8;')
-		self.cur.execute('SET character_set_connection=utf8;')
+		self.db = db_config
 
 
 	########## CRUD INTERFACE METHODS ##########
@@ -135,10 +121,10 @@ class MySqlDriver(BaseDatabaseDriver):
 		)
 
 		# commit the insert to the table
-		with self.conn:
-			insert_count = self.cur.execute(query_stmt, tuple(values))
-			self.conn.commit()
-			if self.cur.rowcount == 1:
+		with self.db.conn:
+			insert_count = self.db.cur.execute(query_stmt, tuple(values))
+			self.db.conn.commit()
+			if self.db.cur.rowcount == 1:
 				return value_props
 			else:
 				return None
@@ -216,12 +202,12 @@ class MySqlDriver(BaseDatabaseDriver):
 		query_stmt = ' '.join(query_stmt_components) + ';'
 
 		# execute the query and return the results
-		with self.conn:
+		with self.db.conn:
 			if where_values is not None:
-				self.cur.execute(query_stmt, where_values)
+				self.db.cur.execute(query_stmt, where_values)
 			else:
-				self.cur.execute(query_stmt)
-			return self.cur.fetchall()
+				self.db.cur.execute(query_stmt)
+			return self.db.cur.fetchall()
 
 
 	def update_by_uuid(self, table_name, uuid, value_props={}):
@@ -308,10 +294,10 @@ class MySqlDriver(BaseDatabaseDriver):
 		query_stmt = ' '.join(query_stmt_components) + ';'
 
 		# commit the update to the datastore
-		with self.conn:
-			self.cur.execute(query_stmt, tuple(set_values + where_values))
+		with self.db.conn:
+			self.db.cur.execute(query_stmt, tuple(set_values + where_values))
 			res[self.RECORD_UPDATED_TS_COLUMN] = current_timestamp
-			res['rows_affected'] = self.cur.rowcount
+			res['rows_affected'] = self.db.cur.rowcount
 			return res
 
 
@@ -364,9 +350,9 @@ class MySqlDriver(BaseDatabaseDriver):
 		query_stmt = ' '.join(query_stmt_components) + ';'
 
 		# execute the query and return the number of deleted records
-		with self.conn:
-			self.cur.execute(query_stmt, tuple(where_values))
-			return self.cur.rowcount
+		with self.db.conn:
+			self.db.cur.execute(query_stmt, tuple(where_values))
+			return self.db.cur.rowcount
 
 
 	########## MYSQL SPECIFIC METHODS ##########
@@ -396,8 +382,8 @@ class MySqlDriver(BaseDatabaseDriver):
 					bind_str,
 					'%({0})s'.format(key)
 				)
-		self.cur.execute(query_string, bind_vars)
-		return self.cur.fetchall()
+		self.db.cur.execute(query_string, bind_vars)
+		return self.db.cur.fetchall()
 
 
 	########## TABLE UTILITIES ##########
@@ -407,9 +393,9 @@ class MySqlDriver(BaseDatabaseDriver):
 		query_stmt = "DESC {};".format(
 			self.escape(table_name)
 		)
-		with self.conn:
-			self.cur.execute(query_stmt)
-		return self.cur.fetchall()
+		with self.db.conn:
+			self.db.cur.execute(query_stmt)
+		return self.db.cur.fetchall()
 
 
 	def get_table_field_names(self, table_name):
@@ -429,10 +415,10 @@ class MySqlDriver(BaseDatabaseDriver):
 			FROM information_schema.TABLES
 			WHERE table_schema = "{}"
 			ORDER BY (data_length + index_length) DESC;
-		""".format(self.database_name)
-		with self.conn:
-			self.cur.execute(query_stmt)
-		return self.cur.fetchall()
+		""".format(self.db.database)
+		with self.db.conn:
+			self.db.cur.execute(query_stmt)
+		return self.db.cur.fetchall()
 
 
 	########## SQL UTILITIES ##########

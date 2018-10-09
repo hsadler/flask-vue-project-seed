@@ -12,7 +12,7 @@ class BaseDatabaseDriver(metaclass=ABCMeta):
 
 
 	@abstractmethod
-	def __init__(self, database_name):
+	def __init__(self, db_config):
 		pass
 
 
