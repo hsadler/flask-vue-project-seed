@@ -1,8 +1,8 @@
 
-import uuid
 import sys
 sys.path.append('..')
 
+import uuid
 import config.config as config
 from data_store.database_driver.mysql_driver import MySqlDriver
 from testie import Testie

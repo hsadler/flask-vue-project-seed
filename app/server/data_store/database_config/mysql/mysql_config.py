@@ -10,11 +10,12 @@ class MySqlConfig():
 
 	"""
 
+
 	instance = None
 
 
 	def __init__(self, host, user, password, database):
-		self.database_name = self.escape(database)
+		self.database = mdb.escape_string(database).decode('utf-8')
 		self.conn = mdb.connect(
 			host=host,
 			user=user,
