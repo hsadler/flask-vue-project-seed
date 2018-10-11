@@ -10,7 +10,6 @@ class MySqlConfig():
 
 	"""
 
-
 	instance = None
 
 

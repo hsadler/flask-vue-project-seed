@@ -5,15 +5,14 @@ sys.path.append('..')
 import uuid
 import config.config as config
 from data_store.database_driver.mysql_driver import MySqlDriver
+from data_store.database_config.mysql.master_mysql_db import MasterMySqlDB
 from testie import Testie
 from utils.print import ppp
 
 
 t = Testie()
 
-mysql_driver = MySqlDriver(
-	database_name=config.MYSQL_DB_NAME
-)
+mysql_driver = MySqlDriver(db_config=MasterMySqlDB.get_instance())
 
 
 ######## HELPER FUNCTIONS ########

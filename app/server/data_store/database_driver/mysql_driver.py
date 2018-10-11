@@ -16,7 +16,7 @@ class MySqlDriver(BaseDatabaseDriver):
 	TODO:
 		- add docstrings to new methods
 		X order by, ascending and descending ('find_by_fields' method)
-		- pass in datastore information (dependency injection)
+		X pass in datastore information (dependency injection)
 		- transactions
 		- type checking, type consistency
 
