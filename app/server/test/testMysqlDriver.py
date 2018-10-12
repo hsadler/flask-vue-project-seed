@@ -165,7 +165,7 @@ t.should_be_equal(
 )
 
 
-# test find
+# test find_by_fields
 found_records = mysql_driver.find_by_fields(
 	table_name=TABLE_NAME,
 	where_props={
@@ -278,7 +278,19 @@ t.should_be_equal(
 )
 
 
-# test update
+# test find_by_uuid
+found_record = mysql_driver.find_by_uuid(
+	table_name=TABLE_NAME,
+	uuid=insert_uuid_1
+)
+ppp('found record uuid:', found_record)
+t.should_be_equal(
+	expected=insert_uuid_1,
+	actual=found_record['uuid']
+)
+
+
+# test update_by_fields
 new_insert_message = 'hello2!'
 update_res = mysql_driver.update_by_fields(
 	table_name=TABLE_NAME,
@@ -303,12 +315,47 @@ t.should_be_equal(
 )
 
 
-# test delete
+# test update_by_uuid
+new_insert_message = 'hello3!'
+update_res = mysql_driver.update_by_uuid(
+	table_name=TABLE_NAME,
+	uuid=insert_uuid_2,
+	value_props={
+		'message': new_insert_message
+	}
+)
+ppp(
+	'rows affected: {0}'.format(update_res['rows_affected']),
+	'updated_ts: {0}'.format(update_res['updated_ts'])
+)
+t.should_be_equal(
+	expected=1,
+	actual=update_res['rows_affected']
+)
+t.should_be_equal(
+	expected=int,
+	actual=type(update_res['updated_ts'])
+)
+
+
+# test delete_by_fields
 rows_deleted = mysql_driver.delete_by_fields(
 	table_name=TABLE_NAME,
 	where_props={
 		'uuid': insert_uuid_1
 	}
+)
+ppp('rows deleted: {0}'.format(rows_deleted))
+t.should_be_equal(
+	expected=1,
+	actual=rows_deleted
+)
+
+
+# test delete_by_uuid
+rows_deleted = mysql_driver.delete_by_uuid(
+	table_name=TABLE_NAME,
+	uuid=insert_uuid_2
 )
 ppp('rows deleted: {0}'.format(rows_deleted))
 t.should_be_equal(
