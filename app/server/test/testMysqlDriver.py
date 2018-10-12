@@ -471,6 +471,29 @@ select_query_result = mysql_driver.query_bind(
 ppp('result of select query:', select_query_result)
 
 
+######## TEST SECOND DRIVER INSTANTIATION ########
+
+
+# test db instances are equal
+mysql_driver2 = MySqlDriver(db_config=MasterMySqlDB.get_instance())
+t.should_be_equal(
+	expected=True,
+	actual=mysql_driver.db == mysql_driver2.db
+)
+found_records = mysql_driver2.find_by_fields(
+	table_name=TABLE_NAME,
+	where_props={
+		'uuid': insert_uuid
+	}
+)
+found_record = found_records[0]
+ppp('found record by uuid with second driver instance:', found_record)
+t.should_be_equal(
+	expected=insert_uuid,
+	actual=found_record['uuid']
+)
+
+
 ######## TEST TABLE UTILS ########
 
 

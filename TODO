@@ -10,6 +10,7 @@
 
 // DB DRIVER (mysql driver)
 	- add docstrings to new methods
+	- add tests for 'by_uuid' methods
 	X pass in datastore information (dependency injection)
 	X order by, ascending and descending:
 		- sample order_props:
