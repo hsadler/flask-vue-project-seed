@@ -10,5 +10,5 @@ MASTER_MYSQL_DB_NAME = 'flask_vue_project_seed'
 
 
 # Redis Cache
-REDIS_HOST = 'redis'
-REDIS_PORT = 6379
+MASTER_REDIS_HOST = 'redis'
+MASTER_REDIS_PORT = 6379

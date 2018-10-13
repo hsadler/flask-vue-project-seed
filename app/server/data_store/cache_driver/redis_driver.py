@@ -19,17 +19,14 @@ class RedisDriver(BaseCacheDriver):
 	"""
 
 
-	def __init__(self):
+	def __init__(self, cache_config):
 		"""
 		Redis driver instance constructor. Configures the Redis connection with
 		host and port.
 
 		"""
 
-		self.r = redis.StrictRedis(
-			host=config.REDIS_HOST,
-			port=config.REDIS_PORT
-		)
+		self.r =
 
 
 	########## CRUD INTERFACE METHODS ##########
