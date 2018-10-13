@@ -4,13 +4,14 @@ import sys
 sys.path.append('..')
 
 from data_store.cache_driver.redis_driver import RedisDriver
+from data_store.cache_config.redis.master_redis_cache import MasterRedisCache
 from testie import Testie
 from utils.print import ppp
 
 
 t = Testie()
 
-redis_driver = RedisDriver()
+redis_driver = RedisDriver(cache_config=MasterRedisCache.get_instance())
 
 
 ######## TEST INTERFACE ########

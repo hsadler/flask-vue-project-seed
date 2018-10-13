@@ -15,6 +15,7 @@ class RedisDriver(BaseCacheDriver):
 
 	TODO:
 		- add docstrings to new methods
+		X add dependency injected cache config
 
 	"""
 
@@ -26,7 +27,7 @@ class RedisDriver(BaseCacheDriver):
 
 		"""
 
-		self.r =
+		self.cache = cache_config
 
 
 	########## CRUD INTERFACE METHODS ##########
@@ -46,7 +47,7 @@ class RedisDriver(BaseCacheDriver):
 
 		"""
 
-		pipe = self.r.pipeline()
+		pipe = self.cache.r.pipeline()
 		keys = []
 		values = []
 		result = {}
@@ -94,9 +95,9 @@ class RedisDriver(BaseCacheDriver):
 
 		serialized_value = self.serialize(value)
 		if ttl is not None:
-			return self.r.set(key, serialized_value, ex=ttl)
+			return self.cache.r.set(key, serialized_value, ex=ttl)
 		else:
-			return self.r.set(key, serialized_value)
+			return self.cache.r.set(key, serialized_value)
 
 
 	def batch_get(self, keys=[]):
@@ -112,7 +113,7 @@ class RedisDriver(BaseCacheDriver):
 
 		"""
 
-		pipe = self.r.pipeline()
+		pipe = self.cache.r.pipeline()
 
 		for key in keys:
 			pipe.get(key)
@@ -143,7 +144,7 @@ class RedisDriver(BaseCacheDriver):
 
 		"""
 
-		serialized_value = self.r.get(key)
+		serialized_value = self.cache.r.get(key)
 		if serialized_value is not None:
 			value = self.deserialize(serialized_value)
 			return value
@@ -164,7 +165,7 @@ class RedisDriver(BaseCacheDriver):
 
 		"""
 
-		pipe = self.r.pipeline()
+		pipe = self.cache.r.pipeline()
 
 		for key in keys:
 			pipe.delete(key)
@@ -190,7 +191,7 @@ class RedisDriver(BaseCacheDriver):
 
 		"""
 
-		return self.r.delete(key)
+		return self.cache.r.delete(key)
 
 
 	########## UTILITY INTERFACE METHODS ##########
@@ -218,7 +219,7 @@ class RedisDriver(BaseCacheDriver):
 
 		"""
 
-		return [ str(x, 'utf-8') for x in self.r.keys() ]
+		return [ str(x, 'utf-8') for x in self.cache.r.keys() ]
 
 
 
