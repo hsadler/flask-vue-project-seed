@@ -78,15 +78,10 @@ class BaseDataObject(metaclass=ABCMeta):
 		# set new_record attribute
 		self.new_record = new_record
 
-		# set database driver and cache driver if exists otherwise, retrieve
-		# from defaults set on subclass
-		self.db_driver = (
-			db_driver if db_driver is not None
-			else self.DEFAULT_DB_DRIVER
-		)
-		self.cache_driver = (
-			cache_driver if cache_driver is not None
-			else self.DEFAULT_CACHE_DRIVER
+		# set database driver and cache driver
+		self.db_driver, self.cache_driver = self.get_drivers(
+			db_driver=db_driver,
+			cache_driver=cache_driver
 		)
 
 
@@ -129,8 +124,8 @@ class BaseDataObject(metaclass=ABCMeta):
 		cls,
 		prop_dict={},
 		limit=None,
-		db_driver_class=None,
-		cache_driver_class=None,
+		db_driver=None,
+		cache_driver=None,
 		cache_ttl=None
 	):
 		"""
@@ -140,8 +135,8 @@ class BaseDataObject(metaclass=ABCMeta):
 		Args:
 			prop_dict (dict): Dictionary of propery name to values.
 			limit (int): Limit lenth of returned data object list.
-			db_driver_class (class): Database driver class.
-			cache_driver_class (class): Cache driver class.
+			db_driver (object): Database driver.
+			cache_driver (object): Cache driver.
 			cache_ttl (int): Cache time-to-live in seconds.
 
 		Returns:
@@ -150,8 +145,8 @@ class BaseDataObject(metaclass=ABCMeta):
 		"""
 
 		db_driver, cache_driver = cls.get_drivers(
-			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class
+			db_driver=db_driver,
+			cache_driver=cache_driver
 		)
 
 		# only check cache if finding solely by single uuid
@@ -163,8 +158,8 @@ class BaseDataObject(metaclass=ABCMeta):
 		):
 			instance = cls.load_from_cache_by_uuid(
 				uuid=prop_dict[cls.UUID_PROPERTY],
-				db_driver_class=db_driver_class,
-				cache_driver_class=cache_driver_class
+				db_driver=db_driver,
+				cache_driver=cache_driver
 			)
 			if instance is not None:
 				return [instance]
@@ -179,8 +174,8 @@ class BaseDataObject(metaclass=ABCMeta):
 		# deserialize records to instances
 		instances = cls.load_database_records(
 			records=records,
-			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class,
+			db_driver=db_driver,
+			cache_driver=cache_driver,
 			records_are_new=False
 		)
 
@@ -188,8 +183,8 @@ class BaseDataObject(metaclass=ABCMeta):
 		if len(instances) > 0:
 			cls.set_batch_to_cache(
 				dataobjects=instances,
-				db_driver_class=db_driver_class,
-				cache_driver_class=cache_driver_class,
+				db_driver=db_driver,
+				cache_driver=cache_driver,
 				ttl=cache_ttl
 			)
 
@@ -200,8 +195,8 @@ class BaseDataObject(metaclass=ABCMeta):
 	def find_one(
 		cls,
 		prop_dict={},
-		db_driver_class=None,
-		cache_driver_class=None,
+		db_driver=None,
+		cache_driver=None,
 		cache_ttl=None
 	):
 		"""
@@ -210,8 +205,8 @@ class BaseDataObject(metaclass=ABCMeta):
 
 		Args:
 			prop_dict (dict): Dictionary of propery name to values.
-			db_driver_class (class): Database driver class.
-			cache_driver_class (class): Cache driver class.
+			db_driver (object): Database driver.
+			cache_driver (object): Cache driver.
 			cache_ttl (int): Cache time-to-live in seconds.
 
 		Returns:
@@ -222,8 +217,8 @@ class BaseDataObject(metaclass=ABCMeta):
 		instance_list = cls.find_many(
 			prop_dict=prop_dict,
 			limit=1,
-			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class,
+			db_driver=db_driver,
+			cache_driver=cache_driver,
 			cache_ttl=cache_ttl
 		)
 
@@ -237,22 +232,22 @@ class BaseDataObject(metaclass=ABCMeta):
 	def find_by_uuids(
 		cls,
 		uuids=[],
-		db_driver_class=None,
-		cache_driver_class=None,
+		db_driver=None,
+		cache_driver=None,
 		cache_ttl=None
 	):
 
 		# get drivers
 		db_driver, cache_driver = cls.get_drivers(
-			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class
+			db_driver=db_driver,
+			cache_driver=cache_driver
 		)
 
 		# batch query cache
 		instances_dict = cls.load_from_cache_by_uuids(
 			uuids=uuids,
-			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class
+			db_driver=db_driver,
+			cache_driver=cache_driver
 		)
 
 		# get keys not found in cache
@@ -265,8 +260,8 @@ class BaseDataObject(metaclass=ABCMeta):
 		if len(uuids_not_found_in_cache) > 0:
 			uuids_to_instances = cls.load_from_database_by_uuids(
 				uuids=uuids_not_found_in_cache,
-				db_driver_class=db_driver_class,
-				cache_driver_class=cache_driver_class
+				db_driver=db_driver,
+				cache_driver=cache_driver
 			)
 			# add found database record instances to the aggregate
 			for key, val in uuids_to_instances.items():
@@ -279,8 +274,8 @@ class BaseDataObject(metaclass=ABCMeta):
 			]
 			cls.set_batch_to_cache(
 				dataobjects=instances_to_be_cached,
-				db_driver_class=db_driver_class,
-				cache_driver_class=cache_driver_class,
+				db_driver=db_driver,
+				cache_driver=cache_driver,
 				ttl=cache_ttl
 			)
 
@@ -293,8 +288,8 @@ class BaseDataObject(metaclass=ABCMeta):
 	def find_by_uuid(
 		cls,
 		uuid,
-		db_driver_class=None,
-		cache_driver_class=None,
+		db_driver=None,
+		cache_driver=None,
 		cache_ttl=None
 	):
 		prop_dict = {
@@ -302,8 +297,8 @@ class BaseDataObject(metaclass=ABCMeta):
 		}
 		return cls.find_one(
 			prop_dict=prop_dict,
-			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class,
+			db_driver=db_driver,
+			cache_driver=cache_driver,
 			cache_ttl=cache_ttl
 		)
 
@@ -480,8 +475,8 @@ class BaseDataObject(metaclass=ABCMeta):
 	def load_database_records(
 		cls,
 		records,
-		db_driver_class,
-		cache_driver_class,
+		db_driver,
+		cache_driver,
 		records_are_new=False
 	):
 		instances = []
@@ -495,8 +490,8 @@ class BaseDataObject(metaclass=ABCMeta):
 					prop_dict[prop] = val
 			instance = cls(
 				prop_dict=prop_dict,
-				db_driver_class=db_driver_class,
-				cache_driver_class=cache_driver_class,
+				db_driver=db_driver,
+				cache_driver=cache_driver,
 				metadata_dict=metadata_dict,
 				new_record=records_are_new
 			)
@@ -505,27 +500,17 @@ class BaseDataObject(metaclass=ABCMeta):
 
 
 	@classmethod
-	def get_drivers(cls, db_driver_class=None, cache_driver_class=None):
-
-		db_driver_class = db_driver_class \
-		if db_driver_class is not None \
-		else cls.DEFAULT_DB_DRIVER_CLASS
-
-		cache_driver_class = cache_driver_class \
-		if cache_driver_class is not None \
-		else cls.DEFAULT_CACHE_DRIVER_CLASS
-
-		db_driver = None
-		cache_driver = None
-
-		if db_driver_class is not None:
-			db_driver = db_driver_class(
-				database_name=config.MYSQL_DB_NAME
-			)
-
-		if cache_driver_class is not None:
-			cache_driver = cache_driver_class()
-
+	def get_drivers(cls, db_driver=None, cache_driver=None):
+		# return drivers if they exist otherwise, retrieve from defaults set on
+		# subclass
+		db_driver = (
+			db_driver if db_driver is not None
+			else cls.DEFAULT_DB_DRIVER
+		)
+		cache_driver = (
+			cache_driver if cache_driver is not None
+			else cls.DEFAULT_CACHE_DRIVER
+		)
 		return db_driver, cache_driver
 
 
@@ -533,14 +518,14 @@ class BaseDataObject(metaclass=ABCMeta):
 	def load_from_database_by_uuids(
 		cls,
 		uuids,
-		db_driver_class,
-		cache_driver_class
+		db_driver,
+		cache_driver
 	):
 
 		# get drivers
 		db_driver, cache_driver = cls.get_drivers(
-			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class
+			db_driver=db_driver,
+			cache_driver=cache_driver
 		)
 
 		# query for records from the database
@@ -557,8 +542,8 @@ class BaseDataObject(metaclass=ABCMeta):
 		# load instances from records
 		instances = cls.load_database_records(
 			records=records,
-			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class,
+			db_driver=db_driver,
+			cache_driver=cache_driver,
 			records_are_new=False
 		)
 
@@ -580,13 +565,13 @@ class BaseDataObject(metaclass=ABCMeta):
 	def load_from_database_by_uuid(
 		cls,
 		uuid,
-		db_driver_class,
-		cache_driver_class
+		db_driver,
+		cache_driver
 	):
 		uuids_to_instances = cls.load_from_database_by_uuids(
 			uuids=[uuid],
-			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class
+			db_driver=db_driver,
+			cache_driver=cache_driver
 		)
 		if uuid in uuids_to_instances:
 			return uuids_to_instances[uuid]
@@ -620,13 +605,13 @@ class BaseDataObject(metaclass=ABCMeta):
 	def set_batch_to_cache(
 		cls,
 		dataobjects,
-		db_driver_class,
-		cache_driver_class,
+		db_driver,
+		cache_driver,
 		ttl=None,
 	):
 		db_driver, cache_driver = cls.get_drivers(
-			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class
+			db_driver=db_driver,
+			cache_driver=cache_driver
 		)
 		cache_key_to_value = {}
 		cache_key_to_uuid = {}
@@ -662,12 +647,12 @@ class BaseDataObject(metaclass=ABCMeta):
 	def delete_batch_from_cache(
 		cls,
 		dataobjects,
-		db_driver_class,
-		cache_driver_class
+		db_driver,
+		cache_driver
 	):
 		db_driver, cache_driver = cls.get_drivers(
-			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class
+			db_driver=db_driver,
+			cache_driver=cache_driver
 		)
 		cache_keys = []
 		cache_key_to_uuid = {}
@@ -689,12 +674,12 @@ class BaseDataObject(metaclass=ABCMeta):
 	def load_from_cache_by_uuids(
 		cls,
 		uuids,
-		db_driver_class,
-		cache_driver_class
+		db_driver,
+		cache_driver
 	):
 		db_driver, cache_driver = cls.get_drivers(
-			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class
+			db_driver=db_driver,
+			cache_driver=cache_driver
 		)
 		cache_keys_to_uuids = {
 			cls.construct_cache_key(uuid=uuid): uuid
@@ -705,8 +690,8 @@ class BaseDataObject(metaclass=ABCMeta):
 		uuids_to_instances = {
 			cache_keys_to_uuids[cache_key]: cls.__deserialize_value_from_cache(
 				cache_value=cache_value,
-				db_driver_class=db_driver_class,
-				cache_driver_class=cache_driver_class
+				db_driver=db_driver,
+				cache_driver=cache_driver
 			)
 			if cache_value is not None else None
 			for cache_key, cache_value
@@ -716,11 +701,11 @@ class BaseDataObject(metaclass=ABCMeta):
 
 
 	@classmethod
-	def load_from_cache_by_uuid(cls, uuid, db_driver_class, cache_driver_class):
+	def load_from_cache_by_uuid(cls, uuid, db_driver, cache_driver):
 		uuids_to_instances = cls.load_from_cache_by_uuids(
 			uuids=[uuid],
-			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class
+			db_driver=db_driver,
+			cache_driver=cache_driver
 		)
 		return uuids_to_instances[uuid]
 
@@ -808,14 +793,14 @@ class BaseDataObject(metaclass=ABCMeta):
 	def __deserialize_values_from_cache(
 		cls,
 		cache_values,
-		db_driver_class,
-		cache_driver_class
+		db_driver,
+		cache_driver
 	):
 		deserialized = [
 			cls(
 				prop_dict=val['properties'],
-				db_driver_class=db_driver_class,
-				cache_driver_class=cache_driver_class,
+				db_driver=db_driver,
+				cache_driver=cache_driver,
 				metadata_dict=val['metadata'],
 				new_record=val['new_record']
 			)
@@ -828,13 +813,13 @@ class BaseDataObject(metaclass=ABCMeta):
 	def __deserialize_value_from_cache(
 		cls,
 		cache_value,
-		db_driver_class,
-		cache_driver_class
+		db_driver,
+		cache_driver
 	):
 		values = cls.__deserialize_values_from_cache(
 			cache_values=[ cache_value ],
-			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class
+			db_driver=db_driver,
+			cache_driver=cache_driver
 		)
 		if len(values) > 0:
 			return values[0]

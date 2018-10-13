@@ -121,7 +121,6 @@ t.should_be_equal(
 	expected=TestUserDataObject,
 	actual=type(test_user_DO)
 )
-sys.exit()
 
 
 # test retrieve single by uuid from 'find_many' method
@@ -150,6 +149,7 @@ t.should_be_equal(
 	expected=True,
 	actual=len(found_test_user_DOs) > 1
 )
+sys.exit()
 
 
 # test retrieve by uuid 'find_one' method
