@@ -166,6 +166,25 @@ t.should_be_equal(
 )
 
 
+######## TEST SECOND INSTANTIATION OF DRIVER ########
+
+
+redis_driver2 = RedisDriver(cache_config=MasterRedisCache.get_instance())
+ppp('redis driver cache 1:', redis_driver.cache)
+ppp('redis driver cache 2:', redis_driver2.cache)
+t.should_be_equal(
+	expected=True,
+	actual=redis_driver.cache == redis_driver2.cache
+)
+cache_key = 'list'
+found_cache_item = redis_driver2.get(key=cache_key)
+ppp('found cache item with redis cache 2:', found_cache_item)
+t.should_be_equal(
+	expected=cache_items[cache_key],
+	actual=found_cache_item
+)
+
+
 ######## TEST REDIS SPECIFIC METHODS ########
 
 
