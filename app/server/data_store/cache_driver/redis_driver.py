@@ -14,7 +14,7 @@ class RedisDriver(BaseCacheDriver):
 	Redis cache driver which implements CRUD and utility public methods.
 
 	TODO:
-		- add docstrings to new methods
+		- add and update docstrings
 		X add dependency injected cache config
 
 	"""

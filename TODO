@@ -1,15 +1,15 @@
 
 
 // CACH DRIVER (redis driver)
-	- add docstrings to new methods
-	- pass in datastore information (dependency injection)
+	- add and update docstrings
+	X pass in datastore information (dependency injection)
 	X batch sets
 	X batch gets
 	X batch deletes
 
 
 // DB DRIVER (mysql driver)
-	- add docstrings to new methods
+	- add and update docstrings
 	X add tests for 'by_uuid' methods
 	X pass in datastore information (dependency injection)
 	X order by, ascending and descending:
@@ -23,8 +23,8 @@
 
 
 // BASE DATA OBJECT
-	- add docstrings to new methods
-	- pass in datastore information (dependency injection)
+	- add and update docstrings
+	- refactor DB driver and cache driver dependency injection
 	- transactions:
 		- two or more dataobjects saves with all or nothing commits to database
 		- implemented at database driver level?

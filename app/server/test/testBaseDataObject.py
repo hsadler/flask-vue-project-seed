@@ -7,6 +7,8 @@ import config.config as config
 from data_object.base_data_object import BaseDataObject
 from data_store.database_driver.mysql_driver import MySqlDriver
 from data_store.cache_driver.redis_driver import RedisDriver
+from data_store.database_config.mysql.master_mysql_db import MasterMySqlDB
+from data_store.cache_config.redis.master_redis_cache import MasterRedisCache
 from testie import Testie
 from utils.print import ppp
 
@@ -15,6 +17,7 @@ from utils.print import ppp
 Test Base Data Object.
 
 TODO:
+	- test new dependency injection of drivers
 	- test all public methods on base data object
 	- add tests for failures
 
@@ -23,9 +26,8 @@ TODO:
 
 t = Testie()
 
-mysql_driver = MySqlDriver(
-	database_name=config.MYSQL_DB_NAME
-)
+mysql_driver = MySqlDriver(db_config=MasterMySqlDB.get_instance())
+redis_driver = RedisDriver(cache_config=MasterRedisCache.get_instance())
 
 TABLE_NAME = 'test_user'
 
@@ -62,9 +64,38 @@ ppp('result of create table query:', query_result)
 
 class TestUserDataObject(BaseDataObject):
 	TABLE_NAME = 'test_user'
-	DEFAULT_DB_DRIVER_CLASS = MySqlDriver
-	DEFAULT_CACHE_DRIVER_CLASS = RedisDriver
+	DEFAULT_DB_DRIVER = MySqlDriver(db_config=MasterMySqlDB.get_instance())
+	DEFAULT_CACHE_DRIVER = RedisDriver(
+		cache_config=MasterRedisCache.get_instance()
+	)
 	DEFAULT_CACHE_TTL = 1
+
+
+######## TEST DATA OBJECT CONSTRUCTOR ########
+
+
+user_data = {
+	'name': 'Ferd',
+	'age': 82,
+	'admin': True
+}
+test_user_DO = TestUserDataObject(
+	prop_dict=user_data,
+	db_driver=mysql_driver,
+	cache_driver=redis_driver,
+	metadata_dict={},
+	new_record=True
+)
+ppp('test user dataobject created with constructor:', test_user_DO.to_dict())
+t.should_be_equal(
+	expected=TestUserDataObject,
+	actual=type(test_user_DO)
+)
+t.should_be_equal(
+	expected=user_data,
+	actual=test_user_DO.get_properties()
+)
+sys.exit()
 
 
 ######## TEST DATA OBJECT CRUD INTERFACE ########

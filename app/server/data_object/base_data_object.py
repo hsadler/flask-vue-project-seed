@@ -15,7 +15,9 @@ class BaseDataObject(metaclass=ABCMeta):
 	Provides base methods and interface for all proper data objects.
 
 	TODO:
-		- add docstrings to new methods
+		- add and update docstrings
+		- refactor dependency injection of db and cache drivers to be instances
+			instead of classes
 		- asses types of caching currently implemented and research
 			alternatives
 		- better management of attribute types (int, str, bool, etc.)
@@ -38,34 +40,32 @@ class BaseDataObject(metaclass=ABCMeta):
 	def __init__(
 		self,
 		prop_dict,
-		db_driver_class,
-		cache_driver_class,
+		db_driver,
+		cache_driver,
 		metadata_dict={},
 		new_record=True
 	):
 		"""
 		Data object instance constructor. Configures the database driver, cache
-		driver, and state dictionary.
+		driver, properties, and metadata.
+
+		NOTE: Should not be used in the wild. Use classmethod 'create' instead.
 
 		Args:
-			prop_dict (dict): Dictionary representing data object state.
-			db_driver_class (class): Database driver class.
-			cache_driver_class (class): Cache driver class.
+			prop_dict (dict): Dictionary representing dataobject properties.
+			db_driver (object): Database driver.
+			cache_driver (object): Cache driver.
+			metadata_dict (dict): Dictionary representing dataobject metadata.
+			new_record (bool): Whether or not dataobject is a new DB record.
 
 		"""
 
-		# set database driver and cache driver classes and instances
-		self.db_driver_class = db_driver_class
-		self.cache_driver_class = cache_driver_class
-		db_driver, cache_driver = self.get_drivers(
-			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class
-		)
+		# set database driver and cache driver
 		self.db_driver = db_driver
 		self.cache_driver = cache_driver
 
-		# set state of dataobject as a dictionary
-		self.state = prop_dict
+		# set properties
+		self.properties = prop_dict
 
 		# set metadata initial values
 		self.metadata = {
@@ -456,6 +456,14 @@ class BaseDataObject(metaclass=ABCMeta):
 			return False
 
 
+	def get_properties(self):
+		return self.properties
+
+
+	def get_metadatas(self):
+		return self.metadata
+
+
 	########## SERIALIZATION, DATABASE, CACHE PUBLIC METHODS ##########
 
 
@@ -713,7 +721,7 @@ class BaseDataObject(metaclass=ABCMeta):
 
 	def to_dict(self):
 		"""
-		Get data object's state and metadata in dictionary format.
+		Get data object's properies and metadata in dictionary format.
 
 		Returns:
 			(dict) Dictionary representation of data object.
@@ -721,7 +729,7 @@ class BaseDataObject(metaclass=ABCMeta):
 		"""
 
 		return {
-			'state': self.state,
+			'properties': self.properties,
 			'metadata': self.metadata,
 			'new_record': self.new_record
 		}
@@ -729,7 +737,7 @@ class BaseDataObject(metaclass=ABCMeta):
 
 	def to_json(self, pretty=False):
 		"""
-		Get data object's state and metadata formatted as JSON string.
+		Get data object's properties and metadata formatted as JSON string.
 
 		Args:
 			pretty (bool): Option for getting JSON string in pretty format.
@@ -753,9 +761,9 @@ class BaseDataObject(metaclass=ABCMeta):
 		serialized_records = []
 		for inst in instances:
 			serialized_record = {}
-			for m_field, m_value in inst.metadata.items():
+			for m_field, m_value in inst.get_metadatas().items():
 				serialized_record[m_field] = m_value
-			for s_field, s_value in inst.state.items():
+			for s_field, s_value in inst.get_properties().items():
 				serialized_record[s_field] = s_value
 			serialized_records.append(serialized_record)
 		return serialized_records
@@ -796,7 +804,7 @@ class BaseDataObject(metaclass=ABCMeta):
 	):
 		deserialized = [
 			cls(
-				prop_dict=val['state'],
+				prop_dict=val['properties'],
 				db_driver_class=db_driver_class,
 				cache_driver_class=cache_driver_class,
 				metadata_dict=val['metadata'],
