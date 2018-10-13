@@ -95,7 +95,6 @@ t.should_be_equal(
 	expected=user_data,
 	actual=test_user_DO.get_properties()
 )
-sys.exit()
 
 
 ######## TEST DATA OBJECT CRUD INTERFACE ########
@@ -111,7 +110,7 @@ test_user_DO = TestUserDataObject.create(prop_dict=user_data)
 ppp("'create' method data object:", test_user_DO.to_dict())
 t.should_be_equal(
 	expected=user_data,
-	actual=test_user_DO.to_dict()['state']
+	actual=test_user_DO.get_properties()
 )
 
 
@@ -122,6 +121,7 @@ t.should_be_equal(
 	expected=TestUserDataObject,
 	actual=type(test_user_DO)
 )
+sys.exit()
 
 
 # test retrieve single by uuid from 'find_many' method

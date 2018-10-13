@@ -18,6 +18,7 @@ class BaseDataObject(metaclass=ABCMeta):
 		- add and update docstrings
 		- refactor dependency injection of db and cache drivers to be instances
 			instead of classes
+		- find a way to require that some constants be set on subclasses
 		- asses types of caching currently implemented and research
 			alternatives
 		- better management of attribute types (int, str, bool, etc.)
@@ -40,10 +41,10 @@ class BaseDataObject(metaclass=ABCMeta):
 	def __init__(
 		self,
 		prop_dict,
-		db_driver,
-		cache_driver,
 		metadata_dict={},
-		new_record=True
+		new_record=True,
+		db_driver=None,
+		cache_driver=None
 	):
 		"""
 		Data object instance constructor. Configures the database driver, cache
@@ -53,16 +54,12 @@ class BaseDataObject(metaclass=ABCMeta):
 
 		Args:
 			prop_dict (dict): Dictionary representing dataobject properties.
-			db_driver (object): Database driver.
-			cache_driver (object): Cache driver.
 			metadata_dict (dict): Dictionary representing dataobject metadata.
 			new_record (bool): Whether or not dataobject is a new DB record.
+			db_driver (object): Database driver.
+			cache_driver (object): Cache driver.
 
 		"""
-
-		# set database driver and cache driver
-		self.db_driver = db_driver
-		self.cache_driver = cache_driver
 
 		# set properties
 		self.properties = prop_dict
@@ -73,13 +70,24 @@ class BaseDataObject(metaclass=ABCMeta):
 			self.UPDATED_TS_METADATA: None
 		}
 
-		# set new_record attribute
-		self.new_record = new_record
-
 		# replace metadata initial values with passed values
 		for key, val in metadata_dict.items():
 			if key in self.METADATA_FIELDS:
 				self.metadata[key] = val
+
+		# set new_record attribute
+		self.new_record = new_record
+
+		# set database driver and cache driver if exists otherwise, retrieve
+		# from defaults set on subclass
+		self.db_driver = (
+			db_driver if db_driver is not None
+			else self.DEFAULT_DB_DRIVER
+		)
+		self.cache_driver = (
+			cache_driver if cache_driver is not None
+			else self.DEFAULT_CACHE_DRIVER
+		)
 
 
 	########## CRUD PUBLIC METHODS ##########
@@ -89,16 +97,16 @@ class BaseDataObject(metaclass=ABCMeta):
 	def create(
 		cls,
 		prop_dict={},
-		db_driver_class=None,
-		cache_driver_class=None
+		db_driver=None,
+		cache_driver=None
 	):
 		"""
 		Data object creation method. NOTE: Does not save to data store.
 
 		Args:
-			prop_dict (dict): Dictionary representing data object state.
-			db_driver_class (class): Database driver class.
-			cache_driver_class (class): Cache driver class.
+			prop_dict (dict): Dictionary representing data object properties.
+			db_driver (object): Database driver.
+			cache_driver (object): Cache driver.
 
 		Returns:
 			(object) Data object instance.
@@ -108,11 +116,11 @@ class BaseDataObject(metaclass=ABCMeta):
 		# set uuid upon dataobject creation
 		prop_dict[cls.UUID_PROPERTY] = uuid.uuid4().hex
 
-		# use the constructor to set state, database driver and cache driver
+		# use the constructor to set properties, DB driver and cache driver
 		return cls(
 			prop_dict=prop_dict,
-			db_driver_class=db_driver_class,
-			cache_driver_class=cache_driver_class
+			db_driver=db_driver,
+			cache_driver=cache_driver
 		)
 
 
@@ -325,7 +333,8 @@ class BaseDataObject(metaclass=ABCMeta):
 				table_name=self.TABLE_NAME,
 				value_props=serialized_record
 			)
-			# update instance state
+			# update instance properties and metadata
+			# (using record as source of truth)
 			if insert_res is not None:
 				for m_field in self.METADATA_FIELDS:
 					self.set_metadata(
@@ -346,7 +355,7 @@ class BaseDataObject(metaclass=ABCMeta):
 				uuid=self.get_prop(self.UUID_PROPERTY),
 				value_props=serialized_record
 			)
-			# update instance state
+			# on success, update instance metadata
 			if update_res['rows_affected'] == 1:
 				self.set_metadata(
 					metadata_name=self.UPDATED_TS_METADATA,
@@ -398,7 +407,7 @@ class BaseDataObject(metaclass=ABCMeta):
 
 		"""
 
-		return self.state[prop_name]
+		return self.properties[prop_name]
 
 
 	def set_prop(self, prop_name, prop_value):
@@ -414,8 +423,8 @@ class BaseDataObject(metaclass=ABCMeta):
 
 		"""
 
-		if prop_name in self.state:
-			self.state[prop_name] = prop_value
+		if prop_name in self.properties:
+			self.properties[prop_name] = prop_value
 			return True
 		else:
 			return False
