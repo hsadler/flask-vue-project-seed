@@ -25,7 +25,7 @@
 // BASE DATA OBJECT
 	- add and update docstrings
 	X refactor DB driver and cache driver dependency injection
-	- find a way to require that some constants be set on subclasses
+	X find a way to require that some constants be set on subclasses
 	- transactions:
 		- two or more dataobjects saves with all or nothing commits to database
 		- implemented at database driver level?

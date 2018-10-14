@@ -18,7 +18,7 @@ class BaseDataObject(metaclass=ABCMeta):
 		- add and update docstrings
 		X refactor dependency injection of db and cache drivers to be instances
 			instead of classes
-		- find a way to require that some constants be set on subclasses
+		X find a way to require that some constants be set on subclasses
 		- asses types of caching currently implemented and research
 			alternatives
 		- better management of attribute types (int, str, bool, etc.)
@@ -68,9 +68,6 @@ class BaseDataObject(metaclass=ABCMeta):
 			cache_driver (object): Cache driver.
 
 		"""
-
-		# validate required attributes are set on subclass
-		self.__validate_required_attributes()
 
 		# set properties
 		self.properties = prop_dict
@@ -836,16 +833,6 @@ class BaseDataObject(metaclass=ABCMeta):
 			return values[0]
 		else:
 			return None
-
-
-	def __validate_required_attributes(self):
-		for req in self.REQUIRED_CLASS_ATTRIBUTES:
-			if not hasattr(self, req):
-				classname = self.__class__.__name__
-				raise RuntimeError(
-					"class {0} does not have required attribute {1}"
-					.format(classname, req)
-				)
 
 
 	def __get_database_prop_names(self):
