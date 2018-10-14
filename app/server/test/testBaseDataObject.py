@@ -149,7 +149,6 @@ t.should_be_equal(
 	expected=True,
 	actual=len(found_test_user_DOs) > 1
 )
-sys.exit()
 
 
 # test retrieve by uuid 'find_one' method
@@ -328,21 +327,22 @@ test_user_DOs = [ test_user_DO_1, test_user_DO_2 ]
 
 
 # test 'get_drivers' method
-db_driver, cache_driver = TestUserDataObject.get_drivers(
-	db_driver_class=MySqlDriver,
-	cache_driver_class=RedisDriver
-)
+# db_driver, cache_driver = TestUserDataObject.get_drivers(
+# 	db_driver=MySqlDriver(db_config=MasterMySqlDB.get_instance()),
+# 	cache_driver=RedisDriver(cache_config=MasterRedisCache.get_instance())
+# )
+db_driver, cache_driver = TestUserDataObject.get_drivers()
 ppp("mysql database driver:", db_driver)
 ppp("redis cache driver:", cache_driver)
-t.should_be_equal(expected=type(db_driver), actual=MySqlDriver)
-t.should_be_equal(expected=type(cache_driver), actual=RedisDriver)
+t.should_be_equal(actual=type(db_driver), expected=MySqlDriver)
+t.should_be_equal(actual=type(cache_driver), expected=RedisDriver)
 
 
 # test 'load_from_database_by_uuids' method
 uuid_to_db_loaded_user_DOs = TestUserDataObject.load_from_database_by_uuids(
 	uuids=[ x.get_prop('uuid') for x in test_user_DOs ],
-	db_driver_class=MySqlDriver,
-	cache_driver_class=RedisDriver
+	db_driver=db_driver,
+	cache_driver=cache_driver
 )
 ppp(
 	"loaded test users from 'load_from_database_by_uuids':",
@@ -368,8 +368,8 @@ t.should_be_equal(
 # test 'load_from_database_by_uuids' method
 db_loaded_user_DO = TestUserDataObject.load_from_database_by_uuid(
 	uuid=test_user_DO_1.get_prop('uuid'),
-	db_driver_class=MySqlDriver,
-	cache_driver_class=RedisDriver
+	db_driver=db_driver,
+	cache_driver=cache_driver
 )
 ppp(
 	"loaded test user from 'load_from_database_by_uuid':",
@@ -396,8 +396,8 @@ t.should_be_equal(expected=str, actual=type(cache_key))
 # test 'load_from_cache_by_uuids' method
 uuids_to_cache_loaded_user_DOs = TestUserDataObject.load_from_cache_by_uuids(
 	uuids=[ x.get_prop('uuid') for x in test_user_DOs ],
-	db_driver_class=MySqlDriver,
-	cache_driver_class=RedisDriver
+	db_driver=db_driver,
+	cache_driver=cache_driver
 )
 ppp(
 	"loaded test users from 'load_from_cache_by_uuids':",
@@ -420,8 +420,8 @@ t.should_be_equal(
 time.sleep(2)
 uuids_to_cache_loaded_user_DOs = TestUserDataObject.load_from_cache_by_uuids(
 	uuids=[ x.get_prop('uuid') for x in test_user_DOs ],
-	db_driver_class=MySqlDriver,
-	cache_driver_class=RedisDriver
+	db_driver=db_driver,
+	cache_driver=cache_driver
 )
 ppp(
 	"loaded dataobjects from 'load_from_cache_by_uuids' after ejection:",
@@ -440,8 +440,8 @@ test_user_DO_1.save()
 # test 'load_from_cache_by_uuid' method
 cache_loaded_user_DO = TestUserDataObject.load_from_cache_by_uuid(
 	uuid=test_user_DO_1.get_prop('uuid'),
-	db_driver_class=MySqlDriver,
-	cache_driver_class=RedisDriver
+	db_driver=db_driver,
+	cache_driver=cache_driver
 )
 ppp(
 	"loaded test user from 'load_from_cache_by_uuid':",
@@ -461,8 +461,8 @@ t.should_be_equal(
 time.sleep(2)
 cache_not_found_user_DO = TestUserDataObject.load_from_cache_by_uuid(
 	uuid=test_user_DO_1.get_prop('uuid'),
-	db_driver_class=MySqlDriver,
-	cache_driver_class=RedisDriver
+	db_driver=db_driver,
+	cache_driver=cache_driver
 )
 ppp(
 	"loaded dataobject from 'load_from_cache_by_uuid' after ejection:",
@@ -477,8 +477,8 @@ t.should_be_equal(
 # first, make sure the dataobject tested is not in the cache
 cached_user_DO_1 = TestUserDataObject.load_from_cache_by_uuid(
 	uuid=test_user_DO_1.get_prop('uuid'),
-	db_driver_class=MySqlDriver,
-	cache_driver_class=RedisDriver
+	db_driver=db_driver,
+	cache_driver=cache_driver
 )
 t.should_be_equal(
 	expected=None,
@@ -491,8 +491,8 @@ set_to_cache_res = test_user_DO_1.set_to_cache(ttl=1)
 ppp("'set_to_cache' response: ", set_to_cache_res)
 cached_user_DO_1 = TestUserDataObject.load_from_cache_by_uuid(
 	uuid=test_user_DO_1.get_prop('uuid'),
-	db_driver_class=MySqlDriver,
-	cache_driver_class=RedisDriver
+	db_driver=db_driver,
+	cache_driver=cache_driver
 )
 ppp('user DO 1 from cache:', cached_user_DO_1.to_dict())
 t.should_be_equal(
@@ -510,8 +510,8 @@ delete_from_cache_res = test_user_DO_1.delete_from_cache()
 ppp("'delete_from_cache' response: ", delete_from_cache_res)
 deleted_cached_user_DO_1 = TestUserDataObject.load_from_cache_by_uuid(
 	uuid=test_user_DO_1.get_prop('uuid'),
-	db_driver_class=MySqlDriver,
-	cache_driver_class=RedisDriver
+	db_driver=db_driver,
+	cache_driver=cache_driver
 )
 ppp('deleted user DO 1 from cache:', deleted_cached_user_DO_1)
 t.should_be_equal(
@@ -527,8 +527,8 @@ t.should_be_equal(
 # first, make sure the dataobjects tested are not in the cache
 cached_user_DOs = TestUserDataObject.load_from_cache_by_uuids(
 	uuids=[ x.get_prop('uuid') for x in test_user_DOs ],
-	db_driver_class=MySqlDriver,
-	cache_driver_class=RedisDriver
+	db_driver=db_driver,
+	cache_driver=cache_driver
 )
 t.should_be_equal(
 	expected=list(cached_user_DOs.values()),
@@ -539,8 +539,8 @@ t.should_be_equal(
 # test 'set_batch_to_cache' method
 set_batch_to_cache_res = TestUserDataObject.set_batch_to_cache(
 	dataobjects=test_user_DOs,
-	db_driver_class=MySqlDriver,
-	cache_driver_class=RedisDriver,
+	db_driver=db_driver,
+	cache_driver=cache_driver,
 	ttl=1
 )
 ppp("'set_batch_to_cache' response: ", set_batch_to_cache_res)
@@ -555,8 +555,8 @@ t.should_be_equal(
 # now load the batch from cache and test if keys are set
 uuids_to_cache_loaded_user_DOs = TestUserDataObject.load_from_cache_by_uuids(
 	uuids=[ x.get_prop('uuid') for x in test_user_DOs ],
-	db_driver_class=MySqlDriver,
-	cache_driver_class=RedisDriver
+	db_driver=db_driver,
+	cache_driver=cache_driver
 )
 t.should_be_equal(
 	expected=[TestUserDataObject, TestUserDataObject],
@@ -574,15 +574,15 @@ t.should_be_equal(
 # test 'delete_batch_from_cache' method
 delete_batch_from_cache_res = TestUserDataObject.delete_batch_from_cache(
 	dataobjects=test_user_DOs,
-	db_driver_class=MySqlDriver,
-	cache_driver_class=RedisDriver
+	db_driver=db_driver,
+	cache_driver=cache_driver
 )
 ppp("'delete_batch_from_cache' response:", delete_batch_from_cache_res)
 # now load the batch from cache
 uuids_to_cache_loaded_user_DOs = TestUserDataObject.load_from_cache_by_uuids(
 	uuids=[ x.get_prop('uuid') for x in test_user_DOs ],
-	db_driver_class=MySqlDriver,
-	cache_driver_class=RedisDriver
+	db_driver=db_driver,
+	cache_driver=cache_driver
 )
 t.should_be_equal(
 	expected=[ None, None ],
@@ -590,8 +590,7 @@ t.should_be_equal(
 )
 
 
-# get test user serialized record via MySqlDriver
-mysql_driver = MySqlDriver(database_name=config.MYSQL_DB_NAME)
+# get test user serialized record via db_driver
 found_records = mysql_driver.find_by_fields(
 	table_name=TABLE_NAME,
 	where_props={
@@ -610,8 +609,8 @@ t.should_be_equal(
 # test the more specialized 'load_database_records' method
 loaded_test_user_DOs_from_records = TestUserDataObject.load_database_records(
 	records=found_records,
-	db_driver_class=MySqlDriver,
-	cache_driver_class=RedisDriver
+	db_driver=db_driver,
+	cache_driver=cache_driver
 )
 ppp(
 	'"load_database_records" dataobjects loaded from records:',
@@ -647,7 +646,7 @@ test_user_DO.save()
 # test 'to_dict' method
 test_user_dict = test_user_DO.to_dict()
 ppp("test user dataobject 'to_dict':", test_user_dict)
-t.should_be_equal(expected=True, actual='state' in test_user_dict)
+t.should_be_equal(expected=True, actual='properties' in test_user_dict)
 t.should_be_equal(expected=True, actual='metadata' in test_user_dict)
 t.should_be_equal(expected=True, actual='new_record' in test_user_dict)
 

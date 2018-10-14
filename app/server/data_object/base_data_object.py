@@ -16,7 +16,7 @@ class BaseDataObject(metaclass=ABCMeta):
 
 	TODO:
 		- add and update docstrings
-		- refactor dependency injection of db and cache drivers to be instances
+		X refactor dependency injection of db and cache drivers to be instances
 			instead of classes
 		- find a way to require that some constants be set on subclasses
 		- asses types of caching currently implemented and research
