@@ -129,6 +129,11 @@ class MySqlDriver(BaseDatabaseDriver):
 
 
 	def find_by_uuid(self, table_name, uuid):
+		"""
+		TODO: method docstring
+
+		"""
+
 		records = self.find_by_fields(
 			table_name=table_name,
 			where_props={ self.RECORD_UUID_COLUMN: uuid }
@@ -209,6 +214,11 @@ class MySqlDriver(BaseDatabaseDriver):
 
 
 	def update_by_uuid(self, table_name, uuid, value_props={}):
+		"""
+		TODO: method docstring
+
+		"""
+
 		return self.update_by_fields(
 			table_name=table_name,
 			value_props=value_props,
@@ -300,6 +310,11 @@ class MySqlDriver(BaseDatabaseDriver):
 
 
 	def delete_by_uuid(self, table_name, uuid):
+		"""
+		TODO: method docstring
+
+		"""
+
 		return self.delete_by_fields(
 			table_name=table_name,
 			where_props={ self.RECORD_UUID_COLUMN: uuid }
