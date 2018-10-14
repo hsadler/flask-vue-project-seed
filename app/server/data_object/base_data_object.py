@@ -16,9 +16,6 @@ class BaseDataObject(metaclass=ABCMeta):
 
 	TODO:
 		- add and update docstrings
-		X refactor dependency injection of db and cache drivers to be instances
-			instead of classes
-		X find a way to require that some constants be set on subclasses
 		- asses types of caching currently implemented and research
 			alternatives
 		- better management of attribute types (int, str, bool, etc.)
@@ -26,8 +23,8 @@ class BaseDataObject(metaclass=ABCMeta):
 	"""
 
 
-	# attributes require by subclasses
-	REQUIRED_CLASS_ATTRIBUTES = [
+	# attributes require by subclasses (not used, for documentation only)
+	REQUIRED_SUBCLASS_ATTRIBUTES = [
 		'TABLE_NAME',
 		'DEFAULT_DB_DRIVER',
 		'DEFAULT_CACHE_DRIVER',

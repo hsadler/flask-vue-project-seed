@@ -1,31 +1,17 @@
 
 
 // CACH DRIVER (redis driver)
-	- add and update docstrings
-	X pass in datastore information (dependency injection)
-	X batch sets
-	X batch gets
-	X batch deletes
+	X add and update docstrings
 
 
 // DB DRIVER (mysql driver)
 	- add and update docstrings
-	X add tests for 'by_uuid' methods
-	X pass in datastore information (dependency injection)
-	X order by, ascending and descending:
-		- sample order_props:
-			{
-				'field': 'col_name',
-				'direction': 'asc'|'ascending'|'desc'|'descending'
-			}
 	- transactions
 	- type checking, type consistency
 
 
 // BASE DATA OBJECT
 	- add and update docstrings
-	X refactor DB driver and cache driver dependency injection
-	X find a way to require that some constants be set on subclasses
 	- transactions:
 		- two or more dataobjects saves with all or nothing commits to database
 		- implemented at database driver level?

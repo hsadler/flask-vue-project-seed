@@ -13,10 +13,6 @@ class RedisDriver(BaseCacheDriver):
 	"""
 	Redis cache driver which implements CRUD and utility public methods.
 
-	TODO:
-		- add and update docstrings
-		X add dependency injected cache config
-
 	"""
 
 
@@ -199,11 +195,35 @@ class RedisDriver(BaseCacheDriver):
 
 	@classmethod
 	def serialize(cls, value):
+		"""
+		Utility interface method for serializing python values in preparation
+		for caching.
+
+		Args:
+			value (mixed): Python value to be serialized.
+
+		Returns:
+			(string) Serialized value.
+
+		"""
+
 		return json.dumps(value)
 
 
 	@classmethod
 	def deserialize(cls, value):
+		"""
+		Utility interface method for deserializing cache retrieved values into
+		python values.
+
+		Args:
+			value (string): Cache value to be deserialized.
+
+		Returns:
+			(mixed) deserialized value.
+
+		"""
+
 		return json.loads(value)
 
 
