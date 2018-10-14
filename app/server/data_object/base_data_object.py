@@ -26,6 +26,14 @@ class BaseDataObject(metaclass=ABCMeta):
 	"""
 
 
+	# attributes require by subclasses
+	REQUIRED_CLASS_ATTRIBUTES = [
+		'TABLE_NAME',
+		'DEFAULT_DB_DRIVER',
+		'DEFAULT_CACHE_DRIVER',
+		'DEFAULT_CACHE_TTL'
+	]
+
 	# properties
 	UUID_PROPERTY = 'uuid'
 
@@ -60,6 +68,9 @@ class BaseDataObject(metaclass=ABCMeta):
 			cache_driver (object): Cache driver.
 
 		"""
+
+		# validate required attributes are set on subclass
+		self.__validate_required_attributes()
 
 		# set properties
 		self.properties = prop_dict
@@ -825,6 +836,16 @@ class BaseDataObject(metaclass=ABCMeta):
 			return values[0]
 		else:
 			return None
+
+
+	def __validate_required_attributes(self):
+		for req in self.REQUIRED_CLASS_ATTRIBUTES:
+			if not hasattr(self, req):
+				classname = self.__class__.__name__
+				raise RuntimeError(
+					"class {0} does not have required attribute {1}"
+					.format(classname, req)
+				)
 
 
 	def __get_database_prop_names(self):
