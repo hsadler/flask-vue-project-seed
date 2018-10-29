@@ -1,22 +1,24 @@
 
 
 // CACH DRIVER (redis driver)
-	X batch sets
-	X batch gets
-	X batch deletes
+	X add and update docstrings
 
 
 // DB DRIVER (mysql driver)
-	X more options for query conditionals (where clauses)
-	X methods for select, update, and delete by primary key id
-	X rewrite testMysqlDriver.py
-	X more thorough testing of where conditions
+	- add and update docstrings
+	- transactions
+	- type checking, type consistency
 
 
 // BASE DATA OBJECT
-	- batch query and batch caching of query result items
+	- add and update docstrings
+	- transactions:
+		- two or more dataobjects saves with all or nothing commits to database
+		- implemented at database driver level?
+		- think about interface
+		- need rollbacks?
+	- think about data type consistency and enforcement
 	- asses types of caching currently implemented and research alternatives
 	- think about db replication schemes (master->slave vs master->master)
 	- think about data consistency problems (in-memory, cache, master, slave)
-	- think about data type consistency and enforcement
-	- switch from auto-incremented ids to UUIDs (better for application)
+

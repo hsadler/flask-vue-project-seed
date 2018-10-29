@@ -13,11 +13,25 @@ class MySqlDriver(BaseDatabaseDriver):
 	"""
 	MySQL database driver which implements CRUD and utility public methods.
 
+	TODO:
+		- add and update docstrings
+		- transactions
+		- type checking, type consistency
+
 	"""
 
-
+	RECORD_UUID_COLUMN = 'uuid'
 	RECORD_CREATED_TS_COLUMN = 'created_ts'
 	RECORD_UPDATED_TS_COLUMN = 'updated_ts'
+
+	REQUIRED_RECORD_PROPERTIES = [
+		RECORD_UUID_COLUMN
+	]
+
+	IMMUTABLE_RECORD_PROPERTIES = [
+		RECORD_UUID_COLUMN,
+		RECORD_CREATED_TS_COLUMN
+	]
 
 	WHERE_MAP = {
 		'=': '=',
@@ -42,32 +56,20 @@ class MySqlDriver(BaseDatabaseDriver):
 	}
 
 
-	def __init__(self, database_name):
+	def __init__(self, db_config):
 		"""
-		MySQL driver instance constructor.
-
-		Sets database name and configures the MySQL server connection and
-		cursor.
+		MySQL driver instance constructor. Accepts MySQL database configuration.
 
 		Args:
-			database_name (str): Name of MySQL database.
+			db_config (MySqlConfig): MySQL database configuration object.
 
 		"""
-		self.database_name = self.escape(database_name)
-		self.conn = mdb.connect(
-			host=config.MYSQL_HOST,
-			user=config.MYSQL_USER,
-			passwd=config.MYSQL_PASSWORD,
-			db=database_name
-		)
-		self.cur = self.conn.cursor(mdb.cursors.DictCursor)
-		self.conn.set_character_set('utf8')
-		self.cur.execute('SET NAMES utf8;')
-		self.cur.execute('SET CHARACTER SET utf8;')
-		self.cur.execute('SET character_set_connection=utf8;')
+
+		self.db = db_config
 
 
 	########## CRUD INTERFACE METHODS ##########
+
 
 	def insert(self, table_name, value_props={}):
 		"""
@@ -79,25 +81,34 @@ class MySqlDriver(BaseDatabaseDriver):
 				key=column name and value=column value.
 
 		Returns:
-			(int) 'id' of the inserted record.
+			(dict) Dictionary representing MySQL record or None if insert is
+				unsuccessful.
 
 		"""
 
-		value_props[self.RECORD_CREATED_TS_COLUMN] = int(time.time())
-		value_props[self.RECORD_UPDATED_TS_COLUMN] = int(time.time())
+		# validate value_props for necessary items
+		if not self.validate_record_props(value_props):
+			raise RuntimeError("invalid record properties for INSERT")
 
+		# set 'created' and 'updated' record metadata
+		value_props[self.RECORD_CREATED_TS_COLUMN] = self.get_curr_timestamp()
+		value_props[self.RECORD_UPDATED_TS_COLUMN] = self.get_curr_timestamp()
+
+		# gather fields and values for record data
 		fields = []
 		values = []
 		for key, val in value_props.items():
 			fields.append(key)
 			values.append(val)
 
+		# construct fields and values substring
 		fields_str = ', '.join([
 			"`{}`".format(self.escape(field))
 			for field in fields
 		])
 		values_str_sub = ', '.join(['%s' for item in values])
 
+		# construct full insert SQL string
 		query_stmt = """
 			INSERT INTO `{0}` ({1})
 			VALUES ({2});
@@ -107,19 +118,37 @@ class MySqlDriver(BaseDatabaseDriver):
 			values_str_sub
 		)
 
-		with self.conn:
-			self.cur.execute(query_stmt, tuple(values))
-			return self.cur.lastrowid
+		# commit the insert to the table
+		with self.db.conn:
+			insert_count = self.db.cur.execute(query_stmt, tuple(values))
+			self.db.conn.commit()
+			if self.db.cur.rowcount == 1:
+				return value_props
+			else:
+				return None
 
 
-	def find_by_id(self, table_name, id):
-		return self.find_by_fields(
+	def find_by_uuid(self, table_name, uuid):
+		"""
+		TODO: method docstring
+
+		"""
+
+		records = self.find_by_fields(
 			table_name=table_name,
-			where_props={ 'id': id }
+			where_props={ self.RECORD_UUID_COLUMN: uuid }
 		)
+		if len(records) > 0:
+			return records[0]
 
 
-	def find_by_fields(self, table_name, where_props={}, limit=None):
+	def find_by_fields(
+		self,
+		table_name,
+		where_props={},
+		order_props={},
+		limit=None
+	):
 		"""
 		MySQL driver interface method for finding records by conditionals.
 
@@ -130,18 +159,19 @@ class MySqlDriver(BaseDatabaseDriver):
 			limit (int or None): Positive integer limit for query results list.
 
 		Returns:
-			(tuple) Tuple of dictionaries representing MySQL records
-			(deserialized).
+			(tuple) Tuple of dictionaries representing MySQL records.
 
 		"""
 
 		query_stmt_components = []
 
+		# add SELECT query component
 		select_component = 'SELECT * FROM `{}`'.format(
 			self.escape(table_name)
 		)
 		query_stmt_components.append(select_component)
 
+		# add WHERE query components
 		where_values = None
 		if len(where_props.keys()) > 0:
 			where_component, where_values = self.construct_where_clause(
@@ -150,25 +180,49 @@ class MySqlDriver(BaseDatabaseDriver):
 			query_stmt_components.append(where_component)
 			where_values = tuple(where_values)
 
+		# add ORDER BY query component
+		if 'field' in order_props:
+			field = order_props['field']
+			direction = (
+				order_props['direction']
+				if 'direction' in order_props else None
+			)
+			order_by_component = self.construct_order_by_clause(
+				field=field,
+				direction=direction
+			)
+			query_stmt_components.append(order_by_component)
+		elif 'random' in order_props and order_props['random'] == True:
+			order_by_component = self.construct_order_by_clause(random=True)
+			query_stmt_components.append(order_by_component)
+
+		# add LIMIT query component
 		if(limit is not None and int(limit) > 0):
 			limit_component = 'LIMIT {}'.format(self.escape(str(limit)))
 			query_stmt_components.append(limit_component)
 
+		# join query components together to create entire statement
 		query_stmt = ' '.join(query_stmt_components) + ';'
 
-		with self.conn:
+		# execute the query and return the results
+		with self.db.conn:
 			if where_values is not None:
-				self.cur.execute(query_stmt, where_values)
+				self.db.cur.execute(query_stmt, where_values)
 			else:
-				self.cur.execute(query_stmt)
-			return self.cur.fetchall()
+				self.db.cur.execute(query_stmt)
+			return self.db.cur.fetchall()
 
 
-	def update_by_id(self, table_name, id, value_props={}):
+	def update_by_uuid(self, table_name, uuid, value_props={}):
+		"""
+		TODO: method docstring
+
+		"""
+
 		return self.update_by_fields(
 			table_name=table_name,
 			value_props=value_props,
-			where_props={ 'id': id }
+			where_props={ self.RECORD_UUID_COLUMN: uuid }
 		)
 
 
@@ -184,27 +238,36 @@ class MySqlDriver(BaseDatabaseDriver):
 				key=column name and value=column value.
 
 		Returns:
-			(integer) Number of rows updated.
+			{
+				'rows_affected': (integer) Number of rows updated,
+				'updated_ts': (integer) Current timestamp
+			}
 
 		"""
 
-		# filter 'id' and 'created_ts' keys from value_props since they should
-		# never be mutated
+		res = {}
+
+		# filter immutable properties from value_props
 		unfiltered_value_props = value_props
 		value_props = {}
 		for key, val in unfiltered_value_props.items():
-			if key != 'id' and key != self.RECORD_CREATED_TS_COLUMN:
+			if key not in self.IMMUTABLE_RECORD_PROPERTIES:
 				value_props[key] = val
-		# mutate 'updated_ts' column to current time on update
-		value_props[self.RECORD_UPDATED_TS_COLUMN] = int(time.time())
 
+		# mutate 'updated_ts' column to current time on update
+		current_timestamp = self.get_curr_timestamp()
+		value_props[self.RECORD_UPDATED_TS_COLUMN] = current_timestamp
+
+		# start gathering query parts
 		query_stmt_components = []
 
+		# add the UPDATE component
 		update_component = 'UPDATE `{}`'.format(
 			self.escape(table_name)
 		)
 		query_stmt_components.append(update_component)
 
+		# add the SET component
 		set_values = None
 		if len(value_props.keys()) > 0:
 			set_fields = []
@@ -222,6 +285,7 @@ class MySqlDriver(BaseDatabaseDriver):
 				"argument 'value_props' required with at least one SET item"
 			)
 
+		# add the WHERE component
 		where_values = None
 		if len(where_props.keys()) > 0:
 			where_component, where_values = self.construct_where_clause(
@@ -234,17 +298,26 @@ class MySqlDriver(BaseDatabaseDriver):
 				"condition"
 			)
 
+		# join the query components together
 		query_stmt = ' '.join(query_stmt_components) + ';'
 
-		with self.conn:
-			self.cur.execute(query_stmt, tuple(set_values + where_values))
-			return self.cur.rowcount
+		# commit the update to the datastore
+		with self.db.conn:
+			self.db.cur.execute(query_stmt, tuple(set_values + where_values))
+			res[self.RECORD_UPDATED_TS_COLUMN] = current_timestamp
+			res['rows_affected'] = self.db.cur.rowcount
+			return res
 
 
-	def delete_by_id(self, table_name, id):
+	def delete_by_uuid(self, table_name, uuid):
+		"""
+		TODO: method docstring
+
+		"""
+
 		return self.delete_by_fields(
 			table_name=table_name,
-			where_props={ 'id': id }
+			where_props={ self.RECORD_UUID_COLUMN: uuid }
 		)
 
 
@@ -264,11 +337,13 @@ class MySqlDriver(BaseDatabaseDriver):
 
 		query_stmt_components = []
 
+		# add the DELETE component
 		delete_component = 'DELETE FROM `{}`'.format(
 			self.escape(table_name)
 		)
 		query_stmt_components.append(delete_component)
 
+		# add the WHERE components
 		where_values = None
 		if len(where_props.keys()) > 0:
 			where_component, where_values = self.construct_where_clause(
@@ -276,6 +351,7 @@ class MySqlDriver(BaseDatabaseDriver):
 			)
 			query_stmt_components.append(where_component)
 		else:
+			# don't allow DELETE without at least one WHERE condition
 			raise RuntimeError(
 				"""
 					argument 'where_props' required with at least one WHERE
@@ -283,11 +359,13 @@ class MySqlDriver(BaseDatabaseDriver):
 				"""
 			)
 
+		# join the query components together
 		query_stmt = ' '.join(query_stmt_components) + ';'
 
-		with self.conn:
-			self.cur.execute(query_stmt, tuple(where_values))
-			return self.cur.rowcount
+		# execute the query and return the number of deleted records
+		with self.db.conn:
+			self.db.cur.execute(query_stmt, tuple(where_values))
+			return self.db.cur.rowcount
 
 
 	########## MYSQL SPECIFIC METHODS ##########
@@ -317,8 +395,8 @@ class MySqlDriver(BaseDatabaseDriver):
 					bind_str,
 					'%({0})s'.format(key)
 				)
-		self.cur.execute(query_string, bind_vars)
-		return self.cur.fetchall()
+		self.db.cur.execute(query_string, bind_vars)
+		return self.db.cur.fetchall()
 
 
 	########## TABLE UTILITIES ##########
@@ -328,9 +406,9 @@ class MySqlDriver(BaseDatabaseDriver):
 		query_stmt = "DESC {};".format(
 			self.escape(table_name)
 		)
-		with self.conn:
-			self.cur.execute(query_stmt)
-		return self.cur.fetchall()
+		with self.db.conn:
+			self.db.cur.execute(query_stmt)
+		return self.db.cur.fetchall()
 
 
 	def get_table_field_names(self, table_name):
@@ -350,10 +428,10 @@ class MySqlDriver(BaseDatabaseDriver):
 			FROM information_schema.TABLES
 			WHERE table_schema = "{}"
 			ORDER BY (data_length + index_length) DESC;
-		""".format(self.database_name)
-		with self.conn:
-			self.cur.execute(query_stmt)
-		return self.cur.fetchall()
+		""".format(self.db.database)
+		with self.db.conn:
+			self.db.cur.execute(query_stmt)
+		return self.db.cur.fetchall()
 
 
 	########## SQL UTILITIES ##########
@@ -367,6 +445,64 @@ class MySqlDriver(BaseDatabaseDriver):
 		"""
 
 		return mdb.escape_string(string).decode('utf-8')
+
+
+	@staticmethod
+	def get_curr_timestamp():
+		"""
+		Get timestamp for current time.
+
+		"""
+
+		return int(time.time())
+
+
+	@classmethod
+	def validate_record_props(self, value_props):
+		"""
+		Ensure required record properties exist.
+
+		"""
+
+		for property_name in self.REQUIRED_RECORD_PROPERTIES:
+			if property_name not in value_props:
+				return False
+		return True
+
+
+	@classmethod
+	def construct_order_by_clause(
+		cls,
+		field=None,
+		direction=None,
+		random=False
+	):
+		"""
+		'ORDER BY' clause string builder.
+
+		"""
+
+		if random:
+			return 'ORDER BY RAND()'
+
+		order_by_component = 'ORDER BY {0}'.format(
+			cls.escape(str(field))
+		)
+		direction_map = {
+			'asc': 'ASC',
+			'ascending': 'ASC',
+			'desc': 'DESC',
+			'descending': 'DESC'
+		}
+		if(
+			direction is not None and
+			direction in direction_map
+		):
+			order_by_component = "{0} {1}".format(
+				order_by_component,
+				direction_map[direction]
+			)
+		return order_by_component
 
 
 	@classmethod
@@ -388,8 +524,10 @@ class MySqlDriver(BaseDatabaseDriver):
 						)
 						where_strings.append(s)
 						where_values.append(cond_val)
-					elif cond_key in cls.WHERE_IN_MAP and \
-					type(cond_val) is list:
+					elif(
+						cond_key in cls.WHERE_IN_MAP and
+						type(cond_val) is list
+					):
 						s = '`{0}` {1} ({2})'.format(
 							cls.escape(prop_col),
 							cls.WHERE_IN_MAP[cond_key],

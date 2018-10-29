@@ -37,7 +37,7 @@ t.should_be_equal(
 )
 
 
-found_wm = WallMessages.find_one(message_id=added_wm.get_prop('id'))
+found_wm = WallMessages.find_one(message_uuid=added_wm.get_prop('uuid'))
 
 ppp(['found wall message:', found_wm.to_dict()])
 
@@ -50,7 +50,7 @@ t.should_be_equal(
 updated_message_body = 'i am the new message'
 updated_message_attribution = 'newman'
 updated_wm = WallMessages.update_message(
-	message_id=added_wm.get_prop('id'),
+	message_uuid=added_wm.get_prop('uuid'),
 	message_body=updated_message_body,
 	message_attribution=updated_message_attribution
 )
@@ -68,7 +68,7 @@ t.should_be_equal(
 
 
 delete_status = WallMessages.delete_message(
-	message_id=added_wm.get_prop('id')
+	message_uuid=added_wm.get_prop('uuid')
 )
 
 ppp('deleted wall message successfully: {0}'.format(delete_status))

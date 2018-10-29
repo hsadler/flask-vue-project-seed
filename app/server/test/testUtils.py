@@ -45,5 +45,6 @@ try:
 	ppp(my_instance, my_instance, as_json=1)
 except:
 	ppp('WARNING: cannot json serialize a python object...')
+	ppp('^^ this should have printed')
 
 

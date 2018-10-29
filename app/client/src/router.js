@@ -21,7 +21,7 @@ export default new Router({
       component: WallMessages
     },
     {
-      path: '/edit-message/:id',
+      path: '/edit-message/:uuid',
       name: 'EditWallMessage',
       component: EditWallMessage
     },

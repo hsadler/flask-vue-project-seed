@@ -3,7 +3,6 @@
 
 import redis
 import simplejson as json
-
 import config.config as config
 from data_store.cache_driver.base_cache_driver import BaseCacheDriver
 
@@ -15,17 +14,14 @@ class RedisDriver(BaseCacheDriver):
 	"""
 
 
-	def __init__(self):
+	def __init__(self, cache_config):
 		"""
 		Redis driver instance constructor. Configures the Redis connection with
 		host and port.
 
 		"""
 
-		self.r = redis.StrictRedis(
-			host=config.REDIS_HOST,
-			port=config.REDIS_PORT,
-		)
+		self.cache = cache_config
 
 
 	########## CRUD INTERFACE METHODS ##########
@@ -45,9 +41,10 @@ class RedisDriver(BaseCacheDriver):
 
 		"""
 
-		pipe = self.r.pipeline()
+		pipe = self.cache.r.pipeline()
 		keys = []
 		values = []
+		result = {}
 
 		for key, val in items.items():
 			keys.append(key)
@@ -55,12 +52,17 @@ class RedisDriver(BaseCacheDriver):
 
 		for i, key in enumerate(keys):
 			value = values[i]
-			json_value = json.dumps(value)
-			pipe.set(key, json_value)
+			if type(key) is not str or value is None:
+				result[key] = False
+				continue
+			serialized_value = self.serialize(value)
+			if ttl is not None:
+				pipe.set(key, serialized_value, ex=ttl)
+			else:
+				pipe.set(key, serialized_value)
 
 		set_statuses = pipe.execute()
 
-		result = {}
 		for i, set_status in enumerate(set_statuses):
 			result[keys[i]] = set_status
 
@@ -82,11 +84,14 @@ class RedisDriver(BaseCacheDriver):
 
 		"""
 
-		json_value = json.dumps(value)
+		if type(key) is not str or value is None:
+			return False
+
+		serialized_value = self.serialize(value)
 		if ttl is not None:
-			return self.r.set(key, json_value, ex=ttl)
+			return self.cache.r.set(key, serialized_value, ex=ttl)
 		else:
-			return self.r.set(key, json_value)
+			return self.cache.r.set(key, serialized_value)
 
 
 	def batch_get(self, keys=[]):
@@ -102,13 +107,17 @@ class RedisDriver(BaseCacheDriver):
 
 		"""
 
-		pipe = self.r.pipeline()
+		pipe = self.cache.r.pipeline()
 
 		for key in keys:
 			pipe.get(key)
 
 		redis_response = pipe.execute()
-		cached_values = [ json.loads(x) for x in redis_response ]
+
+		cached_values = [
+			self.deserialize(x) if x is not None else x
+			for x in redis_response
+		]
 
 		result = {}
 		for i, value in enumerate(cached_values):
@@ -129,9 +138,9 @@ class RedisDriver(BaseCacheDriver):
 
 		"""
 
-		json_value = self.r.get(key)
-		if json_value is not None:
-			value = json.loads(json_value)
+		serialized_value = self.cache.r.get(key)
+		if serialized_value is not None:
+			value = self.deserialize(serialized_value)
 			return value
 		else:
 			return None
@@ -150,7 +159,7 @@ class RedisDriver(BaseCacheDriver):
 
 		"""
 
-		pipe = self.r.pipeline()
+		pipe = self.cache.r.pipeline()
 
 		for key in keys:
 			pipe.delete(key)
@@ -176,7 +185,44 @@ class RedisDriver(BaseCacheDriver):
 
 		"""
 
-		return self.r.delete(key)
+		return self.cache.r.delete(key)
+
+
+	########## UTILITY INTERFACE METHODS ##########
+
+
+	@classmethod
+	def serialize(cls, value):
+		"""
+		Utility interface method for serializing python values in preparation
+		for caching.
+
+		Args:
+			value (mixed): Python value to be serialized.
+
+		Returns:
+			(string) Serialized value.
+
+		"""
+
+		return json.dumps(value)
+
+
+	@classmethod
+	def deserialize(cls, value):
+		"""
+		Utility interface method for deserializing cache retrieved values into
+		python values.
+
+		Args:
+			value (string): Cache value to be deserialized.
+
+		Returns:
+			(mixed) deserialized value.
+
+		"""
+
+		return json.loads(value)
 
 
 	########## REDIS SPECIFIC METHODS ##########
@@ -191,7 +237,5 @@ class RedisDriver(BaseCacheDriver):
 
 		"""
 
-		return [ str(x, 'utf-8') for x in self.r.keys() ]
-
-
+		return [ str(x, 'utf-8') for x in self.cache.r.keys() ]
 
