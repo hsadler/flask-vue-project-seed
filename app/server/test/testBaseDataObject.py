@@ -17,9 +17,7 @@ from utils.print import ppp
 Test Base Data Object.
 
 TODO:
-	- test new dependency injection of drivers
-	- test all public methods on base data object
-	- add tests for failures
+	- add more tests for failures
 
 """
 
@@ -327,10 +325,6 @@ test_user_DOs = [ test_user_DO_1, test_user_DO_2 ]
 
 
 # test 'get_drivers' method
-# db_driver, cache_driver = TestUserDataObject.get_drivers(
-# 	db_driver=MySqlDriver(db_config=MasterMySqlDB.get_instance()),
-# 	cache_driver=RedisDriver(cache_config=MasterRedisCache.get_instance())
-# )
 db_driver, cache_driver = TestUserDataObject.get_drivers()
 ppp("mysql database driver:", db_driver)
 ppp("redis cache driver:", cache_driver)
@@ -365,7 +359,7 @@ t.should_be_equal(
 )
 
 
-# test 'load_from_database_by_uuids' method
+# test 'load_from_database_by_uuid' method
 db_loaded_user_DO = TestUserDataObject.load_from_database_by_uuid(
 	uuid=test_user_DO_1.get_prop('uuid'),
 	db_driver=db_driver,
