@@ -17,9 +17,9 @@ class WallMessages():
 
 
 	@staticmethod
-	def find_one(message_id):
+	def find_one(message_uuid):
 		wm = WallMessageDataObject.find_one(prop_dict={
-			'id': message_id
+			'uuid': message_uuid
 		})
 		return wm
 
@@ -30,23 +30,25 @@ class WallMessages():
 			'message': message_body,
 			'attribution': message_attribution
 		})
-		return wm.save();
+		wm.save()
+		return wm
 
 
 	@staticmethod
-	def update_message(message_id, message_body, message_attribution):
+	def update_message(message_uuid, message_body, message_attribution):
 		wm = WallMessageDataObject.find_one(prop_dict={
-			'id': message_id
+			'uuid': message_uuid
 		})
 		wm.set_prop('message', message_body)
 		wm.set_prop('attribution', message_attribution)
-		return wm.save();
+		wm.save()
+		return wm
 
 
 	@staticmethod
-	def delete_message(message_id):
+	def delete_message(message_uuid):
 		wm = WallMessageDataObject.find_one(prop_dict={
-			'id': message_id
+			'uuid': message_uuid
 		})
 		delete_status = wm.delete()
 		return delete_status
