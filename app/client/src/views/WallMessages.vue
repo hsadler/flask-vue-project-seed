@@ -54,7 +54,7 @@ export default {
     goToEditMessage (message) {
       this.$router.push({
         name: 'EditWallMessage',
-        params: { id: message.id }
+        params: { uuid: message.uuid }
       })
     }
   },

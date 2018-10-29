@@ -58,7 +58,7 @@ export default {
     updateWallMessage () {
       var url = '/api/wall-messages/update-message'
       var options = {
-        message_id: this.wallMessage.id,
+        message_uuid: this.wallMessage.uuid,
         message_body: this.messageBody,
         message_attribution: this.messageAttribution
       }
@@ -69,8 +69,8 @@ export default {
     }
   },
   created () {
-    const messageId = this.$route.params.id
-    var url = '/api/wall-messages/find-one?message_id=' + messageId
+    const messageId = this.$route.params.uuid
+    var url = '/api/wall-messages/find-one?message_uuid=' + messageId
     this.httpService.get(url).then((res) => {
       this.wallMessage = res
     })
