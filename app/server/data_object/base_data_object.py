@@ -5,12 +5,9 @@ import sys
 import uuid
 import simplejson as json
 import config.config as config
-from abc import ABCMeta, abstractmethod
-
-from utils.print import ppp
 
 
-class BaseDataObject(metaclass=ABCMeta):
+class BaseDataObject():
 	"""
 	Provides base methods and interface for all proper data objects.
 
