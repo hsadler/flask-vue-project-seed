@@ -1,24 +1,8 @@
 
-
-// CACH DRIVER (redis driver)
-	X add and update docstrings
-
-
-// DB DRIVER (mysql driver)
-	- add and update docstrings
-	- transactions
-	- type checking, type consistency
-
-
-// BASE DATA OBJECT
-	- add and update docstrings
-	- transactions:
-		- two or more dataobjects saves with all or nothing commits to database
-		- implemented at database driver level?
-		- think about interface
-		- need rollbacks?
-	- think about data type consistency and enforcement
-	- asses types of caching currently implemented and research alternatives
-	- think about db replication schemes (master->slave vs master->master)
-	- think about data consistency problems (in-memory, cache, master, slave)
-
+- create Makefile and transfer all shell scripts to use `make`
+- create base Docker files to contain the core OS installs
+- bump versions per Dependabot alert list: 
+	https://github.com/hsadler/flask-vue-project-seed/security/dependabot
+- check to see if python-data-object code is up-to-date with repo:
+	https://github.com/hsadler/python-data-object
+- consider proper testing with pytest
