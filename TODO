@@ -6,3 +6,6 @@
 - check to see if python-data-object code is up-to-date with repo:
 	https://github.com/hsadler/python-data-object
 - consider proper testing with pytest
+- draft plan/process for project maintenance
+- convert to a "template" repo on github
+- consider importing python-data-object as a python package
