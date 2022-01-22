@@ -1,11 +1,11 @@
 
-- create Makefile and transfer all shell scripts to use `make`
+X create Makefile and transfer all shell scripts to use `make`
+- update README to reflect new Makefile commands
+- remove all prod spin-up stuff since it's not needed
 - create base Docker files to contain the core OS installs
 - bump versions per Dependabot alert list: 
 	https://github.com/hsadler/flask-vue-project-seed/security/dependabot
 - check to see if python-data-object code is up-to-date with repo:
 	https://github.com/hsadler/python-data-object
-- consider proper testing with pytest
 - draft plan/process for project maintenance
 - convert to a "template" repo on github
-- consider importing python-data-object as a python package

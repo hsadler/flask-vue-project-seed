@@ -151,4 +151,5 @@ Tools:
 - pip3
 - Adminer
 - Webpack
+- make
 
