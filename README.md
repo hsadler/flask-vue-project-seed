@@ -2,13 +2,14 @@
 
 # flask-vue-project-seed
 
-> SPA quick start using Python Flask and Vue.js. Containerized with Docker.
+> SPA quick start using Python, Flask, and Vue.js. Containerized with Docker.
 
 
 ## Requirements
 
 - docker
 - docker-compose
+- make (optional)
 
 
 ## What is this repo and how do I use it?
@@ -120,5 +121,4 @@ Tools:
 - pip3
 - Adminer
 - Webpack
-- make
 
