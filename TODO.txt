@@ -1,7 +1,7 @@
 
 X create Makefile and transfer all shell scripts to use `make`
 X update README to reflect new Makefile commands
-- remove all prod spin-up stuff since it's overly complicated
+X remove all prod spin-up stuff since it's overly complicated
 - create base Docker files to contain the core OS installs (maybe)
 - bump versions per Dependabot alert list: 
 	https://github.com/hsadler/flask-vue-project-seed/security/dependabot

@@ -42,12 +42,7 @@ contains these basic parts and features:
 
 ## More Information:
 
-Features dev and prod mode Docker containers.
-
-Prod mode serves exclusively from the Flask backend (app index.html, static
-assets, and JSON API).
-
-Dev mode runs both a Flask backend server and a webpack frontend server
+`make up` runs both a Flask backend server and a webpack frontend server
 simultaneously. The webpack frontend server proxies the Flask backend. The app
 directory is a Docker mounted volume, and changes to backend and client files
 will be automatically reflected.
@@ -57,12 +52,12 @@ will be automatically reflected.
 
 First, spin-up the dev environment:
 ```sh
-make up-dev
+make up
 ```
 
 Then, connect to the app server container:
 ```sh
-make app-shell-dev
+make app-shell
 ```
 
 Once connected, run the table creation python script:
@@ -76,47 +71,21 @@ http://localhost:4000/wall-messages
 ```
 
 
-## Full Usage
-
-### Dev mode
-
-Start dev mode server in Docker container:
-```sh
-make up-dev
-```
-
-Navigate to dev localhost URL:
-```sh
-http://localhost:4000
-```
-
-### Prod mode
-
-Start prod mode server in Docker container:
-```sh
-make up-prod
-```
-
-Navigate to prod localhost URL:
-```sh
-http://localhost
-```
-
 ### Other convenience make commands
 
-Connect to prod or dev mode app server container:
+Connect to app server container:
 ```sh
-make app-shell-[mode]
+make app-shell
 ```
 
-Connect to prod or dev mode MySQL container:
+Connect to MySQL container:
 ```sh
-make mysql-shell-[mode]
+make mysql-shell
 ```
 
-Connect to prod or dev mode Redis container:
+Connect to Redis container:
 ```sh
-make redis-shell-[mode]
+make redis-shell
 ```
 
 
