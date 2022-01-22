@@ -53,16 +53,16 @@ directory is a Docker mounted volume, and changes to backend and client files
 will be automatically reflected.
 
 
-## Getting started with full-stack app example:
+## Getting started with the full-stack app example:
 
 First, spin-up the dev environment:
 ```sh
-source shell-scripts/up-dev.sh
+make up-dev
 ```
 
 Then, connect to the app server container:
 ```sh
-source shell-scripts/app-dev.sh
+make app-shell-dev
 ```
 
 Once connected, run the table creation python script:
@@ -78,11 +78,11 @@ http://localhost:4000/wall-messages
 
 ## Full Usage
 
-### Dev Mode
+### Dev mode
 
 Start dev mode server in Docker container:
 ```sh
-source shell-scripts/up-dev.sh
+make up-dev
 ```
 
 Navigate to dev localhost URL:
@@ -90,11 +90,11 @@ Navigate to dev localhost URL:
 http://localhost:4000
 ```
 
-### Prod Mode
+### Prod mode
 
 Start prod mode server in Docker container:
 ```sh
-source shell-scripts/up-prod.sh
+make up-prod
 ```
 
 Navigate to prod localhost URL:
@@ -102,21 +102,21 @@ Navigate to prod localhost URL:
 http://localhost
 ```
 
-### Other Convenience Shell Scripts
+### Other convenience make commands
 
 Connect to prod or dev mode app server container:
 ```sh
-source shell-scripts/app-[mode].sh
+make app-shell-[mode]
 ```
 
 Connect to prod or dev mode MySQL container:
 ```sh
-source shell-scripts/mysql-[mode].sh
+make mysql-shell-[mode]
 ```
 
 Connect to prod or dev mode Redis container:
 ```sh
-source shell-scripts/redis-[mode].sh
+make redis-shell-[mode]
 ```
 
 
