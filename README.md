@@ -107,10 +107,8 @@ Datastores:
 - Redis
 
 Backend:
-- Nginx
-- uWSGI
-- Supervisor
 - Flask
+- Supervisor
 
 Frontend:
 - Vue.js
