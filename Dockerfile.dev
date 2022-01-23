@@ -22,10 +22,10 @@ COPY config/supervisord.dev.conf /etc/supervisord.conf
 
 # TODO: worry about this later
 # npm installs
-# COPY app/client/package.json /tmp/package.json
-# RUN cd /tmp && \
-# 	npm install && \
-# 	mkdir -p /app/client && \
-# 	cp -a /tmp/node_modules /app/client/
+COPY app/client/package.json /tmp/package.json
+RUN cd /tmp && \
+	npm install && \
+	mkdir -p ./client && \
+	cp -a /tmp/node_modules ./client/
 
 # the rest is handled by the docker-compose.dev.yml file
