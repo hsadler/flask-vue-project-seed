@@ -1,10 +1,8 @@
 
 # Base Data Object
 
-import sys
 import uuid
-import simplejson as json
-import config.config as config
+import json
 
 
 class BaseDataObject():

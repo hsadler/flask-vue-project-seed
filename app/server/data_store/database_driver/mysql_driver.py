@@ -2,9 +2,7 @@
 # MySQL Database Driver
 
 import MySQLdb as mdb
-import config.config as config
 from data_store.database_driver.base_database_driver import BaseDatabaseDriver
-from utils.print import ppp
 
 import time
 

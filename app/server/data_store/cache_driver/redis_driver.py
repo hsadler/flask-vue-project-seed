@@ -2,8 +2,7 @@
 # Redis Cache Driver
 
 import redis
-import simplejson as json
-import config.config as config
+import json
 from data_store.cache_driver.base_cache_driver import BaseCacheDriver
 
 
