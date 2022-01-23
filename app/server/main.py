@@ -16,7 +16,11 @@ app = Flask(
 @app.route('/api/ping', methods=['GET'])
 def handle_ping():
     from api.web.wall_messages_api import get_all
-    return get_all()
+    from utils.print import ppp
+    all = get_all()
+    # TODO: check to see if this works later
+    ppp(all)
+    return all
 
 
 # register api routes
