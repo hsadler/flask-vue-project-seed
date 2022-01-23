@@ -13,6 +13,12 @@ app = Flask(
 )
 
 
+# ping route for testing
+@app.route('/api/ping', methods=['GET'])
+def handle_ping():
+    return jsonify({'hi': 'there'})
+
+
 # register api routes
 from api.web.wall_messages_api import web_wall_messages_api
 app.register_blueprint(web_wall_messages_api, url_prefix='/api/wall-messages')

@@ -2,8 +2,11 @@
 X create Makefile and transfer all shell scripts to use `make`
 X update README to reflect new Makefile commands
 X remove all prod spin-up stuff since it's overly complicated
+- refactor Dockerfile.dev to use official python image and lock install versions
 - bump versions per Dependabot alert list: 
 	https://github.com/hsadler/flask-vue-project-seed/security/dependabot
+	- python packages
+	- npm packages
 - update README with additional information:
 	- how to inspect the DB
 	- how to inspect the redis cache
