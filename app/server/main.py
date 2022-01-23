@@ -2,7 +2,6 @@
 from flask import (
     Flask,
     render_template,
-    jsonify
 )
 
 # init Flask app instance
@@ -16,7 +15,8 @@ app = Flask(
 # ping route for testing
 @app.route('/api/ping', methods=['GET'])
 def handle_ping():
-    return jsonify({'hi': 'there'})
+    from api.web.wall_messages_api import get_all
+    return get_all()
 
 
 # register api routes
