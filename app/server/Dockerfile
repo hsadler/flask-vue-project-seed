@@ -6,19 +6,13 @@ WORKDIR /app
 
 # OS installs, pip installs, etc. (https://pkgs.alpinelinux.org/packages)
 RUN apk add --no-cache \
-    nodejs \
-    npm \
     bash \
     mariadb-dev \
-    build-base \
-    supervisor 
+    build-base 
 
 # copy python requirements file and install packages
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
-
-# custom Supervisord config
-COPY config/supervisord.dev.conf /etc/supervisord.conf
 
 # TODO: worry about this later
 # npm installs
