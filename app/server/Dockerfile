@@ -2,7 +2,7 @@
 # parent image
 FROM python:3.9.10-alpine3.15
 
-WORKDIR /app
+WORKDIR /server
 
 # OS installs, pip installs, etc. (https://pkgs.alpinelinux.org/packages)
 RUN apk add --no-cache \
@@ -10,16 +10,8 @@ RUN apk add --no-cache \
     mariadb-dev \
     build-base 
 
-# copy python requirements file and install packages
+# python requirements
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# TODO: worry about this later
-# npm installs
-# COPY app/client_new/package.json /tmp/package.json
-# RUN cd /tmp && \
-# 	npm install && \
-# 	mkdir -p ./client && \
-# 	cp -a /tmp/node_modules ./client/
-
-# the rest is handled by the docker-compose.dev.yml file
+# the rest is handled by the docker-compose.yaml file

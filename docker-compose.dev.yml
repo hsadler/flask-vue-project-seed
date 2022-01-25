@@ -4,32 +4,18 @@ version: '3'
 
 services:
 
-  # webapp-dev:
-  #   build:
-  #     context: .
-  #     dockerfile: 'Dockerfile.dev'
-  #   image: flask-vue:dev
-  #   container_name: flask-vue-dev
-  #   restart: always
-  #   links:
-  #     - mysql:mysql
-  #     - redis:redis
-  #   ports:
-  #    - "4000:4000"
-  #   volumes:
-  #    - ./app:/app
-  #    - /app/client/node_modules
-  #   environment:
-  #   # flask vars
-  #    - FLASK_HOST=0.0.0.0
-  #    - FLASK_PORT=80
-  #    - FLASK_APP=server/main.py
-  #    - FLASK_DEBUG=1
-  #   # webpack server host and port
-  #    - HOST=0.0.0.0
-  #    - PORT=4000
-  #   # command: /usr/bin/supervisord
-  #   command: 'flask run --host=0.0.0.0 --port=4000'
+  flask-vue-frontend:
+    build:
+      context: ./app/client
+      dockerfile: 'Dockerfile'
+    image: flask-vue-frontend:dev
+    container_name: flask-vue-frontend-dev
+    restart: always
+    ports:
+     - "8080:8080"
+    volumes:
+     - ./app/client:/client
+    command: 'npm run serve'
 
   flask-vue-backend:
     build:
@@ -44,29 +30,11 @@ services:
     ports:
      - "8000:8000"
     volumes:
-     - ./app/server:/app/server
+     - ./app/server:/server
     environment:
-     - FLASK_APP=server/main.py
+     - FLASK_APP=main.py
      - FLASK_DEBUG=1
     command: 'flask run --host=0.0.0.0 --port=8000'
-
-  # flask-vue-frontend:
-  #   build:
-  #     context: ./app/client
-  #     dockerfile: 'Dockerfile'
-  #   image: flask-vue-frontend:dev
-  #   container_name: flask-vue-frontend-dev
-  #   restart: always
-  #   ports:
-  #    - "4000:4000"
-  #   volumes:
-  #    - ./app/client:/app/client
-  #   #  - /app/client/node_modules
-  #   # environment:
-  #   #  - HOST=0.0.0.0
-  #   #  - PORT=4000
-  #   # command: /usr/bin/supervisord
-  #   command: 'npm run serve'
 
   flask-vue-mysql:
     image: mysql:5.7
@@ -85,7 +53,7 @@ services:
     links:
       - flask-vue-mysql:mysql
     ports:
-      - "8080:8080"
+      - "5000:8080"
 
   flask-vue-redis:
     image: redis:4.0.9-alpine
