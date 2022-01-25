@@ -12,5 +12,6 @@ RUN apk add --no-cache \
     bash
 
 COPY ./package.json package.json
+RUN npm i
 
 # the rest is handled by the docker-compose.yaml file
