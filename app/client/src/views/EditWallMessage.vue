@@ -78,7 +78,6 @@ export default {
 }
 </script>
 
-<!--
 <style scoped lang="scss">
   div.edit-wall-message-container {
 
@@ -92,5 +91,3 @@ export default {
 
   }
 </style>
--->
-

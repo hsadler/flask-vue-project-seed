@@ -12,7 +12,6 @@ export default {
 }
 </script>
 
-<!--
 <style scoped lang="scss">
   div.navigation-container {
     padding: 30px;
@@ -25,4 +24,3 @@ export default {
     }
   }
 </style>
--->

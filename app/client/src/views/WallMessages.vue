@@ -67,25 +67,23 @@ export default {
 }
 </script>
 
-<!--
-// <style scoped lang="scss">
-//   div.wall-messages-container {
+<style scoped lang="scss">
+  div.wall-messages-container {
 
-//     section.messages-section {
-//       div.wall-message {
-//         width: 300px;
-//         margin: 10px auto;
-//         padding: 0 20px;
-//         text-align: left;
-//         border: 1px solid gray;
-//         cursor: pointer;
-//       }
-//     }
+    section.messages-section {
+      div.wall-message {
+        width: 300px;
+        margin: 10px auto;
+        padding: 0 20px;
+        text-align: left;
+        border: 1px solid gray;
+        cursor: pointer;
+      }
+    }
 
-//     section.add-message-section {
-//       margin-bottom: 300px;
-//     }
+    section.add-message-section {
+      margin-bottom: 300px;
+    }
 
-//   }
-// </style>
--->
+  }
+</style>
