@@ -19,7 +19,7 @@ contains these basic parts and features:
 
 ### General:
 - Containerized with Docker and Docker Compose
-- Backend and Frontend code built with Webpack
+- Frontend code built with Webpack
 - Example full-stack 'wall message' web application
 
 ### Backend:
@@ -37,16 +37,15 @@ contains these basic parts and features:
 - vue-router
 - Architecture:
   * Services (handle state and business logic, injectable into views and components)
-  * Views (top level web page wrappers)
+  * Views (top level page components)
   * Components (UI building blocks, reusable, nestable)
 
 
 ## More Information:
 
-`make up` runs both a Flask backend server and a webpack frontend server
-simultaneously. The webpack frontend server proxies the Flask backend. The app
-directory is a Docker mounted volume, and changes to backend and client files
-will be automatically reflected.
+`make up` runs a Vue frontend server, a backend JSON API server, a MySQL 
+database, and a Redis cache. Changes to frontend source files and backend source 
+files are automatically reflected via hot-reload.
 
 
 ## Getting started with the full-stack app example:
