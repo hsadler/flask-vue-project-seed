@@ -42,14 +42,13 @@ export default {
   },
   methods: {
     addMessage () {
-      var url = '/api/wall-messages/add-message'
-      var options = {
+      const url = '/api/wall-messages/add-message'
+      const options = {
         message: this.messageBody,
         attribution: this.messageAttribution
       }
-      this.httpService.post(url, options).then((res) => {
-        this.wallMessages.push(res)
-      })
+      const newMessage = this.httpService.post(url, options)
+      this.wallMessages.push(newMessage)
     },
     goToEditMessage (message) {
       this.$router.push({
@@ -58,11 +57,9 @@ export default {
       })
     }
   },
-  created () {
-    var url = '/api/wall-messages/get-all'
-    this.httpService.get(url).then((res) => {
-      this.wallMessages = res
-    })
+  async created () {
+    const url = '/api/wall-messages/get-all'
+    this.wallMessages = await this.httpService.get(url)
   }
 }
 </script>

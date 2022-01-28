@@ -55,25 +55,21 @@ export default {
     }
   },
   methods: {
-    updateWallMessage () {
-      var url = '/api/wall-messages/update-message'
-      var options = {
+    async updateWallMessage () {
+      const url = '/api/wall-messages/update-message'
+      const options = {
         message_uuid: this.wallMessage.uuid,
         message_body: this.messageBody,
         message_attribution: this.messageAttribution
       }
-      this.httpService.post(url, options).then((res) => {
-        this.wallMessage = res
-        this.editingWallMessage = false
-      })
+      this.wallMessage = await this.httpService.post(url, options)
+      this.editingWallMessage = false
     }
   },
-  created () {
+  async created () {
     const messageId = this.$route.params.uuid
-    var url = '/api/wall-messages/find-one?message_uuid=' + messageId
-    this.httpService.get(url).then((res) => {
-      this.wallMessage = res
-    })
+    const url = `/api/wall-messages/find-one?message_uuid=${messageId}`
+    this.wallMessage = await this.httpService.get(url)
   }
 }
 </script>
