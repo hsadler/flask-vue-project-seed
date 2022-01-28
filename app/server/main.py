@@ -1,24 +1,10 @@
 
-from flask import (
-    Flask,
-)
-from flask_cors import (
-    CORS,
-)
+from flask import Flask
+from flask_cors import CORS
 
 # init Flask app instance and configure CORS
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
-
-# ping route for testing
-@app.route('/ping', methods=['GET'])
-def handle_ping():
-    from api.web.wall_messages_api import get_all
-    from utils.print import ppp
-    all = get_all()
-    # TODO: check to see if this works later
-    ppp(all)
-    return all
 
 # register api routes
 from api.web.wall_messages_api import web_wall_messages_api
